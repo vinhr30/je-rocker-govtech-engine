@@ -369,6 +369,22 @@ def find_matches_for_opportunity(opps, fpds, opp) -> list:
     
     opp_url = opp["url"]
     opp_title = opp["title"] or ""
+    title = opp_title.lower()
+
+    KEYWORD_SUPPRESS = {
+        "maintenance", "maint", "repair", "janitorial", "custodial",
+        "grounds", "landscaping", "hvac", "plumbing", "electrical",
+        "construction", "renovation", "roof", "paving", "painting",
+        "facility", "facilities", "building", "structure", "warehouse",
+        "equipment", "hardware", "furniture", "industrial", "machinery",
+        "vehicle", "fleet", "transport", "logistics", "cleaning",
+        "waste", "remediation", "hazardous", "environmental services",
+        "security guard", "armed guard", "unarmed guard"
+    }
+    for kw in KEYWORD_SUPPRESS:
+        if kw in title:
+            return None  # reject immediately
+
     opp_agency = normalize_agency(opp["agency"] or "")
     opp_naics = opp["naics_code"] or ""
     opp_psc = normalize_psc_code(opp["psc_code"] or "")
