@@ -256,6 +256,28 @@ def coerce_award_value(value) -> float:
 
 def score_govtech_match(opp_title: str, opp_agency: str, opp_naics: str, opp_psc: str, row):
     """Apply the shared GovTech scoring/suppression model to one FPDS row."""
+    SIMILARITY_FLOOR = 0.32
+    REJECTION_THRESHOLD = 0.18
+
+    # Reject if FPDS row is missing.
+    if not row:
+        return None
+
+    psc_code_raw = row["product_or_service_code"] if "product_or_service_code" in row.keys() else None
+    naics_code_raw = row["naics_code"] if "naics_code" in row.keys() else None
+    agency_raw = row["awarding_agency_name"] if "awarding_agency_name" in row.keys() else None
+    state_raw = row["place_of_performance_state"] if "place_of_performance_state" in row.keys() else (
+        row["primary_place_of_performance_state_name"] if "primary_place_of_performance_state_name" in row.keys() else None
+    )
+
+    # Reject if no FPDS fields exist.
+    if not any([psc_code_raw, naics_code_raw, agency_raw, state_raw]):
+        return None
+
+    # Reject title-only matches with no PSC and no NAICS on the FPDS row.
+    if psc_code_raw is None and naics_code_raw is None:
+        return None
+
     opp_naics_norm = normalize_naics_code(opp_naics)
     opp_psc_norm = normalize_psc_code(opp_psc)
 
@@ -265,7 +287,7 @@ def score_govtech_match(opp_title: str, opp_agency: str, opp_naics: str, opp_psc
     fpds_title = row["transaction_description"] if "transaction_description" in row.keys() else ""
     fpds_title = fpds_title or ""
 
-    fpds_psc = row["product_or_service_code"] if "product_or_service_code" in row.keys() else ""
+    fpds_psc = psc_code_raw or ""
     fpds_psc = normalize_psc_code(fpds_psc or "")
 
     psc_code = fpds_psc
@@ -293,7 +315,7 @@ def score_govtech_match(opp_title: str, opp_agency: str, opp_naics: str, opp_psc
     if fpds_psc in SUPPRESS_PSC:
         return None
 
-    fpds_naics = row["naics_code"] if "naics_code" in row.keys() else ""
+    fpds_naics = naics_code_raw or ""
     fpds_naics_norm = normalize_naics_code(fpds_naics or "")
 
     naics_code = fpds_naics_norm
@@ -343,10 +365,12 @@ def score_govtech_match(opp_title: str, opp_agency: str, opp_naics: str, opp_psc
     if award_value < 250000:
         score += 15
 
-    similarity = title_similarity(opp_title, fpds_title)
-    if similarity < 0.12:
+    similarity_score = title_similarity(opp_title, fpds_title)
+    if similarity_score < REJECTION_THRESHOLD:
         return None
-    score += int(similarity * 30)
+    if similarity_score < SIMILARITY_FLOOR:
+        return None
+    score += int(similarity_score * 30)
 
     score = max(0, min(score, 100))
     if score < 55:
@@ -354,7 +378,7 @@ def score_govtech_match(opp_title: str, opp_agency: str, opp_naics: str, opp_psc
 
     return {
         "score": score,
-        "similarity": similarity,
+        "similarity": similarity_score,
         "fpds_title": fpds_title,
     }
 
