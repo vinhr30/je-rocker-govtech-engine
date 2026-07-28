@@ -267,6 +267,29 @@ def score_govtech_match(opp_title: str, opp_agency: str, opp_naics: str, opp_psc
 
     fpds_psc = row["product_or_service_code"] if "product_or_service_code" in row.keys() else ""
     fpds_psc = normalize_psc_code(fpds_psc or "")
+
+    psc_code = fpds_psc
+    PSC_SUPPRESS = {
+        "6515", "7030", "7050", "7035", "7025", "7010", "7110", "7045", "7125", "7022", "7021", "7020",
+        "5810", "5836", "5820", "5805", "5895", "5841", "5840", "5821", "5845", "5830",
+        "5998", "5999", "5975", "5965", "5935", "5930",
+        "6650", "6640", "6530", "6525", "6350", "6120", "6015",
+        "3611", "3444", "1730", "1290",
+        "9905", "7510", "6720", "6710", "6610", "6605",
+        "Z2AA", "Z1DB", "S205", "W070", "W061", "T016", "T001",
+        "J065", "J066", "J070", "J059", "J099", "J074", "J063", "J058", "J016", "J045",
+        "N059", "N063", "N065", "N070", "N061",
+        "K023", "K070",
+        "7B22", "7G20", "7E20", "7A21", "7G21", "7B20", "7A20",
+        "H361", "H249",
+        "U099", "U008", "U012", "U009", "U006",
+        "F999", "F108", "F099",
+        "B529", "B519", "B517", "B507",
+        "X1AZ", "V999"
+    }
+    if psc_code in PSC_SUPPRESS:
+        return None  # reject this FPDS match immediately
+
     if fpds_psc in SUPPRESS_PSC:
         return None
 
