@@ -295,6 +295,19 @@ def score_govtech_match(opp_title: str, opp_agency: str, opp_naics: str, opp_psc
 
     fpds_naics = row["naics_code"] if "naics_code" in row.keys() else ""
     fpds_naics_norm = normalize_naics_code(fpds_naics or "")
+
+    naics_code = fpds_naics_norm
+    NAICS_SUPPRESS = {
+        "236220", "238320", "238210", "238990", "238290",
+        "562112", "562910",
+        "337215", "334614", "334290", "334210", "333298", "333293", "332999", "325412",
+        "484210", "443120", "424110", "453998",
+        "722310", "711510", "812930",
+        "811310", "811213"
+    }
+    if naics_code in NAICS_SUPPRESS:
+        return None  # reject this FPDS match immediately
+
     if fpds_naics_norm in SUPPRESS_NAICS:
         return None
 
