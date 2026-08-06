@@ -120,10 +120,18 @@ function tableExists(db, tableName) {
   });
 }
 
+function isSoftSqliteSchemaError(err) {
+  if (!err || !err.message) return false;
+  return /SQLITE_ERROR: no such table:/i.test(err.message) || /SQLITE_ERROR: no such column:/i.test(err.message);
+}
+
 function allAsync(db, sql, params = []) {
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err, rows) => {
-      if (err) return reject(err);
+      if (err) {
+        if (isSoftSqliteSchemaError(err)) return resolve([]);
+        return reject(err);
+      }
       resolve(rows);
     });
   });
@@ -132,7 +140,10 @@ function allAsync(db, sql, params = []) {
 function getAsync(db, sql, params = []) {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err, row) => {
-      if (err) return reject(err);
+      if (err) {
+        if (isSoftSqliteSchemaError(err)) return resolve(null);
+        return reject(err);
+      }
       resolve(row);
     });
   });
