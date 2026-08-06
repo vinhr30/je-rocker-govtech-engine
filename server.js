@@ -30,6 +30,75 @@ clientDb.serialize(() => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  clientDb.get('SELECT COUNT(*) AS count FROM clients', (countErr, row) => {
+    if (countErr) {
+      console.error('[clientDb] failed to read clients count:', countErr.message);
+      return;
+    }
+
+    if (Number(row?.count || 0) > 0) {
+      return;
+    }
+
+    const insertSql = `
+      INSERT INTO clients (
+        client_name, uei, duns, naics, keywords,
+        contact_name, contact_email, contact_phone,
+        preferred_agencies, past_performance, notes
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const dummyClients = [
+      [
+        'Atlas Federal Services',
+        'ATLASFED12345',
+        '123456789',
+        '541519,541611,561210',
+        'IT modernization, cloud migration, program management',
+        'Jordan Miles',
+        'jmiles@atlasfederal.com',
+        '(202) 555-0110',
+        'Department of Defense; VA; DHS',
+        'Prime support on enterprise modernization and service desk delivery.',
+        'Strong incumbent displacement strategy with agile delivery emphasis.'
+      ],
+      [
+        'Northline Consulting Group',
+        'NORTHLINE67890',
+        '987654321',
+        '541330,541512,541690',
+        'engineering analytics, mission support, technical integration',
+        'Casey Nguyen',
+        'cnguyen@northlinecg.com',
+        '(703) 555-0142',
+        'USAF; Navy; GSA',
+        'Sub and prime roles across technical studies and systems integration.',
+        'Focus on recompete captures with teaming partner optionality.'
+      ],
+      [
+        'Blue Harbor Solutions',
+        'BLUEHARBOR2468',
+        '246813579',
+        '561110,541618,541611',
+        'operations support, acquisition advisory, process optimization',
+        'Alex Rivera',
+        'arivera@blueharborsolutions.com',
+        '(571) 555-0197',
+        'HHS; USDA; Department of State',
+        'Operational improvement and acquisition support across civilian agencies.',
+        'Best fit for service contracts with structured transition requirements.'
+      ],
+    ];
+
+    dummyClients.forEach((record) => {
+      clientDb.run(insertSql, record, (insertErr) => {
+        if (insertErr) {
+          console.error('[clientDb] failed to insert dummy client:', insertErr.message);
+        }
+      });
+    });
+  });
 });
 
 const PSC_SUPPRESS = new Set(['S200', 'S201', 'S202', 'S203', 'S204', 'S205', 'S206', 'S207']);

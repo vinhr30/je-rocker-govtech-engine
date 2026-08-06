@@ -1,0 +1,14 @@
+.intake-page {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #050b1a 0%, #0b1328 55%, #040711 100%);
+  color: #dff6ff;
+  padding: 24px;
+}
+
+.intake-card {
+  border: 1px solid rgba(53, 234, 255, 0.35);
+  border-radius: 8px;
+  padding: 16px;
+  background: rgba(4, 17, 33, 0.8);
+  box-shadow: 0 0 24px rgba(53, 234, 255, 0.16);
+}
