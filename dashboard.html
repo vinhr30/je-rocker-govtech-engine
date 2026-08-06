@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Contract Concierge – The Contract Intelligence Partner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: #0f2438;
+    color: #ffffff;
+  }
+
+  /* ================= HERO SECTION ================= */
+  .cover-hero {
+    text-align: center;
+    padding: 60px 20px 40px 20px;
+    background: #0b1a2a;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .hero-title {
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+  }
+
+  .hero-subtitle {
+    font-size: 20px;
+    opacity: 0.85;
+    margin-bottom: 30px;
+  }
+
+  .hero-metrics {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    flex-wrap: wrap;
+  }
+
+  .metric {
+    text-align: center;
+    padding: 10px 20px;
+  }
+
+  .metric-number {
+    font-size: 30px;
+    font-weight: 700;
+    color: #4da3ff;
+  }
+
+  .metric-label {
+    font-size: 12px;
+    opacity: 0.75;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* ================= COVER PAGE ================= */
+  #coverPage {
+    min-height: 100vh;
+    padding: 0 24px 40px 24px;
+    background: linear-gradient(180deg, #071524, #0f2438);
+  }
+
+  .cover-container {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+    margin-top: 40px;
+  }
+
+  .panel {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px;
+    padding: 22px 20px;
+    backdrop-filter: blur(6px);
+  }
+
+  .panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9fc5ff;
+    margin-bottom: 8px;
+  }
+
+  .panel-heading {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .panel-text {
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  .bullet-list {
+    margin: 10px 0 0 0;
+    padding-left: 18px;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  .bullet-list li {
+    margin-bottom: 6px;
+  }
+
+  .divider {
+    width: 60px;
+    height: 3px;
+    background: #4da3ff;
+    border-radius: 2px;
+    margin: 12px 0 18px 0;
+  }
+
+  .vendor-select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    color: #111827;
+    margin-bottom: 16px;
+  }
+
+  .launch-button {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: none;
+    background: #4da3ff;
+    color: #071524;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .launch-button:hover {
+    background: #6bb4ff;
+  }
+
+  .cover-footer {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ================= DASHBOARD ================= */
+  #dashboardPage {
+    display: none;
+    height: 100vh;
+    background: #0b1826;
+  }
+
+  .dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    background: #071524;
+  }
+
+  .back-button {
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.4);
+    background: transparent;
+    color: #ffffff;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .filter-group {
+    display: inline-flex;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.25);
+    overflow: hidden;
+    font-size: 11px;
+  }
+
+  .filter-chip {
+    padding: 5px 10px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    opacity: 0.7;
+  }
+
+  .filter-chip.active {
+    background: #4da3ff;
+    color: #071524;
+    opacity: 1;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 280px 260px minmax(0, 1fr);
+    height: calc(100vh - 46px);
+  }
+
+  .left-panel,
+  .middle-panel,
+  .right-panel {
+    padding: 18px;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    overflow-y: auto;
+  }
+
+  .right-panel {
+    border-right: none;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .section-subtitle {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-bottom: 14px;
+  }
+
+  .vendor-meta {
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.9;
+    margin-bottom: 6px;
+  }
+
+  .tag-row {
+    margin: 10px 0;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.25);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.85;
+    margin-right: 4px;
+    margin-bottom: 4px;
+  }
+
+  .match-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+
+  .match-card:hover {
+    background: rgba(255,255,255,0.10);
+  }
+
+  .match-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .match-subtitle {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-bottom: 6px;
+  }
+
+  .match-meta {
+    font-size: 11px;
+    opacity: 0.75;
+    line-height: 1.4;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    padding: 16px 14px;
+    margin-bottom: 12px;
+  }
+
+  .intel-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.7;
+    margin-top: 8px;
+  }
+
+  .intel-value {
+    font-size: 13px;
+    margin-top: 2px;
+    margin-bottom: 4px;
+  }
+
+  .intel-subsection-title {
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 10px;
+    margin-bottom: 4px;
+  }
+
+  .intel-list {
+    margin: 0 0 4px 0;
+    padding-left: 16px;
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .intel-list li {
+    margin-bottom: 3px;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ================= HERO SECTION ================= -->
+<div class="cover-hero">
+  <div class="hero-title">Contract Concierge</div>
+  <div class="hero-subtitle">the Contract Intelligence Partner</div>
+
+  <div class="hero-metrics">
+    <div class="metric">
+      <div class="metric-number">166,000+</div>
+      <div class="metric-label">Vendors Analyzed</div>
+    </div>
+    <div class="metric">
+      <div class="metric-number">100+</div>
+      <div class="metric-label">Federal Agencies</div>
+    </div>
+    <div class="metric">
+      <div class="metric-number">$1.2T</div>
+      <div class="metric-label">Annual Federal Spend</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= COVER PAGE ================= -->
+<div id="coverPage">
+
+  <div class="cover-container">
+
+    <!-- Panel 1 -->
+    <div class="panel">
+      <div class="panel-title">Mission Brief</div>
+      <div class="panel-heading">See your world in our engine</div>
+      <p class="panel-text">
+        This platform turns fragmented contract data into a single, readable picture of your position in the federal market.
+      </p>
+      <ul class="bullet-list">
+        <li>Understand where you fit in the landscape.</li>
+        <li>See patterns that are hard to spot manually.</li>
+        <li>Give leadership a clear view of risk and opportunity.</li>
+      </ul>
+    </div>
+
+    <!-- Panel 2 -->
+    <div class="panel">
+      <div class="panel-heading">Vendor Intelligence Platform</div>
+      <div class="panel-text">Federal‑grade analytics for every contractor.</div>
+      <div class="divider"></div>
+
+      <select id="vendorSelect" class="vendor-select"></select>
+
+      <button class="launch-button" onclick="goToDashboard()">
+        Launch Dashboard
+      </button>
+    </div>
+
+    <!-- Panel 3 -->
+    <div class="panel">
+      <div class="panel-title">What We Surface</div>
+      <div class="panel-heading">Intel you can act on</div>
+      <ul class="bullet-list">
+        <li>Fit score against upcoming opportunities.</li>
+        <li>Risk indicators from award patterns.</li>
+        <li>Competition level and recurring rivals.</li>
+        <li>Spend history and trend lines.</li>
+        <li>Rebid likelihood and strategy cues.</li>
+      </ul>
+    </div>
+
+    <div class="cover-footer">
+      Powered by AI · Vendor Intel Dashboard
+    </div>
+  </div>
+</div>
+
+<!-- ================= DASHBOARD PAGE ================= -->
+<div id="dashboardPage">
+
+  <div class="dashboard-header">
+    <button class="back-button" onclick="goBackToCover()">← Back to cover</button>
+
+    <div>
+      <span style="font-size:12px;opacity:0.8;margin-right:8px;">Scope:</span>
+      <div class="filter-group">
+        <button id="filterLocal" class="filter-chip" onclick="setFilter('local')">Local (AZ)</button>
+        <button id="filterNational" class="filter-chip" onclick="setFilter('national')">National</button>
+        <button id="filterAll" class="filter-chip active" onclick="setFilter('all')">All</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+
+    <!-- LEFT PANEL — Vendor Profile -->
+    <div class="left-panel">
+      <div class="section-title" id="vendorName">Vendor Name</div>
+      <div class="section-subtitle" id="vendorType">Vendor Type</div>
+
+      <div class="vendor-meta"><strong>Location:</strong> <span id="vendorLocation"></span></div>
+      <div class="vendor-meta"><strong>Primary NAICS:</strong> <span id="vendorNaics"></span></div>
+      <div class="vendor-meta"><strong>Past Awards:</strong> <span id="vendorAwards"></span></div>
+      <div class="vendor-meta"><strong>Footprint:</strong> <span id="vendorFootprint"></span></div>
+
+      <div class="tag-row" id="vendorTags"></div>
+
+      <div class="vendor-meta" style="margin-top:10px;" id="vendorSummary"></div>
+    </div>
+
+    <!-- MIDDLE PANEL — Matches -->
+    <div class="middle-panel">
+      <div class="section-title">Matches</div>
+      <div class="section-subtitle">Top aligned opportunities for this vendor (filtered by scope).</div>
+      <div id="matchList"></div>
+    </div>
+
+    <!-- RIGHT PANEL — Full Intel Panel -->
+    <div class="right-panel">
+      <div class="card">
+        <div class="section-title">Opportunity Intel</div>
+
+        <div class="intel-label">Title</div>
+        <div class="intel-value" id="intelTitle"></div>
+
+        <div class="intel-label">Agency / Place / Scope</div>
+        <div class="intel-value" id="intelMeta"></div>
+
+        <div class="intel-label">Value / Deadline / Set-Aside / Type</div>
+        <div class="intel-value" id="intelValue"></div>
+
+        <div class="intel-subsection-title">Key Factors</div>
+        <ul id="intelFactors" class="intel-list"></ul>
+
+        <div class="intel-subsection-title">Risks</div>
+        <ul id="intelRisks" class="intel-list"></ul>
+
+        <div class="intel-subsection-title">Strategy</div>
+        <ul id="intelStrategyList" class="intel-list"></ul>
+
+        <div class="intel-subsection-title">Fit & Risk</div>
+        <div class="intel-value" id="intelFitRisk"></div>
+
+        <div class="intel-subsection-title">Alignment</div>
+        <ul id="intelAlignment" class="intel-list"></ul>
+
+        <div class="intel-subsection-title">Bid Recommendation</div>
+        <div class="intel-value" id="intelBidRec"></div>
+        <ul id="intelBidWhy" class="intel-list"></ul>
+
+        <div class="intel-subsection-title">Suggested Partners</div>
+        <ul id="intelPartners" class="intel-list"></ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- ============================
+     SECTION 2 — VENDOR + MATCH DATA
+     ============================ -->
+<script>
+const vendors = {
+  acme: {
+    name: "ACME Construction",
+    type: "General Contractor",
+    location: "Phoenix, AZ",
+    naics: "236220",
+    pastAwards: "18 federal awards",
+    footprint: "Southwest + selective nationwide",
+    summary: "ACME specializes in federal vertical construction, renovations, and facility upgrades with a strong VA and USACE track record.",
+    tags: ["Construction", "Renovation", "Facilities", "VA", "USACE"],
+    matches: [
+      {
+        title: "VA Phoenix Medical Center – Parking Structure Expansion",
+        subtitle: "Design-build expansion of structured parking and site improvements",
+        agency: "Department of Veterans Affairs",
+        value: "$8.5M",
+        deadline: "08/12/2026",
+        place: "Phoenix, AZ",
+        scope: "local",
+        setAside: "SDVOSB",
+        contractType: "Design-Build, Firm-Fixed-Price",
+        factors: [
+          "Past performance on VA medical facilities",
+          "Phasing and continuity of operations",
+          "Safety and infection control near active hospital"
+        ],
+        risks: [
+          "Tight phasing around active patient traffic",
+          "Coordination with multiple VA stakeholders",
+          "Potential supply chain volatility for structural steel"
+        ],
+        strategyBullets: [
+          "Highlight prior VA Phoenix and Prescott work with strong CPARS",
+          "Show detailed phasing plan minimizing disruption",
+          "Emphasize local subcontractor network and rapid response"
+        ],
+        alignment: [
+          "NAICS 236220 direct match",
+          "Local presence in Phoenix",
+          "Documented VA healthcare construction experience"
+        ],
+        bidWhy: [
+          "High fit with past performance and geography",
+          "Strong differentiation via VA-specific experience",
+          "Good revenue with manageable risk profile"
+        ],
+        partners: [
+          "Local structural engineering firm",
+          "Traffic control specialist",
+          "Parking systems integrator"
+        ],
+        fitScore: 93,
+        riskScore: 22,
+        compLevel: "Medium",
+        bidRec: "Strongly pursue as a priority capture"
+      },
+      {
+        title: "USACE – Border Region Vehicle Maintenance Facility",
+        subtitle: "New construction of maintenance and support facility",
+        agency: "U.S. Army Corps of Engineers",
+        value: "$19.2M",
+        deadline: "09/05/2026",
+        place: "Yuma, AZ",
+        scope: "local",
+        setAside: "Small Business",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "Experience with secure federal facilities",
+          "Schedule and cost control",
+          "Coordination with CBP and USACE stakeholders"
+        ],
+        risks: [
+          "Remote site logistics in border region",
+          "Potential design clarifications during construction",
+          "Security and access constraints"
+        ],
+        strategyBullets: [
+          "Leverage prior USACE Southwest Division work",
+          "Show strong QC/QA and safety program",
+          "Propose experienced superintendent with USACE background"
+        ],
+        alignment: [
+          "Strong match to heavy vertical construction capabilities",
+          "Regional presence in Arizona",
+          "Experience with secure and controlled facilities"
+        ],
+        bidWhy: [
+          "Strategic USACE relationship opportunity",
+          "Good size for ACME’s bonding and capacity",
+          "Supports long-term federal footprint in AZ"
+        ],
+        partners: [
+          "Security systems subcontractor",
+          "Civil/site work specialist",
+          "Mechanical systems integrator"
+        ],
+        fitScore: 88,
+        riskScore: 28,
+        compLevel: "High",
+        bidRec: "Pursue with disciplined pricing and strong teaming"
+      },
+      {
+        title: "GSA Region 9 – Federal Courthouse Interior Modernization",
+        subtitle: "Phased renovation of occupied federal courthouse",
+        agency: "General Services Administration (GSA) Region 9",
+        value: "$6.1M",
+        deadline: "07/30/2026",
+        place: "Tucson, AZ",
+        scope: "local",
+        setAside: "8(a) Competitive",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "Experience in occupied federal buildings",
+          "Security coordination with USMS and court operations",
+          "Finish quality and schedule adherence"
+        ],
+        risks: [
+          "Complex phasing around court calendars",
+          "Limited work windows and access",
+          "Potential change orders from tenant agencies"
+        ],
+        strategyBullets: [
+          "Show detailed phasing tied to court schedules",
+          "Highlight prior courthouse or secure facility work",
+          "Emphasize communication plan with GSA and tenants"
+        ],
+        alignment: [
+          "Strong fit with interior renovation capabilities",
+          "Regional presence and courthouse experience",
+          "Ability to manage complex stakeholder environment"
+        ],
+        bidWhy: [
+          "High visibility GSA project in AZ",
+          "Good margin potential with careful change management",
+          "Strengthens relationship with GSA Region 9"
+        ],
+        partners: [
+          "Specialty millwork subcontractor",
+          "Security door/hardware vendor",
+          "Acoustical consultant"
+        ],
+        fitScore: 90,
+        riskScore: 30,
+        compLevel: "Medium",
+        bidRec: "Pursue with strong PM and superintendent assignment"
+      },
+      {
+        title: "USACE – Nationwide MATOC for Facility Renovations",
+        subtitle: "Multiple-award task order contract for renovations and repairs",
+        agency: "U.S. Army Corps of Engineers",
+        value: "$75M (MATOC ceiling)",
+        deadline: "10/10/2026",
+        place: "Nationwide (Southwest focus)",
+        scope: "national",
+        setAside: "Small Business",
+        contractType: "IDIQ, Task Order Based",
+        factors: [
+          "Depth of past performance across multiple locations",
+          "Capacity to manage concurrent task orders",
+          "Safety and quality systems"
+        ],
+        risks: [
+          "Uncertain task order volume",
+          "Geographically dispersed work",
+          "Need to scale management quickly"
+        ],
+        strategyBullets: [
+          "Position as regional anchor with scalable teaming",
+          "Highlight systems for managing multiple task orders",
+          "Show strong safety and QA/QC metrics"
+        ],
+        alignment: [
+          "Aligns with ACME’s growth strategy beyond AZ",
+          "Leverages existing USACE relationships",
+          "Supports long-term pipeline stability"
+        ],
+        bidWhy: [
+          "Strategic contract vehicle for future work",
+          "High ceiling with flexible tasking",
+          "Competitive but worth the investment"
+        ],
+        partners: [
+          "Regional specialty subcontractor network",
+          "Nationwide safety consultant",
+          "Scheduling and controls specialist"
+        ],
+        fitScore: 86,
+        riskScore: 35,
+        compLevel: "High",
+        bidRec: "Strategic pursue; invest in strong proposal"
+      },
+      {
+        title: "VA Prescott – Clinic Wing Renovation and Expansion",
+        subtitle: "Renovation and small addition to outpatient clinic wing",
+        agency: "Department of Veterans Affairs",
+        value: "$3.2M",
+        deadline: "08/28/2026",
+        place: "Prescott, AZ",
+        scope: "local",
+        setAside: "VOSB",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "Healthcare construction experience",
+          "Infection control and phasing",
+          "Coordination with clinical operations"
+        ],
+        risks: [
+          "Work in active clinical environment",
+          "Strict infection control requirements",
+          "Potential scope clarifications during construction"
+        ],
+        strategyBullets: [
+          "Leverage prior VA clinic renovation experience",
+          "Show detailed infection control and phasing plan",
+          "Highlight local presence and rapid response"
+        ],
+        alignment: [
+          "Direct match to ACME’s healthcare portfolio",
+          "Local geography and existing VA familiarity",
+          "Strong fit for size and complexity"
+        ],
+        bidWhy: [
+          "High win probability with right teaming",
+          "Supports deepening VA relationship",
+          "Good margin potential with controlled risk"
+        ],
+        partners: [
+          "Mechanical/HVAC healthcare specialist",
+          "Infection control consultant",
+          "Local electrical subcontractor"
+        ],
+        fitScore: 95,
+        riskScore: 20,
+        compLevel: "Medium",
+        bidRec: "Top-priority pursue"
+      }
+    ]
+  },
+
+  boss: {
+    name: "Boss Roofing",
+    type: "Roofing Contractor",
+    location: "Mesa, AZ",
+    naics: "238160",
+    pastAwards: "9 federal awards",
+    footprint: "Arizona + Southwest",
+    summary: "Boss Roofing focuses on federal roofing replacement, repair, and envelope maintenance for facilities across Arizona and the Southwest.",
+    tags: ["Roofing", "Maintenance", "Envelope", "GSA", "VA"],
+    matches: [
+      {
+        title: "GSA Region 9 – Phoenix Federal Building Roof Replacement",
+        subtitle: "Full tear-off and replacement of low-slope roofing system",
+        agency: "General Services Administration (GSA) Region 9",
+        value: "$1.8M",
+        deadline: "07/25/2026",
+        place: "Phoenix, AZ",
+        scope: "local",
+        setAside: "Small Business",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "Experience with occupied federal buildings",
+          "Safety and fall protection plan",
+          "Warranty and roofing system qualifications"
+        ],
+        risks: [
+          "Weather and heat conditions in Phoenix",
+          "Coordination with building tenants",
+          "Potential unforeseen deck repairs"
+        ],
+        strategyBullets: [
+          "Highlight prior GSA roofing projects in AZ",
+          "Show strong safety metrics and heat mitigation plan",
+          "Propose proven roofing system with extended warranty"
+        ],
+        alignment: [
+          "Direct NAICS and capability match",
+          "Local presence in Phoenix metro",
+          "Strong fit with past GSA work"
+        ],
+        bidWhy: [
+          "High fit and manageable size",
+          "Good margin potential with efficient crew",
+          "Strengthens GSA Region 9 relationship"
+        ],
+        partners: [
+          "Roofing manufacturer rep",
+          "Safety consultant for fall protection",
+          "Local waste/haul-off provider"
+        ],
+        fitScore: 92,
+        riskScore: 24,
+        compLevel: "Medium",
+        bidRec: "Strongly pursue"
+      },
+      {
+        title: "VA Prescott – Roof Replacement and Envelope Repairs",
+        subtitle: "Replacement of multiple roof sections and flashing upgrades",
+        agency: "Department of Veterans Affairs",
+        value: "$1.1M",
+        deadline: "08/10/2026",
+        place: "Prescott, AZ",
+        scope: "local",
+        setAside: "VOSB",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "Healthcare facility experience",
+          "Phasing to minimize disruption",
+          "Infection control near sensitive areas"
+        ],
+        risks: [
+          "Work near patient care areas",
+          "Potential hidden conditions under existing roofing",
+          "Weather variability in Prescott"
+        ],
+        strategyBullets: [
+          "Leverage prior VA roofing and envelope work",
+          "Show detailed phasing and protection plan",
+          "Highlight experience with healthcare environments"
+        ],
+        alignment: [
+          "Strong match to roofing specialization",
+          "Regional presence and VA familiarity",
+          "Good size for existing crews"
+        ],
+        bidWhy: [
+          "High probability of win with right teaming",
+          "Supports ongoing VA relationship",
+          "Repeatable scope aligned with core business"
+        ],
+        partners: [
+          "Infection control consultant",
+          "Local crane service",
+          "Roofing manufacturer technical rep"
+        ],
+        fitScore: 90,
+        riskScore: 26,
+        compLevel: "Medium",
+        bidRec: "Pursue as a core opportunity"
+      },
+      {
+        title: "USDA – Roof Repairs at Multiple Ranger Stations",
+        subtitle: "Task-order based repairs and replacements across Region 3",
+        agency: "U.S. Department of Agriculture – Forest Service Region 3",
+        value: "$4.5M (IDIQ ceiling)",
+        deadline: "09/02/2026",
+        place: "Arizona & New Mexico",
+        scope: "national",
+        setAside: "Small Business",
+        contractType: "IDIQ, Task Order Based",
+        factors: [
+          "Ability to service remote locations",
+          "Response time and mobilization",
+          "Experience with small facility portfolios"
+        ],
+        risks: [
+          "Remote access and travel time",
+          "Variable site conditions",
+          "Uncertain task order volume"
+        ],
+        strategyBullets: [
+          "Highlight ability to serve rural AZ/NM locations",
+          "Show flexible crew deployment model",
+          "Emphasize experience with IDIQ/task order work"
+        ],
+        alignment: [
+          "Aligns with Boss Roofing’s regional footprint",
+          "Supports recurring revenue model",
+          "Good fit for small to mid-size tasks"
+        ],
+        bidWhy: [
+          "Strategic vehicle for steady roofing work",
+          "Moderate risk with good planning",
+          "Builds relationship with USFS Region 3"
+        ],
+        partners: [
+          "Regional scaffolding provider",
+          "Local subs in remote areas",
+          "Logistics/transport partner"
+        ],
+        fitScore: 85,
+        riskScore: 32,
+        compLevel: "Medium",
+        bidRec: "Pursue as strategic IDIQ"
+      },
+      {
+        title: "DHS – Border Patrol Station Roof Replacement",
+        subtitle: "Roof replacement and drainage improvements at border facility",
+        agency: "Department of Homeland Security – CBP",
+        value: "$2.6M",
+        deadline: "09/18/2026",
+        place: "Nogales, AZ",
+        scope: "local",
+        setAside: "Small Business",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "Experience with secure facilities",
+          "Access and security coordination",
+          "Schedule and weather resilience"
+        ],
+        risks: [
+          "Security constraints and limited access windows",
+          "Border region logistics",
+          "Potential scope changes from CBP"
+        ],
+        strategyBullets: [
+          "Highlight any prior DHS/CBP or secure facility work",
+          "Show strong security compliance plan",
+          "Emphasize reliable schedule and contingency planning"
+        ],
+        alignment: [
+          "Good match to roofing and envelope expertise",
+          "Regional presence in southern AZ",
+          "Supports entry into DHS/CBP portfolio"
+        ],
+        bidWhy: [
+          "Strategic foothold with DHS",
+          "Good project size for existing capacity",
+          "Moderate risk with proper planning"
+        ],
+        partners: [
+          "Security-cleared crew leads",
+          "Local security escort provider",
+          "Drainage design consultant"
+        ],
+        fitScore: 87,
+        riskScore: 30,
+        compLevel: "High",
+        bidRec: "Selective pursue with strong planning"
+      },
+      {
+        title: "GSA Region 9 – Roof Coating and Preventive Maintenance Program",
+        subtitle: "Multi-year roof coating and maintenance across AZ facilities",
+        agency: "General Services Administration (GSA) Region 9",
+        value: "$7.8M (IDIQ ceiling)",
+        deadline: "10/01/2026",
+        place: "Arizona (multiple cities)",
+        scope: "national",
+        setAside: "Small Business",
+        contractType: "IDIQ, Task Order Based",
+        factors: [
+          "Programmatic maintenance experience",
+          "Coverage across multiple locations",
+          "Reporting and asset management"
+        ],
+        risks: [
+          "Uncertain task order timing",
+          "Need to manage multiple small projects",
+          "Weather and seasonal constraints"
+        ],
+        strategyBullets: [
+          "Position as GSA’s go-to AZ roofing partner",
+          "Show scalable crew model and dispatch capability",
+          "Emphasize digital reporting and asset tracking"
+        ],
+        alignment: [
+          "Aligns with recurring maintenance business model",
+          "Leverages AZ-wide footprint",
+          "Supports long-term relationship with GSA"
+        ],
+        bidWhy: [
+          "High strategic value as a program contract",
+          "Good revenue potential over multiple years",
+          "Moderate risk with proper resource planning"
+        ],
+        partners: [
+          "Roof coating manufacturer",
+          "Inspection and drone survey partner",
+          "Regional safety consultant"
+        ],
+        fitScore: 89,
+        riskScore: 33,
+        compLevel: "High",
+        bidRec: "Strategic pursue; invest in strong proposal"
+      }
+    ]
+  },
+
+  swit: {
+    name: "Southwest IT Solutions",
+    type: "IT Services",
+    location: "Tempe, AZ",
+    naics: "541512",
+    pastAwards: "22 federal awards",
+    footprint: "Nationwide",
+    summary: "Southwest IT Solutions delivers IT modernization, cybersecurity, and cloud services to civilian and defense agencies.",
+    tags: ["Cybersecurity", "Cloud", "IT Modernization", "Zero Trust"],
+    matches: [
+      {
+        title: "VA OIT – Clinic Network Modernization (Region 4)",
+        subtitle: "Upgrade network infrastructure and security at outpatient clinics",
+        agency: "Department of Veterans Affairs – OIT",
+        value: "$4.2M",
+        deadline: "08/20/2026",
+        place: "Arizona & New Mexico (multiple sites)",
+        scope: "national",
+        setAside: "SDVOSB",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "Healthcare IT experience",
+          "Network modernization and segmentation",
+          "Security and compliance (FISMA, HIPAA)"
+        ],
+        risks: [
+          "Work in active clinical environments",
+          "Coordination with local IT and clinical staff",
+          "Tight deployment windows"
+        ],
+        strategyBullets: [
+          "Highlight prior VA and healthcare IT work",
+          "Show strong security and compliance credentials",
+          "Emphasize phased rollout with minimal downtime"
+        ],
+        alignment: [
+          "Direct match to network modernization capabilities",
+          "Regional familiarity with AZ/NM",
+          "Strong fit for size and complexity"
+        ],
+        bidWhy: [
+          "High strategic value within VA OIT",
+          "Good revenue with repeatable scope",
+          "Supports long-term VA relationship"
+        ],
+        partners: [
+          "Network hardware OEM partner",
+          "Local field services subcontractors",
+          "Security compliance consultant"
+        ],
+        fitScore: 91,
+        riskScore: 27,
+        compLevel: "High",
+        bidRec: "Strongly pursue"
+      },
+      {
+        title: "DHS – Zero Trust Pilot for Southwest Field Offices",
+        subtitle: "Design and implement Zero Trust architecture pilot",
+        agency: "Department of Homeland Security",
+        value: "$9.8M",
+        deadline: "09/12/2026",
+        place: "Southwest Region (AZ, NM, TX)",
+        scope: "national",
+        setAside: "Small Business",
+        contractType: "Hybrid (FFP + T&M)",
+        factors: [
+          "Zero Trust architecture expertise",
+          "Cybersecurity certifications and cleared staff",
+          "Experience with DHS or similar environments"
+        ],
+        risks: [
+          "Evolving DHS security requirements",
+          "Integration with legacy systems",
+          "Need for cleared personnel"
+        ],
+        strategyBullets: [
+          "Show strong Zero Trust reference architectures",
+          "Highlight cleared cyber staff and DHS-relevant experience",
+          "Propose phased pilot with measurable outcomes"
+        ],
+        alignment: [
+          "Aligns with SWIT’s cybersecurity focus",
+          "Supports entry into DHS portfolio",
+          "Good size for current capacity"
+        ],
+        bidWhy: [
+          "High strategic value in cyber/Zero Trust space",
+          "Competitive but worth targeted pursuit",
+          "Positions SWIT for future DHS work"
+        ],
+        partners: [
+          "Zero Trust platform vendor",
+          "Clearance-ready cyber subcontractor",
+          "Security operations center partner"
+        ],
+        fitScore: 88,
+        riskScore: 34,
+        compLevel: "High",
+        bidRec: "Selective pursue with strong teaming"
+      },
+      {
+        title: "GSA – Cloud Migration Support for Civilian Agencies (BPAs)",
+        subtitle: "Task-order based cloud migration and optimization services",
+        agency: "General Services Administration",
+        value: "$35M (BPA ceiling)",
+        deadline: "10/05/2026",
+        place: "Nationwide (remote + on-site)",
+        scope: "national",
+        setAside: "Small Business",
+        contractType: "BPA, Task Order Based",
+        factors: [
+          "Cloud migration experience (AWS/Azure/GCP)",
+          "Security and compliance (FedRAMP, FISMA)",
+          "Scalability and resource depth"
+        ],
+        risks: [
+          "Highly competitive BPA environment",
+          "Uncertain task order volume",
+          "Need to support multiple agencies"
+        ],
+        strategyBullets: [
+          "Highlight multi-cloud migration portfolio",
+          "Show strong security and compliance posture",
+          "Position as niche, high-expertise provider"
+        ],
+        alignment: [
+          "Aligns with SWIT’s cloud modernization services",
+          "Supports nationwide reach and remote delivery",
+          "Strategic contract vehicle for future work"
+        ],
+        bidWhy: [
+          "High strategic value despite competition",
+          "Enables access to multiple civilian agencies",
+          "Worth investment if teaming is strong"
+        ],
+        partners: [
+          "Major cloud providers (AWS/Azure)",
+          "Compliance and audit partner",
+          "Staff augmentation subcontractors"
+        ],
+        fitScore: 84,
+        riskScore: 38,
+        compLevel: "Very High",
+        bidRec: "Strategic pursue; only with strong teaming"
+      },
+      {
+        title: "USAF – Base Network Hardening at Luke AFB",
+        subtitle: "Network segmentation and security upgrades",
+        agency: "U.S. Air Force",
+        value: "$3.6M",
+        deadline: "08/30/2026",
+        place: "Luke Air Force Base, AZ",
+        scope: "local",
+        setAside: "Small Business",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "Experience with DoD networks",
+          "Security clearances and compliance",
+          "Coordination with base communications squadron"
+        ],
+        risks: [
+          "Need for cleared staff",
+          "Strict change control processes",
+          "Potential schedule constraints"
+        ],
+        strategyBullets: [
+          "Highlight any prior DoD or AFNET-related work",
+          "Show cleared or clearance-eligible staff",
+          "Emphasize disciplined change management"
+        ],
+        alignment: [
+          "Good match to network security capabilities",
+          "Local AZ presence near Luke AFB",
+          "Supports entry into Air Force portfolio"
+        ],
+        bidWhy: [
+          "Strategic foothold with USAF",
+          "Manageable size for current team",
+          "Moderate risk with proper staffing"
+        ],
+        partners: [
+          "Cleared network engineering subcontractor",
+          "Security compliance specialist",
+          "Base-experienced project manager"
+        ],
+        fitScore: 87,
+        riskScore: 31,
+        compLevel: "Medium",
+        bidRec: "Pursue with cleared team"
+      },
+      {
+        title: "DOI – BLM Data Center Consolidation and Cloud Transition",
+        subtitle: "Migrate regional workloads to cloud and decommission legacy systems",
+        agency: "Department of the Interior – BLM",
+        value: "$7.4M",
+        deadline: "09/25/2026",
+        place: "Western Region (remote + on-site)",
+        scope: "national",
+        setAside: "Small Business",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "Experience with data center consolidation",
+          "Cloud migration planning and execution",
+          "Change management and training"
+        ],
+        risks: [
+          "Legacy systems complexity",
+          "Data migration risks",
+          "Stakeholder resistance to change"
+        ],
+        strategyBullets: [
+          "Show structured migration methodology",
+          "Highlight prior federal data center consolidation work",
+          "Emphasize training and change management plan"
+        ],
+        alignment: [
+          "Aligns with SWIT’s cloud and modernization services",
+          "Supports expansion into DOI/BLM",
+          "Good size and scope for current capacity"
+        ],
+        bidWhy: [
+          "Solid opportunity with moderate competition",
+          "Strategic entry into DOI",
+          "Good revenue with manageable risk"
+        ],
+        partners: [
+          "Cloud migration tooling vendor",
+          "Data migration specialist",
+          "Training and change management partner"
+        ],
+        fitScore: 89,
+        riskScore: 29,
+        compLevel: "Medium",
+        bidRec: "Pursue as a strong fit opportunity"
+      }
+    ]
+  },
+
+  des: {
+    name: "Desert Environmental Services",
+    type: "Environmental Contractor",
+    location: "Phoenix, AZ",
+    naics: "562910",
+    pastAwards: "14 federal awards",
+    footprint: "Southwest + selective nationwide",
+    summary: "Desert Environmental Services provides environmental remediation, hazardous waste cleanup, and site restoration for federal clients.",
+    tags: ["Environmental", "Remediation", "Hazmat", "USACE", "EPA"],
+    matches: [
+      {
+        title: "USACE – Remediation of Former Training Range",
+        subtitle: "Munitions and explosives of concern (MEC) and soil remediation",
+        agency: "U.S. Army Corps of Engineers",
+        value: "$11.5M",
+        deadline: "08/22/2026",
+        place: "Southern Arizona",
+        scope: "local",
+        setAside: "Small Business",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "MEC and UXO remediation experience",
+          "Safety and explosives management",
+          "Regulatory compliance and reporting"
+        ],
+        risks: [
+          "Subsurface unknowns and contamination extent",
+          "Safety risks in MEC environment",
+          "Regulatory scrutiny and documentation"
+        ],
+        strategyBullets: [
+          "Highlight prior USACE remediation projects",
+          "Show certified UXO and safety personnel",
+          "Emphasize robust reporting and stakeholder engagement"
+        ],
+        alignment: [
+          "Direct match to remediation capabilities",
+          "Regional presence in AZ",
+          "Strong fit for size and complexity"
+        ],
+        bidWhy: [
+          "High-value project aligned with core services",
+          "Strengthens USACE relationship",
+          "Worth pursuing with strong safety plan"
+        ],
+        partners: [
+          "UXO specialist subcontractor",
+          "Environmental lab partner",
+          "Regulatory compliance consultant"
+        ],
+        fitScore: 90,
+        riskScore: 36,
+        compLevel: "High",
+        bidRec: "Pursue with robust risk management"
+      },
+      {
+        title: "EPA – Hazardous Waste Site Cleanup (Region 9)",
+        subtitle: "Cleanup of legacy industrial contamination site",
+        agency: "Environmental Protection Agency – Region 9",
+        value: "$9.2M",
+        deadline: "09/08/2026",
+        place: "Arizona",
+        scope: "local",
+        setAside: "Small Business",
+        contractType: "Cost-Plus-Fixed-Fee",
+        factors: [
+          "Complex site remediation experience",
+          "Regulatory coordination with EPA and state agencies",
+          "Community engagement and communication"
+        ],
+        risks: [
+          "Uncertain contamination extent",
+          "Potential community concerns and scrutiny",
+          "Schedule impacts from regulatory approvals"
+        ],
+        strategyBullets: [
+          "Highlight prior EPA or state cleanup projects",
+          "Show strong stakeholder and community engagement plan",
+          "Emphasize technical depth in remediation methods"
+        ],
+        alignment: [
+          "Strong match to environmental remediation focus",
+          "Regional presence and regulatory familiarity",
+          "Supports EPA Region 9 relationship"
+        ],
+        bidWhy: [
+          "Strategic EPA opportunity in core service area",
+          "Higher risk but strong technical fit",
+          "Worth pursuing with careful pricing"
+        ],
+        partners: [
+          "Public outreach specialist",
+          "Geotechnical and hydrogeology consultant",
+          "Environmental legal advisor"
+        ],
+        fitScore: 87,
+        riskScore: 40,
+        compLevel: "High",
+        bidRec: "Selective pursue with strong risk controls"
+      },
+      {
+        title: "BLM – Mine Land Reclamation and Safety Improvements",
+        subtitle: "Reclamation of abandoned mine features and hazard mitigation",
+        agency: "Bureau of Land Management",
+        value: "$4.7M",
+        deadline: "08/29/2026",
+        place: "Arizona & New Mexico",
+        scope: "national",
+        setAside: "Small Business",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "Experience with mine land reclamation",
+          "Remote site logistics",
+          "Safety and environmental protection"
+        ],
+        risks: [
+          "Remote and rugged terrain",
+          "Unknown subsurface conditions",
+          "Weather and access constraints"
+        ],
+        strategyBullets: [
+          "Highlight prior mine reclamation or similar work",
+          "Show strong field logistics and safety planning",
+          "Emphasize environmental protection measures"
+        ],
+        alignment: [
+          "Aligns with field-based remediation capabilities",
+          "Regional familiarity with AZ/NM terrain",
+          "Good size for current capacity"
+        ],
+        bidWhy: [
+          "Solid opportunity with manageable risk",
+          "Supports relationship with BLM",
+          "Good fit for field crews"
+        ],
+        partners: [
+          "Mine safety specialist",
+          "Local heavy equipment subcontractors",
+          "Environmental monitoring firm"
+        ],
+        fitScore: 88,
+        riskScore: 32,
+        compLevel: "Medium",
+        bidRec: "Pursue as a strong fit"
+      },
+      {
+        title: "DOE – Legacy Waste Storage Facility Decommissioning",
+        subtitle: "Decommissioning and decontamination of legacy storage structures",
+        agency: "Department of Energy",
+        value: "$18.9M",
+        deadline: "10/03/2026",
+        place: "Western U.S.",
+        scope: "national",
+        setAside: "Small Business",
+        contractType: "Cost-Plus-Fixed-Fee",
+        factors: [
+          "Experience with hazardous and radiological materials",
+          "Safety and ALARA principles",
+          "Regulatory compliance and documentation"
+        ],
+        risks: [
+          "High safety and regulatory scrutiny",
+          "Complex waste handling and disposal",
+          "Potential schedule impacts from approvals"
+        ],
+        strategyBullets: [
+          "Highlight any DOE or high-hazard experience",
+          "Show strong safety culture and certifications",
+          "Emphasize robust documentation and QA/QC"
+        ],
+        alignment: [
+          "Stretch opportunity aligned with remediation expertise",
+          "Supports entry into DOE portfolio",
+          "Requires careful capacity and risk assessment"
+        ],
+        bidWhy: [
+          "High strategic value but elevated risk",
+          "Worth considering with strong teaming",
+          "Not a must-bid without right partners"
+        ],
+        partners: [
+          "Radiological safety specialist",
+          "High-hazard waste disposal firm",
+          "Regulatory compliance and QA partner"
+        ],
+        fitScore: 80,
+        riskScore: 45,
+        compLevel: "Very High",
+        bidRec: "Evaluate; pursue only with strong DOE-experienced team"
+      },
+      {
+        title: "USFS – Fuel Spill and Soil Remediation at Ranger Station",
+        subtitle: "Cleanup of fuel spill and impacted soils",
+        agency: "U.S. Forest Service – Region 3",
+        value: "$1.3M",
+        deadline: "08/18/2026",
+        place: "Northern Arizona",
+        scope: "local",
+        setAside: "Small Business",
+        contractType: "Firm-Fixed-Price",
+        factors: [
+          "Experience with fuel spill response",
+          "Remote site mobilization",
+          "Regulatory coordination with state agencies"
+        ],
+        risks: [
+          "Access constraints and terrain",
+          "Potential for contamination beyond initial estimates",
+          "Weather impacts on schedule"
+        ],
+        strategyBullets: [
+          "Highlight prior spill response and small site cleanups",
+          "Show rapid mobilization capability in AZ",
+          "Emphasize cost-effective remediation approach"
+        ],
+        alignment: [
+          "Good match to small/medium remediation projects",
+          "Regional presence in AZ",
+          "Supports USFS Region 3 relationship"
+        ],
+        bidWhy: [
+          "High fit, manageable risk",
+          "Good project size for field crews",
+          "Supports recurring work with USFS"
+        ],
+        partners: [
+          "Local drilling/sampling subcontractor",
+          "Environmental lab partner",
+          "Waste transport and disposal provider"
+        ],
+        fitScore: 92,
+        riskScore: 28,
+        compLevel: "Medium",
+        bidRec: "Strongly pursue"
+      }
+    ]
+  }
+};
+</script>
+<!-- ============================
+     SECTION 3 — MAIN JAVASCRIPT LOGIC
+     ============================ -->
+<script>
+let currentVendor = null;
+let currentScope = "all";
+
+function goToDashboard() {
+  document.getElementById("coverPage").style.display = "none";
+  document.getElementById("dashboardPage").style.display = "block";
+}
+
+function goBackToCover() {
+  document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("coverPage").style.display = "block";
+}
+
+function selectVendor(vendorKey) {
+  currentVendor = vendors[vendorKey];
+
+  document.getElementById("vendorName").textContent = currentVendor.name;
+  document.getElementById("vendorType").textContent = currentVendor.type;
+  document.getElementById("vendorLocation").textContent = currentVendor.location;
+  document.getElementById("vendorNaics").textContent = currentVendor.naics;
+  document.getElementById("vendorAwards").textContent = currentVendor.pastAwards;
+  document.getElementById("vendorFootprint").textContent = currentVendor.footprint;
+  document.getElementById("vendorSummary").textContent = currentVendor.summary;
+
+  const tagRow = document.getElementById("vendorTags");
+  tagRow.innerHTML = "";
+  currentVendor.tags.forEach(tag => {
+    const span = document.createElement("span");
+    span.className = "tag";
+    span.textContent = tag;
+    tagRow.appendChild(span);
+  });
+
+  renderMatches();
+  goToDashboard();
+}
+
+function setFilter(scope) {
+  currentScope = scope;
+
+  document.getElementById("filterLocal").classList.remove("active");
+  document.getElementById("filterNational").classList.remove("active");
+  document.getElementById("filterAll").classList.remove("active");
+
+  if (scope === "local") document.getElementById("filterLocal").classList.add("active");
+  if (scope === "national") document.getElementById("filterNational").classList.add("active");
+  if (scope === "all") document.getElementById("filterAll").classList.add("active");
+
+  renderMatches();
+}
+
+function renderMatches() {
+  const list = document.getElementById("matchList");
+  list.innerHTML = "";
+
+  if (!currentVendor) return;
+
+  const filtered = currentVendor.matches.filter(m => {
+    if (currentScope === "all") return true;
+    return m.scope === currentScope;
+  });
+
+  filtered.forEach(match => {
+    const div = document.createElement("div");
+    div.className = "match-card";
+    div.onclick = () => showIntel(match);
+
+    div.innerHTML = `
+      <div class="match-title">${match.title}</div>
+      <div class="match-subtitle">${match.subtitle}</div>
+      <div class="match-meta">
+        <strong>Agency:</strong> ${match.agency}<br>
+        <strong>Value:</strong> ${match.value}<br>
+        <strong>Deadline:</strong> ${match.deadline}
+      </div>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+function showIntel(m) {
+  document.getElementById("intelTitle").textContent = m.title;
+  document.getElementById("intelMeta").textContent =
+    `${m.agency} • ${m.place} • ${m.scope.toUpperCase()}`;
+  document.getElementById("intelValue").textContent =
+    `${m.value} • Due ${m.deadline} • ${m.setAside} • ${m.contractType}`;
+
+  fillList("intelFactors", m.factors);
+  fillList("intelRisks", m.risks);
+  fillList("intelStrategyList", m.strategyBullets);
+  fillList("intelAlignment", m.alignment);
+  fillList("intelBidWhy", m.bidWhy);
+  fillList("intelPartners", m.partners);
+
+  document.getElementById("intelFitRisk").textContent =
+    `Fit Score: ${m.fitScore} • Risk Score: ${m.riskScore} • Competition: ${m.compLevel}`;
+
+  document.getElementById("intelBidRec").textContent = m.bidRec;
+}
+
+function fillList(id, items) {
+  const ul = document.getElementById(id);
+  ul.innerHTML = "";
+  items.forEach(i => {
+    const li = document.createElement("li");
+    li.textContent = i;
+    ul.appendChild(li);
+  });
+}
+
+window.onload = () => {
+  const vendorSelect = document.getElementById("vendorSelect");
+  vendorSelect.innerHTML = `
+    <option value="">Select a vendor...</option>
+    <option value="acme">ACME Construction</option>
+    <option value="boss">Boss Roofing</option>
+    <option value="swit">Southwest IT Solutions</option>
+    <option value="des">Desert Environmental Services</option>
+  `;
+
+  vendorSelect.onchange = () => {
+    if (vendorSelect.value) {
+      selectVendor(vendorSelect.value);
+    }
+  };
+};
+</script>
+
+</body>
+</html>

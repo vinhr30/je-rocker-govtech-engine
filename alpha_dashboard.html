@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ALPHA DASHBOARD - J.E. ROCKER LC</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #05060a;
+      color: #e5e7eb;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-rows: auto auto auto;
+      grid-template-columns: 1fr 1.2fr 1.2fr;
+      gap: 12px;
+      padding: 16px;
+    }
+    .panel {
+      background: #0b0f19;
+      border-radius: 8px;
+      padding: 12px 14px;
+      border: 1px solid #1f2937;
+    }
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+    .lanes {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .lane {
+      background: #050814;
+      border-radius: 6px;
+      padding: 8px;
+      border: 1px solid #111827;
+      font-size: 12px;
+    }
+    .lane h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin: 0 0 6px;
+    }
+    .op-card, .intel-card {
+      background: #020617;
+      border-radius: 4px;
+      padding: 6px;
+      margin-bottom: 6px;
+      border: 1px solid #1f2937;
+    }
+    .op-title, .intel-name {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .op-agency, .op-naics, .op-psc,
+    .intel-count, .intel-obligated {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .op-score {
+      font-size: 11px;
+      color: #93c5fd;
+      margin-top: 4px;
+    }
+    .op-tier {
+      font-size: 11px;
+      color: #fbbf24;
+      margin-top: 2px;
+    }
+    .op-cluster {
+      font-size: 11px;
+      color: #86efac;
+      margin-top: 3px;
+    }
+    .status-strip {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 11px;
+      color: #cbd5e1;
+      flex-wrap: wrap;
+    }
+    .status-pill {
+      border: 1px solid #334155;
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: #0f172a;
+    }
+    .mode-toggle {
+      display: inline-flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .mode-btn {
+      margin-top: 0;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #cbd5e1;
+      padding: 4px 8px;
+      border-radius: 999px;
+    }
+    .mode-btn.active {
+      background: #1d4ed8;
+      color: #ffffff;
+      border-color: #1e40af;
+    }
+    .grouping-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: #cbd5e1;
+    }
+    .group-select {
+      background: #0f172a;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      font-size: 11px;
+      padding: 2px 4px;
+    }
+    .collapse-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 11px;
+      color: #cbd5e1;
+      flex-wrap: wrap;
+    }
+    .pager-btn {
+      margin-top: 0;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #cbd5e1;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .pager-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .pager-select {
+      background: #0f172a;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      font-size: 11px;
+      padding: 2px 4px;
+    }
+    .pager-input {
+      width: 68px;
+      background: #0f172a;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      font-size: 11px;
+      padding: 2px 4px;
+    }
+    button {
+      margin-top: 4px;
+      font-size: 11px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    .panel4-lanes {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard">
+
+    <div class="panel" style="grid-column: 1 / 2; grid-row: 1 / 2;">
+      <div class="panel-title">Panel 1 - Alpha Profile</div>
+      <div>
+        <strong>Company:</strong> J.E. ROCKER LC<br>
+        <strong>Positioning:</strong> Small, fast, specialized GovTech micro-vendor<br>
+        <strong>Status:</strong> New federal vendor, high-skill technical specialist<br><br>
+
+        <strong>NAICS:</strong> 541511, 541512, 541513, 541519, 518210, 611420<br>
+        <strong>PSC:</strong> D302, D307, D399, R499, R699<br><br>
+
+        <strong>Target Agencies:</strong><br>
+        - Department of the Navy<br>
+        - Department of the Air Force<br>
+        - USDA<br>
+        - Department of Veterans Affairs<br>
+        - Small Business Administration<br><br>
+
+        <strong>Capabilities:</strong><br>
+        - Automation scripting and workflow tools<br>
+        - Scraping and data extraction<br>
+        - Dashboard building and reporting<br>
+        - AI workforce assistance and compliance automation<br>
+        - Documentation, training, small IT modernization<br><br>
+
+        <strong>Differentiators:</strong><br>
+        - Fast delivery, small tools in days<br>
+        - Automation-first mindset<br>
+        - Founder-led delivery<br>
+        - Low overhead, high value<br>
+        - GovTech-focused tooling<br><br>
+
+        <strong>Keywords:</strong><br>
+        automation, dashboard, scraping, workflow, reporting, AI, modernization, documentation, training
+      </div>
+    </div>
+
+    <div class="panel" style="grid-column: 2 / 3; grid-row: 1 / 2;">
+      <div class="panel-title">Panel 2 - Match Feed</div>
+      <div class="status-strip">
+        <div class="status-pill" id="primaryCount">Primary: 0</div>
+        <div class="status-pill" id="reviewCount">Review: 0</div>
+        <div class="status-pill" id="activeFeed">Showing: Primary</div>
+      </div>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="showPrimaryBtn" type="button">Primary Feed</button>
+        <button class="mode-btn" id="showReviewBtn" type="button">Review Feed</button>
+      </div>
+      <div class="grouping-bar">
+        <label for="groupingModeSelect">Grouping Mode:</label>
+        <select id="groupingModeSelect" class="group-select">
+          <option value="none" selected>None</option>
+          <option value="title">Group by Title</option>
+          <option value="psc">Group by PSC</option>
+          <option value="naics">Group by NAICS</option>
+          <option value="agency">Group by Agency</option>
+        </select>
+        <label class="collapse-toggle" for="collapseSimilarToggle">
+          <input id="collapseSimilarToggle" type="checkbox" />
+          Collapse Similar Opportunities
+        </label>
+      </div>
+      <div class="pagination-bar">
+        <button class="pager-btn" id="firstPageBtn" type="button">First</button>
+        <button class="pager-btn" id="prevPageBtn" type="button">Prev</button>
+        <button class="pager-btn" id="nextPageBtn" type="button">Next</button>
+        <button class="pager-btn" id="lastPageBtn" type="button">Last</button>
+        <span id="pageInfo">Page 1 of 1</span>
+        <label for="pageSizeSelect">Rows:</label>
+        <select id="pageSizeSelect" class="pager-select">
+          <option value="25">25</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+        </select>
+        <label for="pageJumpInput">Jump:</label>
+        <input id="pageJumpInput" class="pager-input" type="number" min="1" value="1" />
+        <button class="pager-btn" id="jumpPageBtn" type="button">Go</button>
+      </div>
+      <div class="lanes">
+        <div class="lane" id="lane1"><h3>Primary Matches (semantic desc)</h3></div>
+      </div>
+    </div>
+
+    <div class="panel" style="grid-column: 3 / 4; grid-row: 1 / 2;">
+      <div class="panel-title">Panel 3 - Match Intel</div>
+      <div class="lanes" id="panel3">
+        <div class="lane" id="intelDetails">
+          <h3>Select a match</h3>
+          <div class="intel-card">
+            <div class="intel-name">No match selected</div>
+            <div class="intel-count">Click a row in Panel 2 to load expanded intelligence details.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="grid-column: 1 / 4; grid-row: 2 / 4;">
+      <div class="panel-title">Panel 4 - Action Panel</div>
+      <div class="panel4-lanes">
+        <div class="lane"><h3>Lane 1 - Micro-Purchase Outreach</h3><p>Fastest wins &lt; $10k - no past performance.</p></div>
+        <div class="lane"><h3>Lane 2 - Simplified Acquisition Targets</h3><p>&lt; $250k starter contracts aligned with Panel 2.</p></div>
+        <div class="lane"><h3>Lane 3 - Bid-Ready Opportunities</h3><p>Immediate targets from your feed.</p></div>
+        <div class="lane"><h3>Lane 4 - Subcontracting and Teaming</h3><p>Attach to existing contracts to build experience.</p></div>
+        <div class="lane"><h3>Lane 5 - Capability and Compliance Tasks</h3><p>Keep SAM, UEI, reps and certs current.</p></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let primaryMatchesCache = [];
+    let reviewMatchesCache = [];
+    let activeFeedMode = 'primary';
+    let currentPage = 1;
+    let pageSize = 50;
+    let groupingMode = 'none';
+    let collapseSimilar = false;
+
+    function normalizeNaicsDisplay(value) {
+      const digits = String(value || '').replace(/[^0-9]/g, '');
+      if (!digits) return 'N/A';
+      if (digits.length === 5) return `${digits}0`;
+      if (digits.length > 6) return digits.slice(0, 6);
+      return digits;
+    }
+
+    function normalizePscDisplay(value) {
+      const raw = String(value || '').trim().toUpperCase().replace(/\.0$/, '');
+      if (!raw) return 'N/A';
+      const token = raw.match(/[A-Z0-9]{3,4}/);
+      return token ? token[0] : raw.replace(/\s+/g, ' ');
+    }
+
+    function normalizeTitle(value) {
+      return String(value || '').trim().toLowerCase() || 'untitled';
+    }
+
+    function getGroupingKey(row) {
+      switch (groupingMode) {
+        case 'title':
+          return normalizeTitle(row.opportunity_title);
+        case 'psc':
+          return normalizePscDisplay(row.fpds_psc_code);
+        case 'naics':
+          return normalizeNaicsDisplay(row.fpds_naics_code);
+        case 'agency':
+          return String(row.fpds_agency || 'Unknown agency').trim().toLowerCase();
+        default:
+          return '';
+      }
+    }
+
+    function getActiveRows() {
+      return activeFeedMode === 'review' ? reviewMatchesCache : primaryMatchesCache;
+    }
+
+    function getDisplayRows(sourceRows) {
+      if (groupingMode === 'none') {
+        return sourceRows.map((row) => ({
+          ...row,
+          _clusterKey: 'none',
+          _clusterSize: 1,
+          _clusterLead: true,
+        }));
+      }
+
+      const groups = new Map();
+      const order = [];
+
+      sourceRows.forEach((row) => {
+        const key = getGroupingKey(row) || 'unclassified';
+        if (!groups.has(key)) {
+          groups.set(key, []);
+          order.push(key);
+        }
+        groups.get(key).push(row);
+      });
+
+      const grouped = [];
+      order.forEach((key) => {
+        const rows = groups.get(key) || [];
+        if (!rows.length) return;
+
+        if (collapseSimilar) {
+          grouped.push({
+            ...rows[0],
+            _clusterKey: key,
+            _clusterSize: rows.length,
+            _clusterLead: true,
+          });
+          return;
+        }
+
+        rows.forEach((row, idx) => {
+          grouped.push({
+            ...row,
+            _clusterKey: key,
+            _clusterSize: rows.length,
+            _clusterLead: idx === 0,
+          });
+        });
+      });
+
+      return grouped;
+    }
+
+    function getTotalPages() {
+      const displayRows = getDisplayRows(getActiveRows());
+      return Math.max(1, Math.ceil(displayRows.length / pageSize));
+    }
+
+    function setPageWithinBounds(pageNum) {
+      const totalPages = getTotalPages();
+      const normalized = Number(pageNum);
+      if (!Number.isFinite(normalized)) {
+        currentPage = 1;
+        return;
+      }
+      currentPage = Math.min(totalPages, Math.max(1, Math.floor(normalized)));
+    }
+
+    async function loadOpportunities() {
+      try {
+        const [primaryRes, reviewRes] = await Promise.all([
+          fetch('/api/matches'),
+          fetch('/api/review')
+        ]);
+
+        const primaryMatches = await primaryRes.json();
+        const reviewMatches = await reviewRes.json();
+
+        primaryMatchesCache = primaryMatches.slice().sort((a, b) => (Number(b.semantic_score) || 0) - (Number(a.semantic_score) || 0));
+        reviewMatchesCache = reviewMatches.slice().sort((a, b) => (Number(b.semantic_score) || 0) - (Number(a.semantic_score) || 0));
+
+        document.getElementById('primaryCount').textContent = `Primary: ${primaryMatchesCache.length}`;
+        document.getElementById('reviewCount').textContent = `Review: ${reviewMatchesCache.length}`;
+
+        renderActiveFeed();
+      } catch (err) {
+        console.error('Error loading v4.2 matches:', err);
+      }
+    }
+
+    function renderActiveFeed() {
+      const laneHeader = document.querySelector('#lane1 h3');
+      const activeFeed = document.getElementById('activeFeed');
+      const primaryBtn = document.getElementById('showPrimaryBtn');
+      const reviewBtn = document.getElementById('showReviewBtn');
+      const groupingSelect = document.getElementById('groupingModeSelect');
+      const collapseToggle = document.getElementById('collapseSimilarToggle');
+
+      const sourceRows = getDisplayRows(getActiveRows());
+      const totalPages = getTotalPages();
+
+      if (currentPage > totalPages) {
+        currentPage = totalPages;
+      }
+
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const pagedRows = sourceRows.slice(start, end);
+
+      groupingSelect.value = groupingMode;
+      collapseToggle.disabled = groupingMode === 'none';
+      if (groupingMode === 'none') {
+        collapseToggle.checked = false;
+      }
+
+      document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById('pageJumpInput').value = String(currentPage);
+      document.getElementById('firstPageBtn').disabled = currentPage === 1;
+      document.getElementById('prevPageBtn').disabled = currentPage === 1;
+      document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
+      document.getElementById('lastPageBtn').disabled = currentPage === totalPages;
+
+      if (activeFeedMode === 'review') {
+        laneHeader.textContent = groupingMode === 'none' ? 'Review Matches (semantic desc)' : `Review Matches grouped by ${groupingMode}`;
+        activeFeed.textContent = 'Showing: Review';
+        primaryBtn.classList.remove('active');
+        reviewBtn.classList.add('active');
+        renderLane('#lane1', pagedRows, 'review');
+        return;
+      }
+
+      laneHeader.textContent = groupingMode === 'none' ? 'Primary Matches (semantic desc)' : `Primary Matches grouped by ${groupingMode}`;
+      activeFeed.textContent = 'Showing: Primary';
+      reviewBtn.classList.remove('active');
+      primaryBtn.classList.add('active');
+      renderLane('#lane1', pagedRows, 'primary');
+    }
+
+    function renderLane(selector, items, source) {
+      const container = document.querySelector(selector);
+      const existingHeader = container.querySelector('h3');
+      const headerText = existingHeader ? existingHeader.textContent : '';
+      const normalized = items.map(item => ({
+        id: item.id,
+        title: item.opportunity_title,
+        agency: item.fpds_agency || 'Unknown agency',
+        naics: normalizeNaicsDisplay(item.fpds_naics_code),
+        psc: normalizePscDisplay(item.fpds_psc_code),
+        semanticScore: Number(item.semantic_score) || 0,
+        compositeScore: Number(item.composite_score) || 0,
+        confidenceTier: item.confidence_tier || 'LOW',
+        source,
+        clusterSize: Number(item._clusterSize || 1),
+        clusterLead: Boolean(item._clusterLead),
+        clusterKey: item._clusterKey || 'none'
+      }));
+
+      const cardsHtml = normalized.map(item => `
+        <div class="op-card" data-id="${item.id}" data-source="${item.source}">
+          <div class="op-title">${item.title || 'Untitled opportunity'}</div>
+          <div class="op-agency">${item.agency}</div>
+          <div class="op-naics">NAICS: ${item.naics}</div>
+          <div class="op-psc">PSC: ${item.psc}</div>
+          <div class="op-score">Semantic ${(item.semanticScore * 100).toFixed(1)}% | Composite ${(item.compositeScore * 100).toFixed(1)}%</div>
+          <div class="op-tier">Tier: ${item.confidenceTier}</div>
+          ${groupingMode !== 'none' && item.clusterLead ? `<div class="op-cluster">Cluster ${item.clusterKey} (${item.clusterSize} item${item.clusterSize === 1 ? '' : 's'})</div>` : ''}
+          <button>Inspect Match</button>
+        </div>
+      `).join('');
+
+      container.innerHTML = `<h3>${headerText}</h3>${cardsHtml}`;
+
+      container.querySelectorAll('.op-card').forEach((card) => {
+        card.onclick = () => {
+          const id = card.getAttribute('data-id');
+          const matchSource = card.getAttribute('data-source') || 'primary';
+          fetch(`/api/match_intel/${id}?source=${matchSource}`)
+            .then((res) => res.json())
+            .then((intel) => renderMatchIntel(intel))
+            .catch((err) => console.error('Error loading match intel:', err));
+        };
+      });
+    }
+
+    function renderMatchIntel(intel) {
+      const container = document.querySelector('#intelDetails');
+      const sem = Number(intel.scores?.semanticScore || 0) * 100;
+      const comp = Number(intel.scores?.compositeScore || 0) * 100;
+      const riskText = Array.isArray(intel.risk_indicators) ? intel.risk_indicators.join(', ') : (intel.risk_indicators || 'N/A');
+      const descriptionText = intel.paraphrased_description && intel.paraphrased_description !== 'See SAM.gov link'
+        ? intel.paraphrased_description
+        : 'See SAM.gov link';
+      const summaryText = intel.human_summary && !/See SAM\.gov link/i.test(intel.human_summary)
+        ? intel.human_summary
+        : 'See SAM.gov link';
+      const linkLine = (label, url) => {
+        if (!url) return `<div class="intel-count">${label}: Not provided</div>`;
+        return `<div class="intel-count">${label}: <a href="${url}" target="_blank" rel="noopener noreferrer">Open</a></div>`;
+      };
+      const valueLine = (label, value) => {
+        return `<div class="intel-count">${label}: ${value || 'Not provided'}</div>`;
+      };
+
+      container.innerHTML = `
+        <h3>Match ${intel.id} (${intel.source})</h3>
+        <div class="intel-card">
+          <div class="intel-name">${intel.opportunity?.title || 'Untitled opportunity'}</div>
+          <div id="intel-description" class="intel-count"><strong>Description:</strong> ${descriptionText}</div>
+          <div id="intel-human-summary" class="intel-count"><strong>Summary:</strong><div style="white-space: pre-line; margin-top: 4px;">${summaryText}</div><div class="summary-notice">${intel.summary_notice || 'For the full official description, see the SAM.gov link.'}</div></div>
+          <div class="intel-count">Opportunity ID: ${intel.opportunity?.id || 'N/A'}</div>
+          <div class="intel-count">FPDS: ${intel.fpds?.title || 'N/A'}</div>
+          <div class="intel-count">Agency: ${intel.fpds?.agency || 'N/A'}</div>
+          <div class="intel-count">PSC/NAICS: ${intel.fpds?.pscCode || 'N/A'} / ${intel.fpds?.naicsCode || 'N/A'}</div>
+          <div class="intel-count">Tier: ${intel.confidenceTier || 'N/A'}</div>
+          <div class="intel-obligated">Semantic: ${sem.toFixed(1)}% | Composite: ${comp.toFixed(1)}%</div>
+          <div class="intel-count">Suppression flags: PSC ${intel.suppression?.pscBlocked ? 'BLOCKED' : 'clear'}, NAICS ${intel.suppression?.naicsBlocked ? 'BLOCKED' : 'clear'}, Title ${intel.suppression?.titleBlocked ? 'BLOCKED' : 'clear'}</div>
+          <div class="intel-count">Strategy: ${intel.reasoning?.strategy || 'N/A'}</div>
+          <div class="intel-count">Reasoning: ${intel.reasoning?.explanation || 'N/A'}</div>
+          <div class="intel-count">PSC similarity: ${intel.PSC_similarity ?? 'N/A'}%</div>
+          <div class="intel-count">NAICS similarity: ${intel.NAICS_similarity ?? 'N/A'}%</div>
+          <div class="intel-count">FPDS similarity: ${intel.FPDS_similarity ?? 'N/A'}%</div>
+          <div class="intel-count">GovTech semantic band: ${intel.govtech_semantic_band || 'N/A'}</div>
+          <div class="intel-count">Classical signal band: ${intel.classical_signal_band || 'N/A'}</div>
+          <div class="intel-count">Vendor semantic band: ${intel.vendor_semantic_band || 'N/A'}</div>
+          <div class="intel-count">Confidence tier reasoning: ${intel.confidence_reasoning || 'N/A'}</div>
+          <div class="intel-count">Suppression reasoning: ${intel.suppression_reasoning || 'N/A'}</div>
+          <div class="intel-count">Agency alignment: ${intel.agency_alignment || 'N/A'}</div>
+          <div class="intel-count">Typical contract type: ${intel.typical_contract_type || 'N/A'}</div>
+          <div class="intel-count">Typical competition level: ${intel.typical_competition_level || 'N/A'}</div>
+          <div class="intel-count">Typical award size: ${intel.typical_award_size || 'N/A'}</div>
+          <div class="intel-count">Historical vendor patterns: ${intel.historical_vendor_patterns || 'N/A'}</div>
+          <div class="intel-count">JE ROCKER fit score: ${intel.je_rocker_fit_score ?? 'N/A'}%</div>
+          <div class="intel-count">Winnability score: ${intel.winnability_score ?? 'N/A'}%</div>
+          <div class="intel-count">Risk indicators: ${riskText}</div>
+          <div class="intel-count">Opportunity cluster: ${intel.opportunity_cluster || 'N/A'}</div>
+          <div class="intel-count">Award cycle timing: ${intel.award_cycle_timing || 'N/A'}</div>
+          <div class="intel-count">Incumbent vendor: ${intel.incumbent_vendor || 'N/A'}</div>
+          <div class="intel-count">Contract vehicle: ${intel.contract_vehicle || 'N/A'}</div>
+          <div class="intel-count">Small-business friendliness: ${intel.small_business_friendliness || 'N/A'}</div>
+
+          <div class="intel-name" style="margin-top:8px;">Opportunity Documents and Links</div>
+          ${linkLine('SAM.gov link', intel.sam_url)}
+          ${linkLine('Solicitation PDF link', intel.solicitation_pdf_url)}
+          ${linkLine('Attachments link', intel.attachments_url)}
+          ${linkLine('Amendments link', intel.amendments_url)}
+          ${linkLine('FPDS record link', intel.fpds_url)}
+
+          <div class="intel-name" style="margin-top:8px;">Opportunity Metadata</div>
+          ${valueLine('Due date', intel.due_date)}
+          ${valueLine('Set-aside', intel.set_aside)}
+          ${valueLine('Contract type', intel.contract_type)}
+          ${valueLine('Place of performance', intel.place_of_performance)}
+          ${valueLine('Agency office', intel.agency_office)}
+          ${valueLine('Contact email', intel.contact_email)}
+          ${valueLine('Contact phone', intel.contact_phone)}
+        </div>
+      `;
+    }
+
+    document.getElementById('showPrimaryBtn').addEventListener('click', () => {
+      activeFeedMode = 'primary';
+      currentPage = 1;
+      renderActiveFeed();
+    });
+
+    document.getElementById('showReviewBtn').addEventListener('click', () => {
+      activeFeedMode = 'review';
+      currentPage = 1;
+      renderActiveFeed();
+    });
+
+    document.getElementById('groupingModeSelect').addEventListener('change', (event) => {
+      groupingMode = event.target.value || 'none';
+      if (groupingMode === 'none') {
+        collapseSimilar = false;
+        document.getElementById('collapseSimilarToggle').checked = false;
+      }
+      currentPage = 1;
+      renderActiveFeed();
+    });
+
+    document.getElementById('collapseSimilarToggle').addEventListener('change', (event) => {
+      collapseSimilar = Boolean(event.target.checked);
+      currentPage = 1;
+      renderActiveFeed();
+    });
+
+    document.getElementById('firstPageBtn').addEventListener('click', () => {
+      setPageWithinBounds(1);
+      renderActiveFeed();
+    });
+
+    document.getElementById('prevPageBtn').addEventListener('click', () => {
+      setPageWithinBounds(currentPage - 1);
+      renderActiveFeed();
+    });
+
+    document.getElementById('nextPageBtn').addEventListener('click', () => {
+      setPageWithinBounds(currentPage + 1);
+      renderActiveFeed();
+    });
+
+    document.getElementById('lastPageBtn').addEventListener('click', () => {
+      setPageWithinBounds(getTotalPages());
+      renderActiveFeed();
+    });
+
+    document.getElementById('pageSizeSelect').addEventListener('change', (event) => {
+      pageSize = Number(event.target.value) || 50;
+      currentPage = 1;
+      renderActiveFeed();
+    });
+
+    document.getElementById('jumpPageBtn').addEventListener('click', () => {
+      const jumpInput = document.getElementById('pageJumpInput');
+      setPageWithinBounds(jumpInput.value);
+      renderActiveFeed();
+    });
+
+    document.getElementById('pageJumpInput').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        setPageWithinBounds(event.target.value);
+        renderActiveFeed();
+      }
+    });
+
+    loadOpportunities();
+  </script>
+</body>
+</html>
