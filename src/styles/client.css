@@ -1,0 +1,100 @@
+.client-dashboard-container {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.client-search-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: linear-gradient(180deg, rgba(7, 13, 24, 0.95), rgba(10, 17, 30, 0.95));
+}
+
+.client-search-bar input {
+  flex: 1;
+  background: rgba(9, 16, 28, 0.9);
+  border: 1px solid rgba(71, 85, 105, 0.9);
+  color: #dbeafe;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.client-search-bar button {
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  background: linear-gradient(180deg, rgba(11, 20, 34, 0.95), rgba(7, 13, 24, 0.95));
+  color: #dbeafe;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.client-search-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.client-profile-panel,
+.client-opportunities-panel,
+.client-opportunity-intel-panel {
+  border-radius: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background:
+    radial-gradient(120% 100% at 50% -10%, rgba(34, 211, 238, 0.12), rgba(34, 211, 238, 0) 55%),
+    linear-gradient(180deg, #0b111c 0%, #0d1523 100%);
+  box-shadow: 0 12px 24px rgba(2, 6, 23, 0.35);
+  overflow: hidden;
+}
+
+.client-panel-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+  color: #7dd3fc;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.client-panel-body {
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+  min-height: 220px;
+  color: #dbeafe;
+}
+
+.client-opportunity-card {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(71, 85, 105, 0.8);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(9, 16, 28, 0.95), rgba(8, 14, 25, 0.95));
+  color: #e2e8f0;
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.client-opportunity-card:hover {
+  border-color: rgba(45, 212, 191, 0.78);
+  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.28), 0 0 18px rgba(45, 212, 191, 0.2);
+  transform: translateY(-1px);
+}
+
+.client-opportunity-card-active {
+  border-color: rgba(56, 189, 248, 0.9);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35), 0 0 20px rgba(56, 189, 248, 0.25);
+}
+
+@media (max-width: 1100px) {
+  .client-dashboard-container {
+    grid-template-columns: 1fr;
+  }
+}
