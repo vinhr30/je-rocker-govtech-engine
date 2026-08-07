@@ -237,9 +237,9 @@
     <div class="panel" style="grid-column: 2 / 3; grid-row: 1 / 2;">
       <div class="panel-title">Panel 2 - Match Feed</div>
       <div class="status-strip">
-        <div class="status-pill" id="primaryCount">Primary: 0</div>
-        <div class="status-pill" id="reviewCount">Review: 0</div>
-        <div class="status-pill" id="activeFeed">Showing: Primary</div>
+        <div class="status-pill" id="primaryCount">Primary: Loading...</div>
+        <div class="status-pill" id="reviewCount">Review: Loading...</div>
+        <div class="status-pill" id="activeFeed">Loading feed...</div>
       </div>
       <div class="mode-toggle">
         <button class="mode-btn active" id="showPrimaryBtn" type="button">Primary Feed</button>
@@ -420,11 +420,23 @@
     }
 
     async function loadOpportunities() {
+      const primaryCountEl = document.getElementById('primaryCount');
+      const reviewCountEl = document.getElementById('reviewCount');
+      const activeFeedEl = document.getElementById('activeFeed');
+
+      if (primaryCountEl) primaryCountEl.textContent = 'Primary: Loading...';
+      if (reviewCountEl) reviewCountEl.textContent = 'Review: Loading...';
+      if (activeFeedEl) activeFeedEl.textContent = 'Loading feed...';
+
       try {
         const [primaryRes, reviewRes] = await Promise.all([
           fetch('/api/matches'),
           fetch('/api/review')
         ]);
+
+        if (!primaryRes.ok || !reviewRes.ok) {
+          throw new Error('Feed request failed');
+        }
 
         const primaryMatches = await primaryRes.json();
         const reviewMatches = await reviewRes.json();
@@ -438,6 +450,9 @@
         renderActiveFeed();
       } catch (err) {
         console.error('Error loading v4.2 matches:', err);
+        if (primaryCountEl) primaryCountEl.textContent = 'Primary: Unavailable';
+        if (reviewCountEl) reviewCountEl.textContent = 'Review: Unavailable';
+        if (activeFeedEl) activeFeedEl.textContent = 'Feed unavailable';
       }
     }
 
