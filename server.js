@@ -708,14 +708,23 @@ async function loadClientDeepBundle() {
   });
 }
 
-async function loadMatchFeed(tableName) {
+function parseFeedLimit(rawValue, fallback = 500) {
+  const parsed = Number.parseInt(String(rawValue || fallback), 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(25, Math.min(parsed, 2000));
+}
+
+async function loadMatchFeed(tableName, limit = 500) {
   const rows = await allAsync(
     matches,
     `
       SELECT *
       FROM ${tableName}
       ORDER BY semantic_score DESC, composite_score DESC, id DESC
+      LIMIT ?
     `
+    ,
+    [limit]
   );
 
   const ids = [...new Set(rows.map((row) => String(row.opportunity_id || '').trim()).filter(Boolean))];
@@ -762,7 +771,8 @@ async function loadMatchFeed(tableName) {
 
 app.get('/api/matches', async (req, res) => {
   try {
-    res.json(await loadMatchFeed('matches'));
+    const limit = parseFeedLimit(req.query.limit, 500);
+    res.json(await loadMatchFeed('matches', limit));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -770,7 +780,8 @@ app.get('/api/matches', async (req, res) => {
 
 app.get('/api/primary_feed', async (req, res) => {
   try {
-    res.json(await loadMatchFeed('matches'));
+    const limit = parseFeedLimit(req.query.limit, 500);
+    res.json(await loadMatchFeed('matches', limit));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -778,7 +789,8 @@ app.get('/api/primary_feed', async (req, res) => {
 
 app.get('/api/review', async (req, res) => {
   try {
-    res.json(await loadMatchFeed('matches_low_confidence'));
+    const limit = parseFeedLimit(req.query.limit, 500);
+    res.json(await loadMatchFeed('matches_low_confidence', limit));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -786,7 +798,8 @@ app.get('/api/review', async (req, res) => {
 
 app.get('/api/review_feed', async (req, res) => {
   try {
-    res.json(await loadMatchFeed('matches_low_confidence'));
+    const limit = parseFeedLimit(req.query.limit, 500);
+    res.json(await loadMatchFeed('matches_low_confidence', limit));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
