@@ -1,5 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const { createClient, clientEvents } = require('./src/utils/db');
 
 const app = express();
 const PORT = 3000;
@@ -11,6 +12,10 @@ const clientDb = new sqlite3.Database('./client.db');
 
 app.use(express.json());
 app.use(express.static(__dirname));
+
+clientEvents.on('onClientCreated', (client) => {
+  console.info(`[client] created pending client ${client.id}`);
+});
 
 clientDb.serialize(() => {
   clientDb.run(`
@@ -2067,6 +2072,18 @@ async function buildClientIntelPayload(module, context, viewMode) {
     summary: [],
   };
 }
+
+app.post('/api/clients', async (req, res) => {
+  try {
+    const client = await createClient(req.body);
+    if (!client.id) {
+      throw new Error('Client creation did not return an id');
+    }
+    res.status(201).json({ client });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 
 app.get('/api/client/search', async (req, res) => {
   try {

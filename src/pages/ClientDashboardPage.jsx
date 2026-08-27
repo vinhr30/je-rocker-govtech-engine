@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import '../styles/client.css';
 
 const MODULES = [
@@ -14,7 +14,7 @@ function defaultModuleState() {
   return {
     summary: [],
     deep: null,
-    status: 'Waiting for client...',
+    status: 'Pending',
     loadingSummary: false,
     loadingDeep: false,
     error: '',
@@ -23,7 +23,7 @@ function defaultModuleState() {
 
 export default function ClientDashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchStatus, setSearchStatus] = useState('Waiting for client...');
+  const [searchStatus, setSearchStatus] = useState('Pending client context');
   const [searchResults, setSearchResults] = useState([]);
 
   const [activeClient, setActiveClient] = useState(null);
@@ -43,6 +43,23 @@ export default function ClientDashboardPage() {
   const moduleAbortRef = useRef({});
   const opportunityAbortRef = useRef(null);
 
+  useEffect(() => {
+    const clientId = new URLSearchParams(window.location.search).get('client_id');
+    if (!clientId) return;
+
+    async function loadPendingClient() {
+      const res = await fetch(`/api/client/${encodeURIComponent(String(clientId))}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error('Unable to load client profile');
+      const client = await res.json();
+      setActiveClient(client);
+      setClientProfile(client);
+      setSearchStatus(`Pending client: ${client.client_name || `Client #${client.client_id}`}`);
+      resetModules('Pending');
+    }
+
+    loadPendingClient().catch(() => setSearchStatus('Unable to load linked client'));
+  }, []);
+
   const canSearch = searchTerm.trim().length >= 2;
 
   const profileRows = useMemo(() => {
@@ -59,7 +76,7 @@ export default function ClientDashboardPage() {
     ];
   }, [clientProfile]);
 
-  function resetModules(waitingText = 'Waiting for client...') {
+  function resetModules(waitingText = 'Pending') {
     setModuleState(() => {
       const next = {};
       MODULES.forEach((module) => {
@@ -314,10 +331,9 @@ export default function ClientDashboardPage() {
                 <button
                   className="pd-intel-load-button"
                   type="button"
-                  disabled={!activeClient || state.loadingDeep}
-                  onClick={() => loadModuleDeep(module.key)}
+                  disabled
                 >
-                  Load Intelligence
+                  Pending
                 </button>
                 {state.error ? <div className="pd-intel-error">{state.error}</div> : null}
               </div>
