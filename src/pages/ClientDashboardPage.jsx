@@ -4,6 +4,7 @@ import '../styles/client.css';
 const MODULES = [
   { key: 'compliance', label: 'Compliance Panel', placeholder: 'Compliance review is pending.' },
   { key: 'modernization', label: 'Modernization Panel', placeholder: 'Modernization review is pending.' },
+  { key: 'forecasting', label: 'Forecasting Panel', placeholder: 'Forecasting review is pending.' },
   { key: 'weekly', label: 'Weekly Intelligence Report Panel', placeholder: 'Weekly intelligence is pending.' },
   { key: 'opportunities', label: 'Opportunity Feed Panel', placeholder: 'Opportunity analysis is pending.' },
   { key: 'matches', label: 'Matches Panel', placeholder: 'Match analysis is pending.' },

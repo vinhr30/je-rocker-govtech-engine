@@ -111,6 +111,8 @@ async function ensureClientSchema(db) {
     ['sam_registration', 'TEXT'],
     ['business_classifications', 'TEXT'],
     ['modernization_profile', 'TEXT'],
+    ['business_size', 'TEXT'],
+    ['procurement_history', 'TEXT'],
   ];
 
   for (const [name, type] of requiredColumns) {
@@ -134,6 +136,8 @@ function toClientRow(row) {
     sam_registration: row.sam_registration || '',
     business_classifications: row.business_classifications || '',
     modernization_profile: row.modernization_profile || '',
+    business_size: row.business_size || '',
+    procurement_history: row.procurement_history || '',
     lifecycle_status: row.lifecycle_status || 'pending',
     created_at: row.created_at || null,
   };
