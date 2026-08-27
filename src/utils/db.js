@@ -110,6 +110,7 @@ async function ensureClientSchema(db) {
     ['lifecycle_status', "TEXT NOT NULL DEFAULT 'pending'"],
     ['sam_registration', 'TEXT'],
     ['business_classifications', 'TEXT'],
+    ['modernization_profile', 'TEXT'],
   ];
 
   for (const [name, type] of requiredColumns) {
@@ -132,6 +133,7 @@ function toClientRow(row) {
     naics: row.naics || '',
     sam_registration: row.sam_registration || '',
     business_classifications: row.business_classifications || '',
+    modernization_profile: row.modernization_profile || '',
     lifecycle_status: row.lifecycle_status || 'pending',
     created_at: row.created_at || null,
   };
