@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import '../styles/client.css';
 
 const MODULES = [
-  { key: 'weekly', label: 'Weekly Intelligence Report Panel' },
-  { key: 'opportunities', label: 'Opportunity Feed Panel' },
-  { key: 'matches', label: 'Matches Panel' },
-  { key: 'spend', label: 'Spend Trends Panel' },
-  { key: 'vendors', label: 'Vendor Profiles Panel' },
-  { key: 'capture', label: 'Capture Plan Recommendations Panel' },
+  { key: 'weekly', label: 'Weekly Intelligence Report Panel', placeholder: 'Weekly intelligence is pending.' },
+  { key: 'opportunities', label: 'Opportunity Feed Panel', placeholder: 'Opportunity analysis is pending.' },
+  { key: 'matches', label: 'Matches Panel', placeholder: 'Match analysis is pending.' },
+  { key: 'spend', label: 'Spend Trends Panel', placeholder: 'Spend analysis is pending.' },
+  { key: 'vendors', label: 'Vendor Profiles Panel', placeholder: 'Vendor analysis is pending.' },
+  { key: 'capture', label: 'Capture Plan Recommendations Panel', placeholder: 'Capture planning is pending.' },
 ];
 
 function defaultModuleState() {
@@ -40,24 +40,11 @@ export default function ClientDashboardPage() {
   });
 
   const searchAbortRef = useRef(null);
-  const moduleAbortRef = useRef({});
-  const opportunityAbortRef = useRef(null);
-
   useEffect(() => {
     const clientId = new URLSearchParams(window.location.search).get('client_id');
     if (!clientId) return;
 
-    async function loadPendingClient() {
-      const res = await fetch(`/api/client/${encodeURIComponent(String(clientId))}`, { cache: 'no-store' });
-      if (!res.ok) throw new Error('Unable to load client profile');
-      const client = await res.json();
-      setActiveClient(client);
-      setClientProfile(client);
-      setSearchStatus(`Pending client: ${client.client_name || `Client #${client.client_id}`}`);
-      resetModules('Pending');
-    }
-
-    loadPendingClient().catch(() => setSearchStatus('Unable to load linked client'));
+    activatePendingClient(clientId).catch(() => setSearchStatus('Unable to load linked client'));
   }, []);
 
   const canSearch = searchTerm.trim().length >= 2;
@@ -89,96 +76,8 @@ export default function ClientDashboardPage() {
     });
   }
 
-  async function loadModuleSummary(moduleKey, clientId) {
-    setModuleState((prev) => ({
-      ...prev,
-      [moduleKey]: {
-        ...prev[moduleKey],
-        loadingSummary: true,
-        status: 'Loading summary...',
-        error: '',
-      },
-    }));
-
-    try {
-      const res = await fetch(`/api/client/intel/${moduleKey}?client_id=${encodeURIComponent(String(clientId))}&view=summary`, {
-        cache: 'no-store',
-      });
-      if (!res.ok) throw new Error('Summary request failed');
-      const payload = await res.json();
-      setModuleState((prev) => ({
-        ...prev,
-        [moduleKey]: {
-          ...prev[moduleKey],
-          summary: payload.summary || [],
-          status: 'Summary loaded',
-          loadingSummary: false,
-        },
-      }));
-    } catch (_error) {
-      setModuleState((prev) => ({
-        ...prev,
-        [moduleKey]: {
-          ...prev[moduleKey],
-          loadingSummary: false,
-          status: 'Unable to load summary',
-          error: 'Unable to load summary',
-        },
-      }));
-    }
-  }
-
-  async function loadModuleDeep(moduleKey) {
-    if (!activeClient?.client_id) return;
-
-    if (moduleAbortRef.current[moduleKey]) {
-      moduleAbortRef.current[moduleKey].abort();
-    }
-    const controller = new AbortController();
-    moduleAbortRef.current[moduleKey] = controller;
-
-    setModuleState((prev) => ({
-      ...prev,
-      [moduleKey]: {
-        ...prev[moduleKey],
-        loadingDeep: true,
-        status: 'Loading deeper intelligence...',
-        error: '',
-      },
-    }));
-
-    try {
-      const res = await fetch(`/api/client/intel/${moduleKey}?client_id=${encodeURIComponent(String(activeClient.client_id))}&view=deep`, {
-        cache: 'no-store',
-        signal: controller.signal,
-      });
-      if (!res.ok) throw new Error('Deep intel request failed');
-      const payload = await res.json();
-      setModuleState((prev) => ({
-        ...prev,
-        [moduleKey]: {
-          ...prev[moduleKey],
-          deep: payload.deep || null,
-          loadingDeep: false,
-          status: 'Intelligence ready',
-        },
-      }));
-    } catch (error) {
-      if (error?.name === 'AbortError') return;
-      setModuleState((prev) => ({
-        ...prev,
-        [moduleKey]: {
-          ...prev[moduleKey],
-          loadingDeep: false,
-          status: 'Unable to load intelligence',
-          error: 'Unable to load intelligence',
-        },
-      }));
-    }
-  }
-
-  async function activateClient(clientLite) {
-    const res = await fetch(`/api/client/${encodeURIComponent(String(clientLite.client_id))}`, { cache: 'no-store' });
+  async function activatePendingClient(clientId) {
+    const res = await fetch(`/api/client/${encodeURIComponent(String(clientId))}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Unable to load client profile');
     const client = await res.json();
 
@@ -187,18 +86,8 @@ export default function ClientDashboardPage() {
     setClientOpportunities([]);
     setClientOpportunityIntel(null);
     setSearchResults([]);
-    setSearchStatus(`Active client: ${client.client_name || `Client #${client.client_id}`}`);
-
-    resetModules('Loading summary...');
-
-    await Promise.all(MODULES.map((module) => loadModuleSummary(module.key, client.client_id)));
-
-    const opportunitiesRes = await fetch(`/api/client/intel/opportunities?client_id=${encodeURIComponent(String(client.client_id))}&view=deep`, {
-      cache: 'no-store',
-    });
-    if (!opportunitiesRes.ok) throw new Error('Unable to load opportunities');
-    const opportunitiesPayload = await opportunitiesRes.json();
-    setClientOpportunities(opportunitiesPayload.opportunities || []);
+    setSearchStatus(`Pending client: ${client.client_name || `Client #${client.client_id}`}`);
+    resetModules('Pending');
   }
 
   async function runSearch() {
@@ -233,8 +122,7 @@ export default function ClientDashboardPage() {
       }
 
       if (clients.length === 1) {
-        setSearchStatus('Client found. Activating context...');
-        await activateClient(clients[0]);
+        await activatePendingClient(clients[0].client_id);
         return;
       }
 
@@ -244,31 +132,6 @@ export default function ClientDashboardPage() {
       if (error?.name === 'AbortError') return;
       setSearchStatus('Client search unavailable');
       setSearchResults([]);
-    }
-  }
-
-  async function loadOpportunityIntel(opportunityId) {
-    if (!activeClient?.client_id || !opportunityId) return;
-
-    if (opportunityAbortRef.current) {
-      opportunityAbortRef.current.abort();
-    }
-    const controller = new AbortController();
-    opportunityAbortRef.current = controller;
-
-    setClientOpportunityIntel({ loading: 'Loading opportunity intelligence...' });
-
-    try {
-      const res = await fetch(`/api/client/intel/opportunity/${encodeURIComponent(String(opportunityId))}?client_id=${encodeURIComponent(String(activeClient.client_id))}`, {
-        cache: 'no-store',
-        signal: controller.signal,
-      });
-      if (!res.ok) throw new Error('Opportunity intel request failed');
-      const payload = await res.json();
-      setClientOpportunityIntel(payload.intel || null);
-    } catch (error) {
-      if (error?.name === 'AbortError') return;
-      setClientOpportunityIntel({ error: 'Unable to load opportunity intelligence.' });
     }
   }
 
@@ -301,7 +164,7 @@ export default function ClientDashboardPage() {
               key={client.client_id}
               type="button"
               className="client-opportunity-card"
-              onClick={() => activateClient(client)}
+              onClick={() => activatePendingClient(client.client_id)}
             >
               <div><strong>{client.client_name || `Client #${client.client_id}`}</strong></div>
               <div className="intel-count">{client.uei || 'No UEI'} | {client.naics || 'No NAICS'}</div>
@@ -319,7 +182,7 @@ export default function ClientDashboardPage() {
                 <span>{module.label}</span>
               </button>
               <div className="polish-panel-body pd-intel-panel">
-                <div className="pd-intel-status">{state.status}</div>
+                <div className="pd-intel-status">{state.status}: {module.placeholder}</div>
                 <div className="pd-intel-summary">
                   {(state.summary || []).map((row) => (
                     <div className="kv" key={row.label}>
@@ -358,14 +221,14 @@ export default function ClientDashboardPage() {
         <article className="client-opportunities-panel">
           <div className="client-panel-header">Top 10 Opportunities</div>
           <div className="client-panel-body">
-            {!activeClient && 'Waiting for client...'}
-            {activeClient && !clientOpportunities.length && 'No opportunities loaded.'}
+            {!activeClient && 'Pending client activation.'}
+            {activeClient && !clientOpportunities.length && 'Opportunity analysis is pending.'}
             {clientOpportunities.map((row) => (
               <button
                 key={row.opportunity_id || row.title}
                 type="button"
                 className="client-opportunity-card"
-                onClick={() => loadOpportunityIntel(row.opportunity_id || row.title)}
+                disabled
               >
                 <div><strong>{row.title}</strong></div>
                 <div className="intel-count">{row.agency} | PSC {row.psc}</div>
@@ -379,8 +242,8 @@ export default function ClientDashboardPage() {
         <article className="client-opportunity-intel-panel">
           <div className="client-panel-header">Opportunity Intel</div>
           <div className="client-panel-body">
-            {!activeClient && 'Waiting for opportunity selection...'}
-            {activeClient && !clientOpportunityIntel && 'Click an opportunity to load intelligence.'}
+            {!activeClient && 'Pending client activation.'}
+            {activeClient && !clientOpportunityIntel && 'Opportunity intelligence is pending.'}
             {clientOpportunityIntel && Object.entries(clientOpportunityIntel).map(([key, value]) => (
               <div className="kv" key={key}>
                 <span>{key.replaceAll('_', ' ')}</span>

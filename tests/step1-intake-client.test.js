@@ -30,7 +30,7 @@ test('Step 1 dashboard shell keeps modules pending and does not load intelligenc
   const dashboard = fs.readFileSync(path.join(__dirname, '..', 'src/pages/ClientDashboardPage.jsx'), 'utf8');
   assert.match(dashboard, /status: 'Pending'/);
   assert.match(dashboard, /disabled\s*>\s*Pending/);
-  const pendingClientFunction = dashboard.match(/async function loadPendingClient[\s\S]*?\n  }/);
+  const pendingClientFunction = dashboard.match(/async function activatePendingClient[\s\S]*?\n  }/);
   assert.ok(pendingClientFunction);
   assert.doesNotMatch(pendingClientFunction[0], /\/api\/client\/intel/);
 });

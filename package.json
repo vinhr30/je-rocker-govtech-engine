@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test tests/step1-intake-client.test.js"
+    "test": "node --test tests/step1-intake-client.test.js tests/step2-dashboard-activation.test.js"
   },
   "keywords": [],
   "author": "",
