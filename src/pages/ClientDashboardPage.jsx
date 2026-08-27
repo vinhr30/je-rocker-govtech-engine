@@ -7,6 +7,7 @@ const MODULES = [
   { key: 'forecasting', label: 'Forecasting Panel', placeholder: 'Forecasting review is pending.' },
   { key: 'match', label: 'Match Panel', placeholder: 'Opportunity matching is pending.' },
   { key: 'mission', label: 'Mission Panel', placeholder: 'Mission strategy is pending.' },
+  { key: 'pulse', label: 'Pulse Panel', placeholder: 'Operational pulse is pending.' },
   { key: 'weekly', label: 'Weekly Intelligence Report Panel', placeholder: 'Weekly intelligence is pending.' },
   { key: 'opportunities', label: 'Opportunity Feed Panel', placeholder: 'Opportunity analysis is pending.' },
   { key: 'matches', label: 'Matches Panel', placeholder: 'Match analysis is pending.' },
