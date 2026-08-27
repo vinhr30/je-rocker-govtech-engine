@@ -9,7 +9,7 @@ const ENGINE_TRIGGER_MAP = Object.freeze({
   compliance: Object.freeze({ module: 'compliance', trigger: 'client_created' }),
   modernization: Object.freeze({ module: 'modernization', trigger: 'client_created' }),
   forecasting: Object.freeze({ module: 'forecasting', trigger: 'client_created' }),
-  match: Object.freeze({ module: 'matches', trigger: 'client_created' }),
+  match: Object.freeze({ module: 'match', trigger: 'client_created' }),
   mission: Object.freeze({ module: 'vendors', trigger: 'client_created' }),
   pulse: Object.freeze({ module: 'capture', trigger: 'client_created' }),
 });
