@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import '../styles/client.css';
 
 const MODULES = [
+  { key: 'compliance', label: 'Compliance Panel', placeholder: 'Compliance review is pending.' },
   { key: 'weekly', label: 'Weekly Intelligence Report Panel', placeholder: 'Weekly intelligence is pending.' },
   { key: 'opportunities', label: 'Opportunity Feed Panel', placeholder: 'Opportunity analysis is pending.' },
   { key: 'matches', label: 'Matches Panel', placeholder: 'Match analysis is pending.' },
@@ -182,7 +183,7 @@ export default function ClientDashboardPage() {
                 <span>{module.label}</span>
               </button>
               <div className="polish-panel-body pd-intel-panel">
-                <div className="pd-intel-status">{state.status}: {module.placeholder}</div>
+                <div className="pd-intel-status">{state.status}{(state.placeholder ?? module.placeholder) ? `: ${state.placeholder ?? module.placeholder}` : ''}</div>
                 <div className="pd-intel-summary">
                   {(state.summary || []).map((row) => (
                     <div className="kv" key={row.label}>

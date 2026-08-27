@@ -6,7 +6,7 @@ const INTELLIGENCE_LIFECYCLE_STATES = Object.freeze({
 });
 
 const ENGINE_TRIGGER_MAP = Object.freeze({
-  compliance: Object.freeze({ module: 'weekly', trigger: 'client_created' }),
+  compliance: Object.freeze({ module: 'compliance', trigger: 'client_created' }),
   modernization: Object.freeze({ module: 'opportunities', trigger: 'client_created' }),
   forecasting: Object.freeze({ module: 'spend', trigger: 'client_created' }),
   match: Object.freeze({ module: 'matches', trigger: 'client_created' }),

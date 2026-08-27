@@ -108,6 +108,8 @@ async function ensureClientSchema(db) {
     ['capability_signals', 'TEXT'],
     ['targeting_preferences', 'TEXT'],
     ['lifecycle_status', "TEXT NOT NULL DEFAULT 'pending'"],
+    ['sam_registration', 'TEXT'],
+    ['business_classifications', 'TEXT'],
   ];
 
   for (const [name, type] of requiredColumns) {
@@ -126,6 +128,10 @@ function toClientRow(row) {
     notes: row.notes || '',
     capability_signals: row.capability_signals || '',
     targeting_preferences: row.targeting_preferences || '',
+    uei: row.uei || '',
+    naics: row.naics || '',
+    sam_registration: row.sam_registration || '',
+    business_classifications: row.business_classifications || '',
     lifecycle_status: row.lifecycle_status || 'pending',
     created_at: row.created_at || null,
   };
@@ -199,6 +205,22 @@ async function createClient(input, databasePath) {
 }
 
 const addClient = createClient;
+
+async function getClientById(clientId, databasePath) {
+  const normalizedClientId = Number(clientId);
+  if (!Number.isInteger(normalizedClientId) || normalizedClientId <= 0) {
+    throw new TypeError('A valid clientId is required');
+  }
+
+  const db = openClientDb(databasePath);
+  try {
+    await ensureClientSchema(db);
+    const row = await getAsync(db, 'SELECT * FROM clients WHERE client_id = ?', [normalizedClientId]);
+    return row ? toClientRow(row) : null;
+  } finally {
+    await closeAsync(db);
+  }
+}
 
 async function getClients() {
   const db = openClientDb();
@@ -405,6 +427,7 @@ module.exports = {
   clientEvents,
   createClient,
   addClient,
+  getClientById,
   getClients,
   getMostRecentClient,
   getClientCount,

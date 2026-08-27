@@ -33,6 +33,7 @@ test('activation creates a pending lifecycle and null intelligence results', () 
   assert.ok(Object.values(activation.lifecycle).every((engine) => engine.state === 'pending'));
   assert.equal(activation.dashboardUpdate.active, false);
   assert.ok(Object.values(activation.dashboardUpdate.moduleStates).every((state) => state === 'pending'));
+  assert.equal(activation.dashboardUpdate.moduleStates.compliance, 'pending');
 });
 
 test('activation requires a valid client id', () => {
