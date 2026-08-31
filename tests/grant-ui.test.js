@@ -96,10 +96,17 @@ const TEST_DRIVERS = ['legacy modernization backlog', 'procurement cycle time'];
 const TEST_CAPABILITY_MAP = [
   { capability: 'dashboard intelligence', terms: ['decision support dashboard'] },
 ];
+const TEST_DRIVER_MAP = [
+  { capability: 'reduce legacy system risk', terms: ['legacy modernization'] },
+];
 
 async function seedDriverDb(dir) {
   const databasePath = path.join(dir, 'business_driver.db');
-  await seedBusinessDrivers(databasePath, { drivers: TEST_DRIVERS, capabilityMap: TEST_CAPABILITY_MAP });
+  await seedBusinessDrivers(databasePath, {
+    drivers: TEST_DRIVERS,
+    capabilityMap: TEST_CAPABILITY_MAP,
+    driverMap: TEST_DRIVER_MAP,
+  });
   return databasePath;
 }
 
@@ -211,7 +218,7 @@ test('signal sets load business drivers and capability map terms', async () => {
 
 test('a missing business_driver.db contributes no signal rather than failing', async () => {
   const signals = await getSignalSets({ businessDriverDatabasePath: '/tmp/grant-ui-no-drivers.db' });
-  assert.deepStrictEqual(signals, { businessDrivers: [], capabilityMapTerms: [] });
+  assert.deepStrictEqual(signals, { businessDrivers: [], capabilityMapTerms: [], driverMapTerms: [] });
 });
 
 test('business drivers score at agency weight and land in score_business_driver', () => {
@@ -405,6 +412,39 @@ test('a grant with no text scores zero on every axis', () => {
     capabilityMapTerms: [],
   });
   assert.strictEqual(result.score_total, 0);
+});
+
+test('driver map terms score on the business driver axis', () => {
+  const grant = { agency: 'Smithsonian Institution', title: 'Improving interoperability across partner systems' };
+
+  const withoutMap = scoreGrantForCompany(grant, JE_ROCKER, { businessDrivers: JE_ROCKER_DRIVERS, capabilityMapTerms: [], driverMapTerms: [] });
+  const withMap = scoreGrantForCompany(grant, JE_ROCKER, {
+    businessDrivers: JE_ROCKER_DRIVERS,
+    capabilityMapTerms: [],
+    driverMapTerms: ['interoperability', 'data sharing'],
+  });
+
+  assert.strictEqual(withoutMap.score_business_driver, 0, 'the outcome phrasing alone never appears in notices');
+  assert.strictEqual(withMap.score_business_driver, WEIGHTS.businessDriver);
+  assert.deepStrictEqual(withMap.reasons.businessDrivers, ['interoperability']);
+});
+
+test('driver map terms are seeded and loaded', async () => {
+  const businessDriverDatabasePath = await seedDriverDb(tempDir('drivermap'));
+  const signals = await getSignalSets({ businessDriverDatabasePath });
+  assert.deepStrictEqual(signals.driverMapTerms, ['legacy modernization']);
+});
+
+test('a driver map term repeated across drivers is only counted once', () => {
+  const grant = { agency: 'X', title: 'A system modernization and legacy modernization effort' };
+  const result = scoreGrantForCompany(grant, JE_ROCKER, {
+    businessDrivers: [],
+    capabilityMapTerms: [],
+    driverMapTerms: ['legacy modernization', 'legacy modernization', 'system modernization'],
+  });
+
+  assert.strictEqual(result.score_business_driver, WEIGHTS.businessDriver * 2, 'two distinct terms, no duplicate credit');
+  assert.deepStrictEqual(result.reasons.businessDrivers.sort(), ['legacy modernization', 'system modernization']);
 });
 
 test('hyphenated words inside a phrase do not match on their own', () => {

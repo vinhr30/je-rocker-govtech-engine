@@ -62,6 +62,45 @@ const JE_ROCKER_CAPABILITY_MAP = {
   ],
 };
 
+const JE_ROCKER_DRIVER_MAP = {
+  'reduce legacy system risk': [
+    'legacy system replacement', 'modernize legacy systems', 'legacy modernization', 'system modernization',
+  ],
+  'accelerate digital modernization': [
+    'digital transformation', 'modernize digital infrastructure', 'it modernization', 'technology modernization',
+  ],
+  'improve data interoperability': [
+    'interoperability', 'data sharing', 'data exchange', 'cross-agency data integration',
+  ],
+  'increase procurement transparency': [
+    'procurement modernization', 'acquisition transparency', 'contracting data visibility', 'procurement analytics',
+  ],
+  'deploy AI-driven decision support': [
+    'ai-driven analytics', 'machine learning', 'predictive analytics', 'decision support systems',
+  ],
+  'replace manual workflows with automation': [
+    'workflow automation', 'process automation', 'automated systems', 'digital workflow modernization',
+  ],
+  'modernize public sector dashboards': [
+    'dashboard modernization', 'real-time dashboards', 'executive reporting', 'mission analytics dashboards',
+  ],
+  'strengthen compliance and reporting': [
+    'compliance automation', 'audit automation', 'regulatory reporting', 'policy compliance',
+  ],
+  'enable real-time operational visibility': [
+    'real-time analytics', 'operational dashboards', 'situational awareness', 'mission-critical visibility',
+  ],
+  'support multi-agency data sharing': [
+    'interagency data sharing', 'federated data systems', 'cross-agency interoperability', 'shared data infrastructure',
+  ],
+  'advance mission-critical decision support': [
+    'mission analytics', 'decision support systems', 'operational decision support', 'strategic decision support',
+  ],
+  'reduce technical debt in federal systems': [
+    'legacy modernization', 'system modernization', 'technical debt reduction', 'modernize federal systems',
+  ],
+};
+
 function toCapabilityEntries(map) {
   return Object.entries(map).map(([capability, terms]) => ({ capability, terms }));
 }
@@ -82,6 +121,7 @@ async function seedBusinessDrivers(
     companyId = COMPANY_ID,
     drivers = JE_ROCKER_DRIVERS,
     capabilityMap = toCapabilityEntries(JE_ROCKER_CAPABILITY_MAP),
+    driverMap = toCapabilityEntries(JE_ROCKER_DRIVER_MAP),
   } = {},
 ) {
   const db = new sqlite3.Database(databasePath);
@@ -105,6 +145,16 @@ async function seedBusinessDrivers(
     )
   `);
 
+  await runAsync(db, `
+    CREATE TABLE IF NOT EXISTS driver_map (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      company_id TEXT NOT NULL,
+      driver TEXT NOT NULL,
+      mapped_term TEXT NOT NULL,
+      UNIQUE(company_id, driver, mapped_term)
+    )
+  `);
+
   for (const driver of drivers) {
     await runAsync(
       db,
@@ -123,8 +173,18 @@ async function seedBusinessDrivers(
     }
   }
 
+  for (const entry of driverMap) {
+    for (const term of entry.terms || []) {
+      await runAsync(
+        db,
+        'INSERT INTO driver_map (company_id, driver, mapped_term) VALUES (?, ?, ?) ON CONFLICT DO NOTHING',
+        [companyId, String(entry.capability).trim(), String(term).trim()],
+      );
+    }
+  }
+
   await new Promise((resolve) => db.close(resolve));
-  return { drivers: drivers.length, capabilityMap: capabilityMap.length };
+  return { drivers: drivers.length, capabilityMap: capabilityMap.length, driverMap: driverMap.length };
 }
 
 module.exports = {
@@ -132,13 +192,14 @@ module.exports = {
   DEFAULT_BUSINESS_DRIVER_DB,
   JE_ROCKER_CAPABILITY_MAP,
   JE_ROCKER_DRIVERS,
+  JE_ROCKER_DRIVER_MAP,
   seedBusinessDrivers,
   toCapabilityEntries,
 };
 
 if (require.main === module) {
   seedBusinessDrivers()
-    .then((counts) => console.log(`Seeded ${counts.drivers} drivers, ${counts.capabilityMap} capability mappings`))
+    .then((counts) => console.log(`Seeded ${counts.drivers} drivers, ${counts.capabilityMap} capability mappings, ${counts.driverMap} driver mappings`))
     .catch((error) => {
       console.error(error.message);
       process.exitCode = 1;

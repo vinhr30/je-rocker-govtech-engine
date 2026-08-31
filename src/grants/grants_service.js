@@ -134,7 +134,12 @@ function scoreGrantForCompany(grant, profile, signals = {}) {
   const agencyText = haystack(grant.agency, grant.agency_code);
 
   const agency = matchTokens(tokenize(profile.preferred_agencies), agencyText, WEIGHTS.agency);
-  const businessDriver = matchTokens(tokenize(signals.businessDrivers), subject, WEIGHTS.businessDriver);
+  // driver_map widens each driver with the wording grant notices actually use.
+  const businessDriver = matchTokens(
+    tokenize([...(signals.businessDrivers || []), ...(signals.driverMapTerms || [])]),
+    subject,
+    WEIGHTS.businessDriver,
+  );
   // capability_map widens each capability with related wording at the same weight.
   const capabilities = matchTokens(
     tokenize([...(profile.capabilities || []), ...(signals.capabilityMapTerms || [])]),
@@ -231,7 +236,7 @@ async function getCompanyProfile({ companyDatabasePath = DEFAULT_COMPANY_DB, com
 
 /** Signal sets are optional; a missing database simply contributes no score. */
 async function getSignalSets({ businessDriverDatabasePath = DEFAULT_BUSINESS_DRIVER_DB, companyId = COMPANY_ID } = {}) {
-  const empty = { businessDrivers: [], capabilityMapTerms: [] };
+  const empty = { businessDrivers: [], capabilityMapTerms: [], driverMapTerms: [] };
   let db;
   try {
     db = await openReadOnly(businessDriverDatabasePath);
@@ -239,12 +244,22 @@ async function getSignalSets({ businessDriverDatabasePath = DEFAULT_BUSINESS_DRI
     return empty;
   }
 
+  const readTerms = async (sql) => {
+    try {
+      return await allAsync(db, sql, [companyId]);
+    } catch {
+      return [];
+    }
+  };
+
   try {
-    const drivers = await allAsync(db, 'SELECT driver FROM business_drivers WHERE company_id = ?', [companyId]);
-    const mapped = await allAsync(db, 'SELECT mapped_term FROM capability_map WHERE company_id = ?', [companyId]);
+    const drivers = await readTerms('SELECT driver FROM business_drivers WHERE company_id = ?');
+    const mapped = await readTerms('SELECT mapped_term FROM capability_map WHERE company_id = ?');
+    const driverMapped = await readTerms('SELECT mapped_term FROM driver_map WHERE company_id = ?');
     return {
       businessDrivers: drivers.map((row) => row.driver),
       capabilityMapTerms: mapped.map((row) => row.mapped_term),
+      driverMapTerms: driverMapped.map((row) => row.mapped_term),
     };
   } catch {
     return empty;
