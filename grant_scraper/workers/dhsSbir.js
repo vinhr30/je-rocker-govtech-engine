@@ -1,3 +1,3 @@
-const { createSbirWorker } = require('./sbirWorker');
+const { createGrantsGovSbirWorker } = require('./grantsGovSbirWorker');
 
-module.exports = createSbirWorker('dhs_sbir');
+module.exports = createGrantsGovSbirWorker('dhs_sbir');

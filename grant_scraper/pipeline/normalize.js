@@ -42,12 +42,19 @@ function toNumber(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-/** Accepts ISO strings and the MM/DD/YYYY form used by the Grants.gov full API. */
+/** Accepts ISO strings, epoch milliseconds, and the MM/DD/YYYY form used by Grants.gov. */
 function toIsoDate(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return new Date(value).toISOString().slice(0, 10);
+  }
   const text = toText(value);
   if (!text) return null;
-  const usFormat = text.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (usFormat) return `${usFormat[3]}-${usFormat[1]}-${usFormat[2]}`;
+  if (/^\d{12,}$/.test(text)) return new Date(Number(text)).toISOString().slice(0, 10);
+  const usFormat = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (usFormat) {
+    const year = usFormat[3].length === 2 ? `20${usFormat[3]}` : usFormat[3];
+    return `${year}-${usFormat[1].padStart(2, '0')}-${usFormat[2].padStart(2, '0')}`;
+  }
   const isoPrefix = text.match(/^\d{4}-\d{2}-\d{2}/);
   return isoPrefix ? isoPrefix[0] : text;
 }
@@ -98,6 +105,45 @@ function mapSbir(record) {
   };
 }
 
+function mapDodTopic(record) {
+  return {
+    title: pick(record, ['topicTitle']),
+    agency: pick(record, ['component', 'command']) || 'Department of Defense',
+    program: pick(record, ['program']),
+    opportunityNumber: pick(record, ['topicCode', 'solicitationNumber']),
+    status: pick(record, ['topicStatus']),
+    postedDate: pick(record, ['topicStartDate', 'topicPreReleaseStartDate']),
+    closeDate: pick(record, ['topicEndDate']),
+    awardFloor: null,
+    awardCeiling: null,
+    description: pick(record, ['solicitationTitle', 'cycleName']),
+  };
+}
+
+function mapNasaSolicitation(record) {
+  return {
+    title: pick(record, ['Opportunity']),
+    agency: 'NASA',
+    program: pick(record, ['program']),
+    opportunityNumber: null,
+    status: null,
+    postedDate: pick(record, ['Open Date']),
+    closeDate: pick(record, ['Close Date']),
+    awardFloor: null,
+    awardCeiling: null,
+    description: pick(record, ['Selection Announcement'])
+      ? `Selection announcement: ${pick(record, ['Selection Announcement'])}`
+      : null,
+  };
+}
+
+/** Grants.gov docType says "forecast"/"synopsis", so the SBIR vs STTR program is read from the notice text. */
+function mapGrantsGovSbir(record) {
+  const mapped = mapGrantsGovFull(record);
+  const haystack = `${record.title || ''} ${record.number || ''}`.toUpperCase();
+  return { ...mapped, program: haystack.includes('STTR') ? 'STTR' : 'SBIR' };
+}
+
 function mapState(record) {
   return {
     title: pick(record, ['Title', 'title', 'GrantTitle', 'name', 'opportunity_title']),
@@ -116,6 +162,14 @@ function mapState(record) {
 const MAPPERS = {
   grants_gov_simpler: mapGrantsGovSimpler,
   grants_gov_full: mapGrantsGovFull,
+  dod_sbir: mapDodTopic,
+  nasa_sbir: mapNasaSolicitation,
+  nsf_sbir: mapGrantsGovSbir,
+  nih_sbir: mapGrantsGovSbir,
+  doe_sbir: mapGrantsGovSbir,
+  usda_sbir: mapGrantsGovSbir,
+  dhs_sbir: mapGrantsGovSbir,
+  dot_sbir: mapGrantsGovSbir,
 };
 
 function selectMapper(row) {

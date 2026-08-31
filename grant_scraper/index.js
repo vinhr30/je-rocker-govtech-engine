@@ -6,10 +6,10 @@ const { runTopicExtraction } = require('./pipeline/topics');
 const { SCHEDULE, runAll, runCadence, runWorkers } = require('./scheduler');
 
 /** Runs a single named source end to end. Useful for verifying one endpoint. */
-async function runSource(sourceId, { databasePath, fetchImpl, now } = {}) {
+async function runSource(sourceId, { databasePath, fetchImpl, env, now } = {}) {
   const worker = getWorker(sourceId);
   return withDatabase(async (db) => {
-    const ingestion = await worker.run({ db, fetchImpl, now });
+    const ingestion = await worker.run({ db, fetchImpl, env, now });
     const normalization = await runNormalization(db, { sourceId, now });
     const topics = worker.source.category === 'sbir'
       ? await runTopicExtraction(db, { sourceId, now })

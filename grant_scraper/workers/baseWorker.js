@@ -1,4 +1,4 @@
-const { fetchJson } = require('../lib/http');
+const { fetchJson, fetchText } = require('../lib/http');
 const { getAsync, runAsync } = require('../lib/db');
 
 const UPSERT_RAW = `
@@ -26,6 +26,23 @@ function firstDefined(record, keys) {
   return null;
 }
 
+async function writeRecords(db, source, items, fetchedAt) {
+  let written = 0;
+  for (const item of items) {
+    await runAsync(db, UPSERT_RAW, [
+      source.id,
+      source.name,
+      source.category,
+      item.externalId,
+      item.url || null,
+      JSON.stringify(item.record),
+      fetchedAt,
+    ]);
+    written += 1;
+  }
+  return written;
+}
+
 /**
  * Builds a worker that fetches a source, parses it into discrete records,
  * and writes each record's raw JSON into grants_raw.
@@ -38,26 +55,14 @@ function createWorker(source, parse) {
     id: source.id,
     source,
     parse,
-    async run({ db, fetchImpl, now = () => new Date().toISOString() } = {}) {
+    async run({ db, fetchImpl, env, now = () => new Date().toISOString() } = {}) {
       if (!db) throw new Error(`Worker ${source.id} requires a database handle`);
 
-      const payload = await fetchJson(source, { fetchImpl });
+      const fetcher = source.fetchMode === 'html' ? fetchText : fetchJson;
+      const payload = await fetcher(source, { fetchImpl, env });
       const parsed = parse(payload).filter((item) => item && item.externalId);
       const fetchedAt = now();
-
-      let written = 0;
-      for (const item of parsed) {
-        await runAsync(db, UPSERT_RAW, [
-          source.id,
-          source.name,
-          source.category,
-          item.externalId,
-          item.url || null,
-          JSON.stringify(item.record),
-          fetchedAt,
-        ]);
-        written += 1;
-      }
+      const written = await writeRecords(db, source, parsed, fetchedAt);
 
       return {
         sourceId: source.id,
@@ -80,4 +85,5 @@ module.exports = {
   createWorker,
   findRawId,
   firstDefined,
+  writeRecords,
 };

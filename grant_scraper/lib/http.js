@@ -19,14 +19,27 @@ function buildHeaders(source, env) {
   return headers;
 }
 
-async function fetchJson(source, {
-  timeoutMs = DEFAULT_TIMEOUT_MS,
-  fetchImpl = globalThis.fetch,
-  env = process.env,
-} = {}) {
+function requireCredential(source, env) {
+  if (source.authRequired && source.authEnvVar && !env[source.authEnvVar]) {
+    throw new Error(`${source.id} requires ${source.authEnvVar} to be set`);
+  }
+}
+
+/** Credentials for query-param APIs are appended at request time, never stored. */
+function buildUrl(source, env) {
+  if (!source.authQueryParam || !source.authEnvVar) return source.endpoint;
+  const secret = env[source.authEnvVar];
+  if (!secret) return source.endpoint;
+  const url = new URL(source.endpoint);
+  url.searchParams.set(source.authQueryParam, secret);
+  return url.toString();
+}
+
+async function request(source, { timeoutMs = DEFAULT_TIMEOUT_MS, fetchImpl = globalThis.fetch, env = process.env } = {}) {
   if (typeof fetchImpl !== 'function') {
     throw new Error('No fetch implementation is available');
   }
+  requireCredential(source, env);
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -41,19 +54,34 @@ async function fetchJson(source, {
       init.body = JSON.stringify(source.body || {});
     }
 
-    const response = await fetchImpl(source.endpoint, init);
+    const response = await fetchImpl(buildUrl(source, env), init);
     if (!response.ok) {
       throw new Error(`${source.id} request failed with status ${response.status}`);
     }
-    return await response.json();
+    return response;
   } finally {
     clearTimeout(timer);
   }
+}
+
+async function fetchJson(source, options = {}) {
+  const response = await request(source, options);
+  return response.json();
+}
+
+async function fetchText(source, options = {}) {
+  const response = await request(
+    { ...source, headers: { Accept: 'text/html,application/xhtml+xml', ...(source.headers || {}) } },
+    options,
+  );
+  return response.text();
 }
 
 module.exports = {
   DEFAULT_TIMEOUT_MS,
   USER_AGENT,
   buildHeaders,
+  buildUrl,
   fetchJson,
+  fetchText,
 };

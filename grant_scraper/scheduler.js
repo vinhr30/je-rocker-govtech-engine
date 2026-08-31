@@ -21,13 +21,13 @@ function getScheduledWorkers(cadence) {
   return listWorkers({ cadence });
 }
 
-async function runWorkers(db, workers, { fetchImpl, now } = {}) {
+async function runWorkers(db, workers, { fetchImpl, env, now } = {}) {
   const results = [];
   const failures = [];
 
   for (const worker of workers) {
     try {
-      results.push(await worker.run({ db, fetchImpl, now }));
+      results.push(await worker.run({ db, fetchImpl, env, now }));
     } catch (error) {
       failures.push({ sourceId: worker.id, error: error.message });
     }
@@ -37,11 +37,11 @@ async function runWorkers(db, workers, { fetchImpl, now } = {}) {
 }
 
 /** Runs one cadence end to end: ingest -> normalize -> extract topics. */
-async function runCadence(cadence, { databasePath, fetchImpl, now } = {}) {
+async function runCadence(cadence, { databasePath, fetchImpl, env, now } = {}) {
   const workers = getScheduledWorkers(cadence);
 
   return withDatabase(async (db) => {
-    const ingestion = await runWorkers(db, workers, { fetchImpl, now });
+    const ingestion = await runWorkers(db, workers, { fetchImpl, env, now });
     const normalization = await runNormalization(db, { now });
     const topics = cadence === 'weekly'
       ? await runTopicExtraction(db, { now })

@@ -19,16 +19,22 @@ const TOPIC_CONTAINERS = ['solicitation_topics', 'topics', 'topic_list'];
 function pick(record, keys) {
   for (const key of keys) {
     const value = record[key];
-    if (value !== null && value !== undefined && value !== '') return String(value);
+    if (value === null || value === undefined || value === '') continue;
+    if (typeof value === 'object') continue;
+    return String(value);
   }
   return null;
 }
 
+/**
+ * DoD returns one topic per record, while solicitation-style sources nest a
+ * topic array. Both are flattened to a single list of topic objects.
+ */
 function findTopics(record) {
   for (const key of TOPIC_CONTAINERS) {
     if (Array.isArray(record[key])) return record[key];
   }
-  return [];
+  return record.topicCode || record.topicTitle ? [record] : [];
 }
 
 /** SBIR and STTR share a solicitation envelope, so program is inferred per topic. */
@@ -39,20 +45,38 @@ function resolveProgram(topic, record) {
   return haystack.toUpperCase().includes('STTR') ? 'STTR' : 'SBIR';
 }
 
+/** DoD encodes phases as a phaseHierarchy JSON string; flatten it to "I, II". */
+function resolvePhase(topic) {
+  const direct = pick(topic, ['sbir_phase', 'phase']);
+  if (direct) return direct;
+
+  const hierarchy = topic.phaseHierarchy;
+  if (!hierarchy) return null;
+  try {
+    const parsed = typeof hierarchy === 'string' ? JSON.parse(hierarchy) : hierarchy;
+    const values = (parsed.config || []).map((entry) => entry.displayValue).filter(Boolean);
+    return values.length ? values.join(', ') : null;
+  } catch {
+    return null;
+  }
+}
+
 function extractTopics(row) {
   const record = JSON.parse(row.raw_json);
   return findTopics(record)
     .map((topic, index) => {
-      const topicNumber = pick(topic, ['topic_number', 'topic_code', 'number']) || `${row.external_id}-${index + 1}`;
+      const topicNumber =
+        pick(topic, ['topic_number', 'topicCode', 'topic_code', 'number']) || `${row.external_id}-${index + 1}`;
       return {
         rawId: row.id,
         sourceId: row.source_id,
         externalId: row.external_id,
         program: resolveProgram(topic, record),
-        phase: pick(topic, ['sbir_phase', 'phase']) || pick(record, ['phase']),
+        phase: resolvePhase(topic) || pick(record, ['phase']),
         topicNumber,
-        topicTitle: pick(topic, ['topic_title', 'title']),
-        topicDescription: pick(topic, ['topic_description', 'description']),
+        topicTitle: pick(topic, ['topic_title', 'topicTitle', 'title']),
+        topicDescription:
+          pick(topic, ['topic_description', 'description']) || pick(topic, ['solicitationTitle', 'cycleName']),
       };
     })
     .filter((topic) => topic.topicTitle || topic.topicDescription);
