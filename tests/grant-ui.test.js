@@ -339,6 +339,22 @@ test('the detail view includes the signal section when signals are supplied', ()
   assert.ok(!renderDetail(grant).includes('Why this matches'), 'section is omitted without signals');
 });
 
+test('hyphenated words inside a phrase do not match on their own', () => {
+  const driverHit = scoreGrantForCompany(
+    { agency: 'State', title: 'Real-time coverage of human rights abuses' },
+    JE_ROCKER,
+    { businessDrivers: ['enable real-time operational visibility'], capabilityMapTerms: [] },
+  );
+  assert.strictEqual(driverHit.score_business_driver, 0, '"real-time" must not match on its own');
+
+  const capabilityHit = scoreGrantForCompany(
+    { agency: 'Labor', title: 'Brookwood-Sago high-risk mine safety grants' },
+    JE_ROCKER,
+    { businessDrivers: [], capabilityMapTerms: ['high-risk high-reward'] },
+  );
+  assert.strictEqual(capabilityHit.score_capabilities, 0, '"high-risk" must not match on its own');
+});
+
 test('short agency codes do not match ordinary words', () => {  const result = scoreGrantForCompany(
     { agency: 'Department of Commerce', title: 'Connecting the dots in rural broadband' },
     JE_ROCKER,

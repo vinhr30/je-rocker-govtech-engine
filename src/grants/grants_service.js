@@ -68,9 +68,6 @@ function tokenize(value) {
     const segments = trimmed.split(/[\s/]+/).filter(Boolean);
     if (segments.length > 1) {
       phrases.add(trimmed);
-      for (const segment of segments) {
-        if (segment.includes('-') || /[a-z]{2,}\d|\d[a-z]{2,}/.test(segment)) phrases.add(segment);
-      }
     } else if (!STOPWORDS.has(trimmed)) {
       words.add(trimmed);
     }
