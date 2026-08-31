@@ -160,13 +160,43 @@ async function withDatabase(handler, databasePath) {
   }
 }
 
+/** Landing table for the SBIR.gov harvester; keyed by topic page so re-runs upsert. */
+async function ensureSbirSchema(db) {
+  await runAsync(db, `
+    CREATE TABLE IF NOT EXISTS sbir_topic_sources (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sbir_topic_url TEXT NOT NULL UNIQUE,
+      official_url TEXT NOT NULL,
+      title TEXT,
+      agency TEXT,
+      solicitation_number TEXT,
+      topic_number TEXT,
+      phase TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await runAsync(db, 'CREATE INDEX IF NOT EXISTS ix_sbir_topic_sources_agency ON sbir_topic_sources(agency)');
+}
+
+async function withSbirDatabase(handler, databasePath) {
+  const db = openDatabase(databasePath);
+  try {
+    await ensureSbirSchema(db);
+    return await handler(db);
+  } finally {
+    await closeAsync(db);
+  }
+}
+
 module.exports = {
   DEFAULT_DB_PATH,
   allAsync,
   closeAsync,
+  ensureSbirSchema,
   ensureSchema,
   getAsync,
   openDatabase,
   runAsync,
   withDatabase,
+  withSbirDatabase,
 };
