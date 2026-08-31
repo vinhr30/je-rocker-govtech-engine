@@ -3,7 +3,16 @@ const sqlite3 = require('sqlite3').verbose();
 
 const DEFAULT_GRANTS_DB = path.join(__dirname, '..', '..', 'grant_scraper', 'data', 'grants.db');
 const DEFAULT_COMPANY_DB = path.join(__dirname, '..', '..', 'company.db');
+const DEFAULT_BUSINESS_DRIVER_DB = path.join(__dirname, '..', '..', 'business_driver.db');
 const COMPANY_ID = 'jerocker';
+
+const WEIGHTS = Object.freeze({
+  agency: 4,
+  businessDriver: 4,
+  capabilities: 3,
+  focusAreas: 3,
+  modernization: 2,
+});
 
 const LIST_COLUMNS = `
   opportunity_number, title, agency, agency_code, status, posted_date, close_date,
@@ -89,24 +98,51 @@ function matchTokens(tokens, text, weight) {
 }
 
 /**
- * Scores a grant against the JE ROCKER LC profile. Every grant keeps a score so
- * the list can be ranked rather than filtered, and the matched terms explain why.
+ * Scores a grant against the JE ROCKER LC profile and its signal sets. Every
+ * grant keeps a score so the list can be ranked rather than filtered, and each
+ * axis is reported separately so the UI can explain the ranking.
  */
-function scoreGrantForCompany(grant, profile) {
-  if (!profile) return { score: 0, reasons: {} };
+function scoreGrantForCompany(grant, profile, signals = {}) {
+  const empty = {
+    score: 0,
+    score_agency: 0,
+    score_capabilities: 0,
+    score_focus_areas: 0,
+    score_modernization: 0,
+    score_business_driver: 0,
+    score_total: 0,
+    reasons: {},
+  };
+  if (!profile) return empty;
 
   const subject = haystack(grant.title, grant.opportunity_category, grant.description);
   const agencyText = haystack(grant.agency, grant.agency_code);
 
-  const agency = matchTokens(tokenize(profile.preferred_agencies), agencyText, 4);
-  const capabilities = matchTokens(tokenize(profile.capabilities), subject, 3);
-  const focusAreas = matchTokens(tokenize(profile.focus_areas), subject, 3);
-  const modernization = matchTokens(tokenize(profile.modernization_signals), subject, 2);
+  const agency = matchTokens(tokenize(profile.preferred_agencies), agencyText, WEIGHTS.agency);
+  const businessDriver = matchTokens(tokenize(signals.businessDrivers), subject, WEIGHTS.businessDriver);
+  // capability_map widens each capability with related wording at the same weight.
+  const capabilities = matchTokens(
+    tokenize([...(profile.capabilities || []), ...(signals.capabilityMapTerms || [])]),
+    subject,
+    WEIGHTS.capabilities,
+  );
+  const focusAreas = matchTokens(tokenize(profile.focus_areas), subject, WEIGHTS.focusAreas);
+  const modernization = matchTokens(tokenize(profile.modernization_signals), subject, WEIGHTS.modernization);
+
+  const total =
+    agency.score + businessDriver.score + capabilities.score + focusAreas.score + modernization.score;
 
   return {
-    score: agency.score + capabilities.score + focusAreas.score + modernization.score,
+    score: total,
+    score_agency: agency.score,
+    score_capabilities: capabilities.score,
+    score_focus_areas: focusAreas.score,
+    score_modernization: modernization.score,
+    score_business_driver: businessDriver.score,
+    score_total: total,
     reasons: {
       agency: agency.hits,
+      businessDrivers: businessDriver.hits,
       capabilities: capabilities.hits,
       focusAreas: focusAreas.hits,
       modernizationSignals: modernization.hits,
@@ -126,7 +162,18 @@ function toListItem(row, relevance) {
     postedDate: row.posted_date,
     url: row.url,
     href: `/grant/${encodeURIComponent(row.opportunity_number)}`,
-    relevance: relevance ? { score: relevance.score, reasons: relevance.reasons } : null,
+    relevance: relevance
+      ? {
+        score: relevance.score_total,
+        score_agency: relevance.score_agency,
+        score_capabilities: relevance.score_capabilities,
+        score_focus_areas: relevance.score_focus_areas,
+        score_modernization: relevance.score_modernization,
+        score_business_driver: relevance.score_business_driver,
+        score_total: relevance.score_total,
+        reasons: relevance.reasons,
+      }
+      : null,
   };
 }
 
@@ -167,14 +214,40 @@ async function getCompanyProfile({ companyDatabasePath = DEFAULT_COMPANY_DB, com
   }
 }
 
+/** Signal sets are optional; a missing database simply contributes no score. */
+async function getSignalSets({ businessDriverDatabasePath = DEFAULT_BUSINESS_DRIVER_DB, companyId = COMPANY_ID } = {}) {
+  const empty = { businessDrivers: [], capabilityMapTerms: [] };
+  let db;
+  try {
+    db = await openReadOnly(businessDriverDatabasePath);
+  } catch {
+    return empty;
+  }
+
+  try {
+    const drivers = await allAsync(db, 'SELECT driver FROM business_drivers WHERE company_id = ?', [companyId]);
+    const mapped = await allAsync(db, 'SELECT mapped_term FROM capability_map WHERE company_id = ?', [companyId]);
+    return {
+      businessDrivers: drivers.map((row) => row.driver),
+      capabilityMapTerms: mapped.map((row) => row.mapped_term),
+    };
+  } catch {
+    return empty;
+  } finally {
+    await closeAsync(db);
+  }
+}
+
 /** List layer: rows that came from the Simpler browser list worker. */
 async function listGrants({
   limit = 50,
   offset = 0,
   databasePath = DEFAULT_GRANTS_DB,
   companyDatabasePath = DEFAULT_COMPANY_DB,
+  businessDriverDatabasePath = DEFAULT_BUSINESS_DRIVER_DB,
 } = {}) {
   const profile = await getCompanyProfile({ companyDatabasePath });
+  const signals = await getSignalSets({ businessDriverDatabasePath });
   const db = await openReadOnly(databasePath);
 
   try {
@@ -186,8 +259,8 @@ async function listGrants({
     );
 
     // Every grant is returned; the profile only changes the ordering.
-    const ranked = rows.map((row) => ({ row, relevance: scoreGrantForCompany(row, profile) }));
-    if (profile) ranked.sort((a, b) => b.relevance.score - a.relevance.score);
+    const ranked = rows.map((row) => ({ row, relevance: scoreGrantForCompany(row, profile, signals) }));
+    if (profile) ranked.sort((a, b) => b.relevance.score_total - a.relevance.score_total);
 
     return {
       total: ranked.length,
@@ -196,6 +269,51 @@ async function listGrants({
       offset,
       company: profile ? { id: profile.id, name: profile.name, type: profile.type } : null,
       grants: ranked.slice(offset, offset + limit).map((entry) => toListItem(entry.row, profile ? entry.relevance : null)),
+    };
+  } finally {
+    await closeAsync(db);
+  }
+}
+
+/** Cross-signal breakdown for one grant, used by the "why this matches" view. */
+async function getGrantSignals(oppNum, {
+  databasePath = DEFAULT_GRANTS_DB,
+  companyDatabasePath = DEFAULT_COMPANY_DB,
+  businessDriverDatabasePath = DEFAULT_BUSINESS_DRIVER_DB,
+} = {}) {
+  const profile = await getCompanyProfile({ companyDatabasePath });
+  const signals = await getSignalSets({ businessDriverDatabasePath });
+  const db = await openReadOnly(databasePath);
+
+  try {
+    const row = await getAsync(
+      db,
+      `SELECT ${LIST_COLUMNS} FROM grants_normalized WHERE opportunity_number = ? LIMIT 1`,
+      [oppNum],
+    );
+    if (!row) return null;
+
+    const relevance = scoreGrantForCompany(row, profile, signals);
+    return {
+      oppNum: row.opportunity_number,
+      title: row.title,
+      company: profile ? { id: profile.id, name: profile.name } : null,
+      scores: {
+        score_agency: relevance.score_agency,
+        score_capabilities: relevance.score_capabilities,
+        score_focus_areas: relevance.score_focus_areas,
+        score_modernization: relevance.score_modernization,
+        score_business_driver: relevance.score_business_driver,
+        score_total: relevance.score_total,
+      },
+      weights: WEIGHTS,
+      signals: [
+        { key: 'agency', label: 'Preferred agency', weight: WEIGHTS.agency, score: relevance.score_agency, matches: relevance.reasons.agency || [] },
+        { key: 'business_driver', label: 'Business driver', weight: WEIGHTS.businessDriver, score: relevance.score_business_driver, matches: relevance.reasons.businessDrivers || [] },
+        { key: 'capabilities', label: 'Capabilities', weight: WEIGHTS.capabilities, score: relevance.score_capabilities, matches: relevance.reasons.capabilities || [] },
+        { key: 'focus_areas', label: 'Focus areas', weight: WEIGHTS.focusAreas, score: relevance.score_focus_areas, matches: relevance.reasons.focusAreas || [] },
+        { key: 'modernization', label: 'Modernization signals', weight: WEIGHTS.modernization, score: relevance.score_modernization, matches: relevance.reasons.modernizationSignals || [] },
+      ],
     };
   } finally {
     await closeAsync(db);
@@ -254,10 +372,14 @@ async function getGrantDetail(oppNum, { databasePath = DEFAULT_GRANTS_DB } = {})
 
 module.exports = {
   COMPANY_ID,
+  DEFAULT_BUSINESS_DRIVER_DB,
   DEFAULT_COMPANY_DB,
   DEFAULT_GRANTS_DB,
+  WEIGHTS,
   getCompanyProfile,
   getGrantDetail,
+  getGrantSignals,
+  getSignalSets,
   listGrants,
   scoreGrantForCompany,
 };

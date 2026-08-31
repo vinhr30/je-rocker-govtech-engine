@@ -6,10 +6,11 @@ const path = require('node:path');
 const sqlite3 = require('sqlite3').verbose();
 
 const { ensureSchema, openDatabase, runAsync, closeAsync } = require('../grant_scraper/lib/db');
-const { listGrants, getGrantDetail, scoreGrantForCompany, getCompanyProfile } = require('../src/grants/grants_service');
+const { listGrants, getGrantDetail, getGrantSignals, getSignalSets, scoreGrantForCompany, getCompanyProfile, WEIGHTS } = require('../src/grants/grants_service');
 const { renderList, renderRow, buildListUrl } = require('../src/grants/grants_list');
-const { renderDetail, toPlainText } = require('../src/grants/grants_detail');
+const { renderDetail, renderSignals, toPlainText } = require('../src/grants/grants_detail');
 const { seedCompanyProfile, JE_ROCKER } = require('../scripts/seed_company_profile');
+const { seedBusinessDrivers } = require('../scripts/seed_business_drivers');
 
 const GRANT = {
   agency: 'Animal and Plant Health Inspection Service',
@@ -88,6 +89,17 @@ async function seedGrantsDb(dir) {
 async function seedCompanyDb(dir) {
   const databasePath = path.join(dir, 'company.db');
   await seedCompanyProfile(databasePath);
+  return databasePath;
+}
+
+const TEST_DRIVERS = ['legacy modernization backlog', 'procurement cycle time'];
+const TEST_CAPABILITY_MAP = [
+  { capability: 'dashboard intelligence', terms: ['decision support dashboard'] },
+];
+
+async function seedDriverDb(dir) {
+  const databasePath = path.join(dir, 'business_driver.db');
+  await seedBusinessDrivers(databasePath, { drivers: TEST_DRIVERS, capabilityMap: TEST_CAPABILITY_MAP });
   return databasePath;
 }
 
@@ -189,8 +201,145 @@ test('JE ROCKER scoring ranks agency above capability above generic noise', () =
   assert.deepStrictEqual(capabilityMatch.reasons.capabilities, ['dashboard intelligence']);
 });
 
-test('short agency codes do not match ordinary words', () => {
-  const result = scoreGrantForCompany(
+test('signal sets load business drivers and capability map terms', async () => {
+  const businessDriverDatabasePath = await seedDriverDb(tempDir('signals'));
+  const signals = await getSignalSets({ businessDriverDatabasePath });
+
+  assert.deepStrictEqual(signals.businessDrivers.sort(), [...TEST_DRIVERS].sort());
+  assert.deepStrictEqual(signals.capabilityMapTerms, ['decision support dashboard']);
+});
+
+test('a missing business_driver.db contributes no signal rather than failing', async () => {
+  const signals = await getSignalSets({ businessDriverDatabasePath: '/tmp/grant-ui-no-drivers.db' });
+  assert.deepStrictEqual(signals, { businessDrivers: [], capabilityMapTerms: [] });
+});
+
+test('business drivers score at agency weight and land in score_business_driver', () => {
+  const grant = { agency: 'Smithsonian Institution', title: 'Reducing procurement cycle time across bureaus' };
+  const result = scoreGrantForCompany(grant, JE_ROCKER, {
+    businessDrivers: TEST_DRIVERS,
+    capabilityMapTerms: [],
+  });
+
+  assert.strictEqual(result.score_business_driver, WEIGHTS.businessDriver);
+  assert.strictEqual(WEIGHTS.businessDriver, WEIGHTS.agency, 'business driver carries agency weight');
+  assert.deepStrictEqual(result.reasons.businessDrivers, ['procurement cycle time']);
+  assert.strictEqual(result.score_agency, 0);
+});
+
+test('capability map terms score on the capabilities axis', () => {
+  const grant = { agency: 'Smithsonian Institution', title: 'Decision support dashboard for field teams' };
+  const withoutMap = scoreGrantForCompany(grant, JE_ROCKER, { businessDrivers: [], capabilityMapTerms: [] });
+  const withMap = scoreGrantForCompany(grant, JE_ROCKER, {
+    businessDrivers: [],
+    capabilityMapTerms: ['decision support dashboard'],
+  });
+
+  assert.strictEqual(withoutMap.score_capabilities, 0);
+  assert.strictEqual(withMap.score_capabilities, WEIGHTS.capabilities);
+  assert.strictEqual(withMap.score_business_driver, 0);
+});
+
+test('score_total is the sum of every cross-signal axis', () => {
+  const grant = {
+    agency: 'National Science Foundation',
+    agency_code: 'NSF',
+    title: 'Procurement cycle time and dashboard intelligence for automation',
+    description: 'digital modernization of legacy system replacement',
+  };
+  const result = scoreGrantForCompany(grant, JE_ROCKER, {
+    businessDrivers: TEST_DRIVERS,
+    capabilityMapTerms: [],
+  });
+
+  const parts =
+    result.score_agency +
+    result.score_capabilities +
+    result.score_focus_areas +
+    result.score_modernization +
+    result.score_business_driver;
+
+  assert.strictEqual(result.score_total, parts);
+  assert.strictEqual(result.score, result.score_total, 'score aliases score_total');
+  assert.ok(result.score_agency > 0 && result.score_business_driver > 0 && result.score_capabilities > 0);
+});
+
+test('list rows carry the cross-signal breakdown', async () => {
+  const dir = tempDir('breakdown');
+  const databasePath = await seedGrantsDb(dir);
+  const companyDatabasePath = await seedCompanyDb(dir);
+  const businessDriverDatabasePath = await seedDriverDb(dir);
+
+  const payload = await listGrants({ databasePath, companyDatabasePath, businessDriverDatabasePath });
+  const first = payload.grants[0];
+
+  for (const key of ['score_agency', 'score_capabilities', 'score_focus_areas', 'score_modernization', 'score_business_driver', 'score_total']) {
+    assert.strictEqual(typeof first.relevance[key], 'number', `${key} is present`);
+  }
+});
+
+test('grant signals endpoint reports every axis with weights and matches', async () => {
+  const dir = tempDir('endpoint');
+  const databasePath = await seedGrantsDb(dir);
+  const companyDatabasePath = await seedCompanyDb(dir);
+  const businessDriverDatabasePath = await seedDriverDb(dir);
+  const opts = { databasePath, companyDatabasePath, businessDriverDatabasePath };
+
+  const signals = await getGrantSignals('CCC-3', opts);
+  assert.strictEqual(signals.oppNum, 'CCC-3');
+  assert.strictEqual(signals.company.name, 'JE ROCKER LC');
+  assert.deepStrictEqual(Object.keys(signals.scores).sort(), [
+    'score_agency', 'score_business_driver', 'score_capabilities',
+    'score_focus_areas', 'score_modernization', 'score_total',
+  ]);
+  assert.deepStrictEqual(signals.signals.map((s) => s.key), [
+    'agency', 'business_driver', 'capabilities', 'focus_areas', 'modernization',
+  ]);
+  assert.strictEqual(signals.scores.score_capabilities, WEIGHTS.capabilities);
+  assert.deepStrictEqual(
+    signals.signals.find((s) => s.key === 'capabilities').matches,
+    ['dashboard intelligence'],
+  );
+
+  assert.strictEqual(await getGrantSignals('NOPE', opts), null);
+});
+
+test('detail view renders the cross-signal breakdown', () => {
+  const html = renderSignals({
+    company: { id: 'jerocker', name: 'JE ROCKER LC' },
+    scores: { score_total: 7 },
+    signals: [
+      { key: 'agency', label: 'Preferred agency', weight: 4, score: 4, matches: ['nsf'] },
+      { key: 'business_driver', label: 'Business driver', weight: 4, score: 0, matches: [] },
+      { key: 'capabilities', label: 'Capabilities', weight: 3, score: 3, matches: ['dashboard intelligence'] },
+      { key: 'focus_areas', label: 'Focus areas', weight: 3, score: 0, matches: [] },
+      { key: 'modernization', label: 'Modernization signals', weight: 2, score: 0, matches: [] },
+    ],
+  });
+
+  assert.match(html, /Why this matches JE ROCKER LC/);
+  assert.match(html, /Total relevance score: <strong>7<\/strong>/);
+  for (const label of ['Preferred agency', 'Business driver', 'Capabilities', 'Focus areas', 'Modernization signals']) {
+    assert.ok(html.includes(label), `missing signal: ${label}`);
+  }
+  assert.match(html, /dashboard intelligence/);
+  assert.match(html, /no match/, 'unmatched axes are shown as zero');
+  assert.strictEqual(renderSignals(null), '', 'absent signals render nothing');
+});
+
+test('the detail view includes the signal section when signals are supplied', () => {
+  const grant = { oppNum: 'A', title: 'T', agency: 'A', hasDetail: true, fundingRange: {}, attachments: [] };
+  const withSignals = renderDetail(grant, {
+    company: { name: 'JE ROCKER LC' },
+    scores: { score_total: 4 },
+    signals: [{ key: 'agency', label: 'Preferred agency', weight: 4, score: 4, matches: ['nsf'] }],
+  });
+
+  assert.match(withSignals, /Why this matches JE ROCKER LC/);
+  assert.ok(!renderDetail(grant).includes('Why this matches'), 'section is omitted without signals');
+});
+
+test('short agency codes do not match ordinary words', () => {  const result = scoreGrantForCompany(
     { agency: 'Department of Commerce', title: 'Connecting the dots in rural broadband' },
     JE_ROCKER,
   );

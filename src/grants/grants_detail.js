@@ -49,7 +49,37 @@
       .join('')}</ul>`;
   }
 
-  function renderDetail(grant) {
+  function renderSignals(signals) {
+    if (!signals || !signals.signals) return '';
+
+    const rows = signals.signals
+      .map((signal) => {
+        const matches = signal.matches.length
+          ? signal.matches.map((m) => `<span class="grant-signal-term">${escapeHtml(m)}</span>`).join('')
+          : '<span class="grant-detail-muted">no match</span>';
+        return `
+          <div class="grant-signal${signal.score > 0 ? ' grant-signal--hit' : ''}">
+            <div class="grant-signal-head">
+              <span class="grant-signal-label">${escapeHtml(signal.label)}</span>
+              <span class="grant-signal-score">${signal.score}<span class="grant-signal-weight"> (×${signal.weight})</span></span>
+            </div>
+            <div class="grant-signal-terms">${matches}</div>
+          </div>
+        `;
+      })
+      .join('');
+
+    const company = signals.company ? escapeHtml(signals.company.name) : 'JE ROCKER LC';
+    return `
+      <section class="grant-signals">
+        <h3 class="grant-signals-title">Why this matches ${company}</h3>
+        <div class="grant-signals-total">Total relevance score: <strong>${signals.scores.score_total}</strong></div>
+        <div class="grant-signals-grid">${rows}</div>
+      </section>
+    `;
+  }
+
+  function renderDetail(grant, signals) {
     if (!grant) return '<p class="grant-error">Grant not found.</p>';
 
     const pending = grant.hasDetail
@@ -62,6 +92,7 @@
         <h2 class="grant-detail-title">${escapeHtml(grant.title) || '(untitled)'}</h2>
         <p class="grant-detail-sub">${escapeHtml(grant.agency) || '—'} · ${escapeHtml(grant.oppNum)}</p>
         ${pending}
+        ${renderSignals(signals)}
         <div class="grant-detail-grid">
           ${field('Opportunity category', escapeHtml(grant.opportunityCategory))}
           ${field('CFDA', escapeHtml(grant.cfda))}
@@ -82,14 +113,20 @@
     container.innerHTML = '<p class="grant-loading">Loading grant detail…</p>';
 
     try {
-      const response = await fetchImpl(`/api/grants/${encodeURIComponent(oppNum)}`);
-      if (response.status === 404) {
+      const [detailResponse, signalsResponse] = await Promise.all([
+        fetchImpl(`/api/grants/${encodeURIComponent(oppNum)}`),
+        fetchImpl(`/api/grants/${encodeURIComponent(oppNum)}/signals`),
+      ]);
+
+      if (detailResponse.status === 404) {
         container.innerHTML = renderDetail(null);
         return null;
       }
-      if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
-      const payload = await response.json();
-      container.innerHTML = renderDetail(payload.grant);
+      if (!detailResponse.ok) throw new Error(`Request failed with status ${detailResponse.status}`);
+
+      const payload = await detailResponse.json();
+      const signals = signalsResponse.ok ? await signalsResponse.json() : null;
+      container.innerHTML = renderDetail(payload.grant, signals);
       return payload.grant;
     } catch (error) {
       container.innerHTML = `<p class="grant-error">Could not load grant: ${escapeHtml(error.message)}</p>`;
@@ -97,5 +134,5 @@
     }
   }
 
-  return { mountGrantDetail, renderAttachments, renderDetail, renderFundingRange, toPlainText };
+  return { mountGrantDetail, renderAttachments, renderDetail, renderFundingRange, renderSignals, toPlainText };
 }));

@@ -1,7 +1,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const { createClient, clientEvents } = require('./src/utils/db');
-const { listGrants, getGrantDetail } = require('./src/grants/grants_service');
+const { listGrants, getGrantDetail, getGrantSignals } = require('./src/grants/grants_service');
 
 const app = express();
 const PORT = 3000;
@@ -2236,6 +2236,18 @@ app.get('/api/grants', async (req, res) => {
     const offset = Math.max(Number.parseInt(String(req.query.offset || '0'), 10) || 0, 0);
 
     res.json(await listGrants({ limit, offset }));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/grants/:oppNum/signals', async (req, res) => {
+  try {
+    const signals = await getGrantSignals(String(req.params.oppNum || ''));
+    if (!signals) {
+      return res.status(404).json({ error: 'Grant not found' });
+    }
+    res.json(signals);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
