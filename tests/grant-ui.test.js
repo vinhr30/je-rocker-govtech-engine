@@ -7,7 +7,7 @@ const sqlite3 = require('sqlite3').verbose();
 
 const { ensureSchema, openDatabase, runAsync, closeAsync } = require('../grant_scraper/lib/db');
 const { listGrants, getGrantDetail, getGrantSignals, getSignalSets, scoreGrantForCompany, getCompanyProfile, WEIGHTS } = require('../src/grants/grants_service');
-const { renderList, renderRow, buildListUrl } = require('../src/grants/grants_list');
+const { renderList, renderRow, buildListUrl, mountGrantsList } = require('../src/grants/grants_list');
 const { renderDetail, renderSignals, toPlainText } = require('../src/grants/grants_detail');
 const { seedCompanyProfile, JE_ROCKER } = require('../scripts/seed_company_profile');
 const { seedBusinessDrivers, JE_ROCKER_DRIVERS } = require('../scripts/seed_business_drivers');
@@ -541,6 +541,58 @@ test('detail module reports missing grants and missing detail layers', async () 
   });
   assert.match(pending, /Detail layer has not been ingested/);
   assert.match(pending, /No attachments published/);
+});
+
+test('every row carries a direct external link and no nested anchors', () => {
+  const html = renderRow({
+    oppNum: 'AAA-1', title: 'Chronic Wasting Disease', agency: 'APHIS',
+    deadline: '2026-09-30', status: 'Open', awardMin: 100, awardMax: 413380,
+    url: 'https://simpler.grants.gov/opportunity/abc',
+    href: '/grant/AAA-1', relevance: null,
+  });
+
+  assert.match(html, /href="https:\/\/simpler\.grants\.gov\/opportunity\/abc"/, 'external link present');
+  assert.match(html, /target="_blank"/);
+  assert.match(html, /rel="noreferrer"/);
+  assert.match(html, /href="\/grant\/AAA-1"/, 'internal detail link present');
+
+  const tokens = html.match(/<a\b|<\/a>/g) || [];
+  let depth = 0;
+  let maxDepth = 0;
+  for (const token of tokens) {
+    depth += token === '</a>' ? -1 : 1;
+    maxDepth = Math.max(maxDepth, depth);
+  }
+  assert.strictEqual(maxDepth, 1, 'anchors must not nest');
+  assert.strictEqual(tokens.filter((t) => t !== '</a>').length, 2, 'exactly two links per row');
+  assert.match(html, /^\s*<div class="grant-row"/, 'row container is a div');
+});
+
+test('a row without a url still renders without an external link', () => {
+  const html = renderRow({ oppNum: 'X', title: 'T', agency: 'A', href: '/grant/X', relevance: null });
+  assert.ok(!html.includes('grant-row-open'), 'no dangling external link');
+  assert.match(html, /href="\/grant\/X"/);
+});
+
+test('the list requests the full result set by default', async () => {
+  const requested = [];
+  const fetchImpl = async (url) => {
+    requested.push(url);
+    return { ok: true, status: 200, json: async () => ({ grants: [], total: 0 }) };
+  };
+  const container = { innerHTML: '', dataset: {}, addEventListener() {} };
+
+  await mountGrantsList(container, { fetchImpl });
+  assert.deepStrictEqual(requested, ['/api/grants?limit=all']);
+});
+
+test('the list header reports both the rendered and total counts', () => {
+  const html = renderList({
+    grants: [{ oppNum: 'A', title: 'T', agency: 'A', href: '/grant/A', relevance: null }],
+    company: { id: 'jerocker', name: 'JE ROCKER LC' },
+    total: 1612,
+  });
+  assert.match(html, /showing 1 of 1612 opportunities/);
 });
 
 test('list url carries only paging parameters', async () => {

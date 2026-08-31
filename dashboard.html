@@ -1595,7 +1595,7 @@ window.onload = () => {
     window.openGrantEngine = () => {
       detail.hidden = true;
       list.hidden = false;
-      window.GrantList.mountGrantsList(list);
+      window.GrantList.mountGrantsList(list, { onSelect: (oppNum) => window.openGrantDetail(oppNum) });
     };
 
     window.openGrantDetail = (oppNum) => {
@@ -1603,13 +1603,6 @@ window.onload = () => {
       detail.hidden = false;
       window.GrantDetail.mountGrantDetail(detail, oppNum);
     };
-
-    list.addEventListener('click', (event) => {
-      const row = event.target.closest('.grant-row');
-      if (!row) return;
-      event.preventDefault();
-      window.openGrantDetail(row.dataset.oppNum);
-    });
 
     detail.addEventListener('click', (event) => {
       if (!event.target.closest('[data-action="back"]')) return;

@@ -2232,7 +2232,10 @@ app.get('/api/client/:id', async (req, res) => {
 
 app.get('/api/grants', async (req, res) => {
   try {
-    const limit = Math.min(Number.parseInt(String(req.query.limit || '50'), 10) || 50, 200);
+    const rawLimit = String(req.query.limit || '50');
+    const limit = rawLimit === 'all'
+      ? Number.MAX_SAFE_INTEGER
+      : Math.min(Number.parseInt(rawLimit, 10) || 50, 5000);
     const offset = Math.max(Number.parseInt(String(req.query.offset || '0'), 10) || 0, 0);
 
     res.json(await listGrants({ limit, offset }));

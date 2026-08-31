@@ -36,13 +36,17 @@
   function renderRow(grant) {
     const status = grant.status ? escapeHtml(grant.status) : 'Unknown';
     const relevance = grant.relevance && grant.relevance.score > 0
-      ? `<span class="grant-row-score" title="Client relevance score">match ${grant.relevance.score}</span>`
+      ? `<span class="grant-row-score" title="Relevance score">match ${grant.relevance.score}</span>`
+      : '';
+    // Anchors cannot nest, so the row is a div carrying two independent links.
+    const external = grant.url
+      ? `<a class="grant-row-open" href="${escapeHtml(grant.url)}" target="_blank" rel="noreferrer" title="Open the grant posting">Open ↗</a>`
       : '';
 
     return `
-      <a class="grant-row" href="${escapeHtml(grant.href)}" data-opp-num="${escapeHtml(grant.oppNum)}">
+      <div class="grant-row" data-opp-num="${escapeHtml(grant.oppNum)}">
         <span class="grant-row-main">
-          <span class="grant-row-title">${escapeHtml(grant.title) || '(untitled)'}</span>
+          <a class="grant-row-title" href="${escapeHtml(grant.href)}">${escapeHtml(grant.title) || '(untitled)'}</a>
           <span class="grant-row-agency">${escapeHtml(grant.agency) || '—'}</span>
         </span>
         <span class="grant-row-meta">
@@ -50,8 +54,9 @@
           <span class="grant-row-status status-${status.toLowerCase().replace(/[^a-z]/g, '')}">${status}</span>
           <span class="grant-row-award">${formatMoney(grant.awardMin)} – ${formatMoney(grant.awardMax)}</span>
           ${relevance}
+          ${external}
         </span>
-      </a>
+      </div>
     `;
   }
 
@@ -62,8 +67,8 @@
     }
 
     const scope = payload.company
-      ? `<p class="grant-scope">Ranked by relevance to <strong>${escapeHtml(payload.company.name)}</strong> · ${payload.total} opportunities.</p>`
-      : `<p class="grant-scope">${payload.total} open opportunities.</p>`;
+      ? `<p class="grant-scope">Ranked by relevance to <strong>${escapeHtml(payload.company.name)}</strong> · showing ${grants.length} of ${payload.total} opportunities.</p>`
+      : `<p class="grant-scope">Showing ${grants.length} of ${payload.total} open opportunities.</p>`;
 
     return `
       ${scope}
@@ -84,8 +89,22 @@
     return query ? `/api/grants?${query}` : '/api/grants';
   }
 
+  /** Clicking anywhere in a row opens the grant, except on the row's own links. */
+  function bindRowSelection(container, onSelect) {
+    if (container.dataset.grantRowsBound === 'true') return;
+    container.dataset.grantRowsBound = 'true';
+    container.addEventListener('click', (event) => {
+      if (event.target.closest('a')) return;
+      const row = event.target.closest('.grant-row');
+      if (!row) return;
+      const oppNum = row.dataset.oppNum;
+      if (onSelect) onSelect(oppNum);
+      else window.location.href = `/grant/${encodeURIComponent(oppNum)}`;
+    });
+  }
+
   async function mountGrantsList(container, options) {
-    const { fetchImpl = globalThis.fetch, limit, offset } = options || {};
+    const { fetchImpl = globalThis.fetch, limit = 'all', offset, onSelect } = options || {};
     if (!container) return null;
     container.innerHTML = '<p class="grant-loading">Loading grants…</p>';
 
@@ -94,6 +113,7 @@
       if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
       const payload = await response.json();
       container.innerHTML = renderList(payload);
+      bindRowSelection(container, onSelect);
       return payload;
     } catch (error) {
       container.innerHTML = `<p class="grant-error">Could not load grants: ${escapeHtml(error.message)}</p>`;
@@ -101,5 +121,5 @@
     }
   }
 
-  return { buildListUrl, escapeHtml, formatDate, formatMoney, mountGrantsList, renderList, renderRow };
+  return { bindRowSelection, buildListUrl, escapeHtml, formatDate, formatMoney, mountGrantsList, renderList, renderRow };
 }));
