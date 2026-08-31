@@ -451,6 +451,71 @@ test('seeding replaces prior rows instead of accumulating them', async () => {
   assert.deepStrictEqual(signals.businessDrivers, ['new driver'], 'the renamed row does not linger');
 });
 
+test('a term in both maps scores once, on the driver axis', () => {
+  const grant = { agency: 'Smithsonian Institution', title: 'A machine learning pilot' };
+  const result = scoreGrantForCompany(grant, JE_ROCKER, {
+    businessDrivers: [],
+    capabilityMapTerms: ['machine learning'],
+    driverMapTerms: ['machine learning'],
+  });
+
+  assert.strictEqual(result.score_business_driver, WEIGHTS.businessDriver);
+  assert.strictEqual(result.score_capabilities, 0, 'the capability axis yields the shared term');
+  assert.strictEqual(result.score_total, WEIGHTS.businessDriver);
+  assert.deepStrictEqual(result.reasons.capabilities, []);
+});
+
+test('a term only in capability_map still scores on the capability axis', () => {
+  const grant = { agency: 'Smithsonian Institution', title: 'A decision support dashboard rollout' };
+  const result = scoreGrantForCompany(grant, JE_ROCKER, {
+    businessDrivers: [],
+    capabilityMapTerms: ['decision support dashboard'],
+    driverMapTerms: [],
+  });
+
+  assert.strictEqual(result.score_capabilities, WEIGHTS.capabilities);
+  assert.strictEqual(result.score_business_driver, 0);
+  assert.strictEqual(result.score_total, WEIGHTS.capabilities);
+});
+
+test('a term only in driver_map scores on the driver axis', () => {
+  const grant = { agency: 'Smithsonian Institution', title: 'Improving interoperability of case systems' };
+  const result = scoreGrantForCompany(grant, JE_ROCKER, {
+    businessDrivers: [],
+    capabilityMapTerms: [],
+    driverMapTerms: ['interoperability'],
+  });
+
+  assert.strictEqual(result.score_business_driver, WEIGHTS.businessDriver);
+  assert.strictEqual(result.score_capabilities, 0);
+});
+
+test('agency scoring is unaffected by term claiming', () => {
+  const grant = { agency: 'National Science Foundation', agency_code: 'NSF', title: 'Machine learning research' };
+  const shared = { businessDrivers: [], capabilityMapTerms: ['machine learning'], driverMapTerms: ['machine learning'] };
+  const capabilityOnly = { businessDrivers: [], capabilityMapTerms: ['machine learning'], driverMapTerms: [] };
+
+  const a = scoreGrantForCompany(grant, JE_ROCKER, shared);
+  const b = scoreGrantForCompany(grant, JE_ROCKER, capabilityOnly);
+
+  assert.strictEqual(a.score_agency, WEIGHTS.agency);
+  assert.strictEqual(b.score_agency, WEIGHTS.agency, 'agency uses its own haystack and never competes');
+  assert.deepStrictEqual(a.reasons.agency, ['nsf']);
+});
+
+test('a term shared with modernization signals scores only at the higher weight', () => {
+  const grant = { agency: 'X', title: 'A legacy system replacement effort' };
+  const result = scoreGrantForCompany(grant, JE_ROCKER, {
+    businessDrivers: [],
+    capabilityMapTerms: [],
+    driverMapTerms: ['legacy system replacement'],
+  });
+
+  assert.strictEqual(result.score_business_driver, WEIGHTS.businessDriver);
+  assert.strictEqual(result.score_modernization, 0, 'modernization yields the shared term');
+  assert.strictEqual(result.score_total, WEIGHTS.businessDriver);
+});
+
 test('driver map terms score on the business driver axis', () => {
   const grant = { agency: 'Smithsonian Institution', title: 'Improving interoperability across partner systems' };
 

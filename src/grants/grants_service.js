@@ -117,6 +117,18 @@ function matchTokens(tokens, text, weight) {
  * grant keeps a score so the list can be ranked rather than filtered, and each
  * axis is reported separately so the UI can explain the ranking.
  */
+/**
+ * Claims tokens for the first axis that asks for them. Axes are evaluated in
+ * descending weight order, so a term shared by two axes scores once, at the
+ * higher weight, instead of being counted on both.
+ */
+function claimTokens(tokens, claimed) {
+  const phrases = tokens.phrases.filter((token) => !claimed.has(token));
+  const words = tokens.words.filter((token) => !claimed.has(token));
+  for (const token of [...phrases, ...words]) claimed.add(token);
+  return { phrases, words };
+}
+
 function scoreGrantForCompany(grant, profile, signals = {}) {
   const empty = {
     score: 0,
@@ -133,21 +145,27 @@ function scoreGrantForCompany(grant, profile, signals = {}) {
   const subject = subjectText(grant);
   const agencyText = haystack(grant.agency, grant.agency_code);
 
+  // Agency matches a different haystack, so it never competes for these tokens.
   const agency = matchTokens(tokenize(profile.preferred_agencies), agencyText, WEIGHTS.agency);
+
+  const claimed = new Set();
   // driver_map widens each driver with the wording grant notices actually use.
-  const businessDriver = matchTokens(
+  const driverTokens = claimTokens(
     tokenize([...(signals.businessDrivers || []), ...(signals.driverMapTerms || [])]),
-    subject,
-    WEIGHTS.businessDriver,
+    claimed,
   );
   // capability_map widens each capability with related wording at the same weight.
-  const capabilities = matchTokens(
+  const capabilityTokens = claimTokens(
     tokenize([...(profile.capabilities || []), ...(signals.capabilityMapTerms || [])]),
-    subject,
-    WEIGHTS.capabilities,
+    claimed,
   );
-  const focusAreas = matchTokens(tokenize(profile.focus_areas), subject, WEIGHTS.focusAreas);
-  const modernization = matchTokens(tokenize(profile.modernization_signals), subject, WEIGHTS.modernization);
+  const focusTokens = claimTokens(tokenize(profile.focus_areas), claimed);
+  const modernizationTokens = claimTokens(tokenize(profile.modernization_signals), claimed);
+
+  const businessDriver = matchTokens(driverTokens, subject, WEIGHTS.businessDriver);
+  const capabilities = matchTokens(capabilityTokens, subject, WEIGHTS.capabilities);
+  const focusAreas = matchTokens(focusTokens, subject, WEIGHTS.focusAreas);
+  const modernization = matchTokens(modernizationTokens, subject, WEIGHTS.modernization);
 
   const total =
     agency.score + businessDriver.score + capabilities.score + focusAreas.score + modernization.score;
