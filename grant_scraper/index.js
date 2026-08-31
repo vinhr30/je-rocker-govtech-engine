@@ -5,14 +5,27 @@ const { runNormalization } = require('./pipeline/normalize');
 const { runTopicExtraction } = require('./pipeline/topics');
 const { SCHEDULE, runAll, runCadence, runWorkers } = require('./scheduler');
 
+const SOURCE_ALIASES = {
+  simpler: 'simpler_browser',
+  simpler_browser: 'simpler_browser',
+  simpler_api: 'grants_gov_simpler',
+  simpler_grants: 'grants_gov_simpler',
+  full: 'grants_gov_full',
+};
+
+function resolveSourceId(sourceId) {
+  return SOURCE_ALIASES[sourceId] || sourceId;
+}
+
 /** Runs a single named source end to end. Useful for verifying one endpoint. */
-async function runSource(sourceId, { databasePath, fetchImpl, env, now } = {}) {
-  const worker = getWorker(sourceId);
+async function runSource(sourceId, { databasePath, fetchImpl, env, detailLimit, maxPages, browserFactory, now } = {}) {
+  const resolved = resolveSourceId(sourceId);
+  const worker = getWorker(resolved);
   return withDatabase(async (db) => {
-    const ingestion = await worker.run({ db, fetchImpl, env, now });
-    const normalization = await runNormalization(db, { sourceId, now });
+    const ingestion = await worker.run({ db, fetchImpl, env, detailLimit, maxPages, browserFactory, now });
+    const normalization = await runNormalization(db, { sourceId: resolved, now });
     const topics = worker.source.category === 'sbir'
-      ? await runTopicExtraction(db, { sourceId, now })
+      ? await runTopicExtraction(db, { sourceId: resolved, now })
       : { solicitations: 0, written: 0, failures: [] };
     return { ingestion, normalization, topics };
   }, databasePath);
@@ -47,6 +60,7 @@ module.exports = {
   listWorkers,
   openDatabase,
   registry,
+  resolveSourceId,
   runAll,
   runCadence,
   runNormalization,
@@ -65,14 +79,16 @@ if (require.main === module) {
 
   const source = getArg('--source');
   const cadence = getArg('--cadence');
+  const maxPages = getArg('--max-pages');
+  const options = maxPages ? { maxPages: Number(maxPages) } : {};
 
   const task = source
-    ? runSource(source)
+    ? runSource(source, options)
     : cadence
-      ? runCadence(cadence)
+      ? runCadence(cadence, options)
       : args.includes('--stats')
         ? getIngestionStats()
-        : runAll();
+        : runAll(options);
 
   task
     .then((result) => {

@@ -36,6 +36,18 @@ function closeAsync(db) {
   });
 }
 
+async function columnNames(db, table) {
+  const rows = await allAsync(db, `PRAGMA table_info(${table})`);
+  return rows.map((row) => row.name);
+}
+
+async function addColumnIfMissing(db, table, column, definition) {
+  const existing = await columnNames(db, table);
+  if (!existing.includes(column)) {
+    await runAsync(db, `ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+}
+
 async function ensureSchema(db) {
   await runAsync(db, `
     CREATE TABLE IF NOT EXISTS grants_raw (
@@ -43,23 +55,40 @@ async function ensureSchema(db) {
       source_id TEXT NOT NULL,
       source_name TEXT,
       category TEXT,
+      source_type TEXT NOT NULL DEFAULT 'single',
+      ingestion_method TEXT NOT NULL DEFAULT 'api',
       external_id TEXT NOT NULL,
       source_url TEXT,
       raw_json TEXT NOT NULL,
       fetched_at TEXT NOT NULL
     )
   `);
+  await addColumnIfMissing(db, 'grants_raw', 'source_type', "TEXT NOT NULL DEFAULT 'single'");
+  await addColumnIfMissing(db, 'grants_raw', 'ingestion_method', "TEXT NOT NULL DEFAULT 'api'");
   await runAsync(db, 'CREATE UNIQUE INDEX IF NOT EXISTS ux_grants_raw_source_external ON grants_raw(source_id, external_id)');
+
+  // grants_gov_full is detail-only now, so rows captured under the old search list shape are dropped.
+  await runAsync(db, "DELETE FROM grants_raw WHERE source_id = 'grants_gov_full' AND source_type = 'single'");
+
+  // The original table declared raw_id NOT NULL, which blocks list and detail rows; rebuild when seen.
+  const normalizedInfo = await allAsync(db, 'PRAGMA table_info(grants_normalized)');
+  if (normalizedInfo.some((column) => column.name === 'raw_id' && column.notnull === 1)) {
+    await runAsync(db, 'DROP TABLE grants_normalized');
+  }
 
   await runAsync(db, `
     CREATE TABLE IF NOT EXISTS grants_normalized (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      raw_id INTEGER NOT NULL,
+      merge_key TEXT,
+      list_raw_id INTEGER,
+      detail_raw_id INTEGER,
+      raw_id INTEGER,
       source_id TEXT NOT NULL,
       category TEXT,
       external_id TEXT,
       title TEXT,
       agency TEXT,
+      agency_code TEXT,
       program TEXT,
       opportunity_number TEXT,
       status TEXT,
@@ -67,13 +96,41 @@ async function ensureSchema(db) {
       close_date TEXT,
       award_floor REAL,
       award_ceiling REAL,
+      estimated_funding REAL,
+      cfda_numbers TEXT,
+      funding_instruments TEXT,
+      applicant_types TEXT,
+      attachments TEXT,
+      related_opportunities TEXT,
+      opportunity_category TEXT,
       url TEXT,
       description TEXT,
       normalized_at TEXT NOT NULL,
-      FOREIGN KEY (raw_id) REFERENCES grants_raw(id)
+      detail_updated_at TEXT
     )
   `);
-  await runAsync(db, 'CREATE UNIQUE INDEX IF NOT EXISTS ux_grants_normalized_raw ON grants_normalized(raw_id)');
+
+  for (const [column, definition] of [
+    ['merge_key', 'TEXT'],
+    ['list_raw_id', 'INTEGER'],
+    ['detail_raw_id', 'INTEGER'],
+    ['agency_code', 'TEXT'],
+    ['estimated_funding', 'REAL'],
+    ['cfda_numbers', 'TEXT'],
+    ['funding_instruments', 'TEXT'],
+    ['applicant_types', 'TEXT'],
+    ['attachments', 'TEXT'],
+    ['related_opportunities', 'TEXT'],
+    ['opportunity_category', 'TEXT'],
+    ['detail_updated_at', 'TEXT'],
+  ]) {
+    await addColumnIfMissing(db, 'grants_normalized', column, definition);
+  }
+
+  // Identity moved from raw_id to merge_key so list and detail layers collapse into one row.
+  await runAsync(db, 'DELETE FROM grants_normalized WHERE merge_key IS NULL');
+  await runAsync(db, 'DROP INDEX IF EXISTS ux_grants_normalized_raw');
+  await runAsync(db, 'CREATE UNIQUE INDEX IF NOT EXISTS ux_grants_normalized_merge ON grants_normalized(merge_key)');
 
   await runAsync(db, `
     CREATE TABLE IF NOT EXISTS grant_topics (

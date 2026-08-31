@@ -2,11 +2,13 @@ const { fetchJson, fetchText } = require('../lib/http');
 const { getAsync, runAsync } = require('../lib/db');
 
 const UPSERT_RAW = `
-  INSERT INTO grants_raw (source_id, source_name, category, external_id, source_url, raw_json, fetched_at)
-  VALUES (?, ?, ?, ?, ?, ?, ?)
+  INSERT INTO grants_raw (source_id, source_name, category, source_type, ingestion_method, external_id, source_url, raw_json, fetched_at)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   ON CONFLICT(source_id, external_id) DO UPDATE SET
     source_name = excluded.source_name,
     category = excluded.category,
+    source_type = excluded.source_type,
+    ingestion_method = excluded.ingestion_method,
     source_url = excluded.source_url,
     raw_json = excluded.raw_json,
     fetched_at = excluded.fetched_at
@@ -33,6 +35,8 @@ async function writeRecords(db, source, items, fetchedAt) {
       source.id,
       source.name,
       source.category,
+      source.sourceType || 'single',
+      source.ingestionMethod || 'api',
       item.externalId,
       item.url || null,
       JSON.stringify(item.record),
@@ -67,6 +71,7 @@ function createWorker(source, parse) {
       return {
         sourceId: source.id,
         category: source.category,
+        sourceType: source.sourceType || 'single',
         parsed: parsed.length,
         written,
         fetchedAt,

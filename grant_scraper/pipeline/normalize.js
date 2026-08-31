@@ -1,13 +1,68 @@
 const { allAsync, runAsync } = require('../lib/db');
 
-const INSERT_NORMALIZED = `
+const BROWSER_LIST_SOURCE = 'simpler_browser';
+const API_LIST_SOURCE = 'grants_gov_simpler';
+const FEDERAL_LIST_SOURCES = new Set([BROWSER_LIST_SOURCE, API_LIST_SOURCE]);
+const FEDERAL_DETAIL_SOURCE = 'grants_gov_full';
+
+// Simpler owns list fields outright; Grants.gov detail only fills gaps in them.
+const UPSERT_LIST = `
   INSERT INTO grants_normalized (
-    raw_id, source_id, category, external_id, title, agency, program,
+    merge_key, list_raw_id, source_id, category, external_id, title, agency,
+    program, opportunity_number, status, posted_date, close_date, url, normalized_at
+  )
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ON CONFLICT(merge_key) DO UPDATE SET
+    list_raw_id = excluded.list_raw_id,
+    external_id = excluded.external_id,
+    title = excluded.title,
+    agency = excluded.agency,
+    program = excluded.program,
+    opportunity_number = excluded.opportunity_number,
+    status = excluded.status,
+    posted_date = excluded.posted_date,
+    close_date = excluded.close_date,
+    url = COALESCE(excluded.url, grants_normalized.url),
+    normalized_at = excluded.normalized_at
+`;
+
+const UPSERT_DETAIL = `
+  INSERT INTO grants_normalized (
+    merge_key, detail_raw_id, source_id, category, opportunity_number, title, agency,
+    agency_code, award_floor, award_ceiling, estimated_funding, cfda_numbers,
+    funding_instruments, applicant_types, attachments, related_opportunities,
+    opportunity_category, url, description, normalized_at, detail_updated_at
+  )
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ON CONFLICT(merge_key) DO UPDATE SET
+    detail_raw_id = excluded.detail_raw_id,
+    opportunity_number = COALESCE(grants_normalized.opportunity_number, excluded.opportunity_number),
+    title = COALESCE(grants_normalized.title, excluded.title),
+    agency = COALESCE(grants_normalized.agency, excluded.agency),
+    agency_code = excluded.agency_code,
+    award_floor = excluded.award_floor,
+    award_ceiling = excluded.award_ceiling,
+    estimated_funding = excluded.estimated_funding,
+    cfda_numbers = excluded.cfda_numbers,
+    funding_instruments = excluded.funding_instruments,
+    applicant_types = excluded.applicant_types,
+    attachments = excluded.attachments,
+    related_opportunities = excluded.related_opportunities,
+    opportunity_category = excluded.opportunity_category,
+    url = COALESCE(grants_normalized.url, excluded.url),
+    description = excluded.description,
+    detail_updated_at = excluded.detail_updated_at
+`;
+
+const UPSERT_SINGLE = `
+  INSERT INTO grants_normalized (
+    merge_key, raw_id, source_id, category, external_id, title, agency, program,
     opportunity_number, status, posted_date, close_date,
     award_floor, award_ceiling, url, description, normalized_at
   )
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  ON CONFLICT(raw_id) DO UPDATE SET
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ON CONFLICT(merge_key) DO UPDATE SET
+    raw_id = excluded.raw_id,
     title = excluded.title,
     agency = excluded.agency,
     program = excluded.program,
@@ -72,6 +127,38 @@ function mapGrantsGovSimpler(record) {
     awardFloor: pick({ ...summary, ...record }, ['award_floor']),
     awardCeiling: pick({ ...summary, ...record }, ['award_ceiling']),
     description: pick({ ...summary, ...record }, ['summary_description', 'description']),
+  };
+}
+
+/** Grants.gov nests live detail under `synopsis` and pre-publication detail under `forecast`. */
+function mapFullDetail(detail) {
+  const body = detail.synopsis || detail.forecast || {};
+  const cfdas = (detail.cfdas || []).map((entry) => entry.cfdaNumber).filter(Boolean);
+  const attachments = (detail.synopsisAttachmentFolders || []).flatMap((folder) =>
+    (folder.synopsisAttachments || []).map((file) => ({
+      id: file.id,
+      name: file.fileName,
+      description: file.fileDescription,
+      mimeType: file.mimeType,
+    })),
+  );
+
+  return {
+    opportunityNumber: pick(detail, ['opportunityNumber']),
+    title: pick(detail, ['opportunityTitle']),
+    agency: detail.agencyDetails ? detail.agencyDetails.agencyName : null,
+    agencyCode: pick(detail, ['owningAgencyCode']) || (detail.agencyDetails ? detail.agencyDetails.agencyCode : null),
+    awardFloor: pick(body, ['awardFloor']),
+    awardCeiling: pick(body, ['awardCeiling']),
+    estimatedFunding: pick(body, ['estimatedFunding']),
+    cfdaNumbers: cfdas.length ? cfdas.join(', ') : null,
+    fundingInstruments: (body.fundingInstruments || []).map((i) => i.description).join(', ') || null,
+    applicantTypes: (body.applicantTypes || []).map((i) => i.description).join(', ') || null,
+    attachments: attachments.length ? JSON.stringify(attachments) : null,
+    relatedOpportunities: (detail.relatedOpps || []).length ? JSON.stringify(detail.relatedOpps) : null,
+    opportunityCategory: detail.opportunityCategory ? detail.opportunityCategory.description : null,
+    description: pick(body, ['synopsisDesc', 'forecastDesc']),
+    detailUpdatedAt: pick(body, ['lastUpdatedDate', 'createdDate']),
   };
 }
 
@@ -179,6 +266,16 @@ function selectMapper(row) {
   return mapState;
 }
 
+/** Federal list and detail rows share one merged row keyed by opportunity number. */
+function mergeKeyFor(row, record) {
+  if (FEDERAL_LIST_SOURCES.has(row.source_id) || row.source_id === FEDERAL_DETAIL_SOURCE) {
+    const number = record.opportunity_number || record.opportunityNumber;
+    if (!number) return null;
+    return `FED:${String(number).trim().toUpperCase()}`;
+  }
+  return `${row.source_id}:${row.external_id}`;
+}
+
 function normalizeRow(row) {
   const record = JSON.parse(row.raw_json);
   const mapped = selectMapper(row)(record);
@@ -201,46 +298,116 @@ function normalizeRow(row) {
   };
 }
 
+/** DOM-extracted list rows already use normalized field names. */
+function mapSimplerBrowser(record) {
+  return {
+    title: pick(record, ['title']),
+    agency: pick(record, ['agency']),
+    program: pick(record, ['category']),
+    opportunityNumber: pick(record, ['opportunityNumber']),
+    status: pick(record, ['status']),
+    postedDate: pick(record, ['postedDate']),
+    closeDate: pick(record, ['deadline']),
+  };
+}
+
+async function writeListRow(db, row, record, mergeKey, normalizedAt) {
+  const mapped = row.source_id === BROWSER_LIST_SOURCE ? mapSimplerBrowser(record) : mapGrantsGovSimpler(record);
+  await runAsync(db, UPSERT_LIST, [
+    mergeKey, row.id, row.source_id, row.category, row.external_id,
+    toText(mapped.title), toText(mapped.agency), toText(mapped.program),
+    toText(mapped.opportunityNumber), toText(mapped.status),
+    toIsoDate(mapped.postedDate), toIsoDate(mapped.closeDate),
+    row.source_url || null, normalizedAt,
+  ]);
+}
+
+async function writeDetailRow(db, row, record, mergeKey, normalizedAt) {
+  const d = mapFullDetail(record);
+  await runAsync(db, UPSERT_DETAIL, [
+    mergeKey, row.id, row.source_id, row.category, toText(d.opportunityNumber),
+    toText(d.title), toText(d.agency), toText(d.agencyCode),
+    toNumber(d.awardFloor), toNumber(d.awardCeiling), toNumber(d.estimatedFunding),
+    d.cfdaNumbers, d.fundingInstruments, d.applicantTypes, d.attachments,
+    d.relatedOpportunities, d.opportunityCategory,
+    row.source_url || null, toText(d.description), normalizedAt, toText(d.detailUpdatedAt),
+  ]);
+}
+
+async function writeSingleRow(db, row, mergeKey, normalizedAt) {
+  const v = normalizeRow(row);
+  await runAsync(db, UPSERT_SINGLE, [
+    mergeKey, v.rawId, v.sourceId, v.category, v.externalId, v.title, v.agency,
+    v.program, v.opportunityNumber, v.status, v.postedDate, v.closeDate,
+    v.awardFloor, v.awardCeiling, v.url, v.description, normalizedAt,
+  ]);
+}
+
 /**
- * Reads pending rows from grants_raw and writes normalized records into
- * grants_normalized. Pass reprocess:true to rebuild every row.
+ * Reads rows from grants_raw and writes merged records into grants_normalized.
+ * Simpler supplies list fields, Grants.gov detail supplies deep metadata, and
+ * the two are joined on opportunity number.
  */
 async function runNormalization(db, { sourceId, reprocess = false, now = () => new Date().toISOString() } = {}) {
   const conditions = [];
   const params = [];
   if (!reprocess) {
-    conditions.push('r.id NOT IN (SELECT raw_id FROM grants_normalized)');
+    conditions.push(
+      '(r.id NOT IN (SELECT list_raw_id FROM grants_normalized WHERE list_raw_id IS NOT NULL) AND ' +
+        'r.id NOT IN (SELECT detail_raw_id FROM grants_normalized WHERE detail_raw_id IS NOT NULL) AND ' +
+        'r.id NOT IN (SELECT raw_id FROM grants_normalized WHERE raw_id IS NOT NULL))',
+    );
   }
   if (sourceId) {
     conditions.push('r.source_id = ?');
     params.push(sourceId);
   }
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-  const rows = await allAsync(db, `SELECT r.* FROM grants_raw r ${where} ORDER BY r.id ASC`, params);
+
+  // List rows first so detail COALESCE never overwrites authoritative list fields,
+  // and the browser list source last so it wins over the API list source.
+  const rows = await allAsync(
+    db,
+    `SELECT r.* FROM grants_raw r ${where} ORDER BY CASE r.source_type WHEN 'list' THEN 0 WHEN 'single' THEN 1 ELSE 2 END, CASE r.source_id WHEN '${BROWSER_LIST_SOURCE}' THEN 1 ELSE 0 END, r.id ASC`,
+    params,
+  );
 
   const normalizedAt = now();
   const failures = [];
+  const skipped = [];
   let written = 0;
 
   for (const row of rows) {
     try {
-      const value = normalizeRow(row);
-      await runAsync(db, INSERT_NORMALIZED, [
-        value.rawId, value.sourceId, value.category, value.externalId, value.title,
-        value.agency, value.program, value.opportunityNumber, value.status,
-        value.postedDate, value.closeDate, value.awardFloor, value.awardCeiling,
-        value.url, value.description, normalizedAt,
-      ]);
+      const record = JSON.parse(row.raw_json);
+      const mergeKey = mergeKeyFor(row, record);
+      if (!mergeKey) {
+        skipped.push({ rawId: row.id, sourceId: row.source_id, reason: 'missing opportunity number' });
+        continue;
+      }
+
+      if (FEDERAL_LIST_SOURCES.has(row.source_id)) await writeListRow(db, row, record, mergeKey, normalizedAt);
+      else if (row.source_id === FEDERAL_DETAIL_SOURCE) await writeDetailRow(db, row, record, mergeKey, normalizedAt);
+      else await writeSingleRow(db, row, mergeKey, normalizedAt);
+
       written += 1;
     } catch (error) {
       failures.push({ rawId: row.id, sourceId: row.source_id, error: error.message });
     }
   }
 
-  return { candidates: rows.length, written, failures };
+  return {
+    candidates: rows.length,
+    written,
+    skipped: skipped.length,
+    skippedSample: skipped.slice(0, 3),
+    failures,
+  };
 }
 
 module.exports = {
+  mapFullDetail,
+  mergeKeyFor,
   normalizeRow,
   runNormalization,
   toIsoDate,

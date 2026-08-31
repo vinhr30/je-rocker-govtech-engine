@@ -1,4 +1,5 @@
 const WORKERS = [
+  require('./simpler_browser_worker'),
   require('./grantsGovSimpler'),
   require('./grantsGovFull'),
   require('./dodSbir'),
