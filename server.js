@@ -1,6 +1,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const { createClient, clientEvents } = require('./src/utils/db');
+const { listGrants, getGrantDetail } = require('./src/grants/grants_service');
 
 const app = express();
 const PORT = 3000;
@@ -388,6 +389,7 @@ function htmlLayout({ title, content, includeNav = true, extraHead = '' }) {
           <a href="/business-driver">Business Driver</a>
           <a href="/primary-dashboard">Primary Dashboard</a>
           <a href="/client-dashboard">Client Dashboard</a>
+          <a href="/grant-engine">Grant Engine</a>
         </div>
       </nav>
     `
@@ -411,6 +413,7 @@ function htmlLayout({ title, content, includeNav = true, extraHead = '' }) {
       <link rel="stylesheet" href="/src/styles/global.css" />
       <link rel="stylesheet" href="/src/styles/layout.css" />
       <link rel="stylesheet" href="/src/styles/dashboard.css" />
+      <link rel="stylesheet" href="/src/styles/grants.css" />
       ${extraHead}
     </head>
     <body>
@@ -2225,6 +2228,79 @@ app.get('/api/client/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+app.get('/api/grants', async (req, res) => {
+  try {
+    const limit = Math.min(Number.parseInt(String(req.query.limit || '50'), 10) || 50, 200);
+    const offset = Math.max(Number.parseInt(String(req.query.offset || '0'), 10) || 0, 0);
+    const clientId = req.query.client_id ? Number.parseInt(String(req.query.client_id), 10) : null;
+
+    res.json(await listGrants({ limit, offset, clientId: Number.isFinite(clientId) ? clientId : null }));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/grants/:oppNum', async (req, res) => {
+  try {
+    const grant = await getGrantDetail(String(req.params.oppNum || ''));
+    if (!grant) {
+      return res.status(404).json({ error: 'Grant not found' });
+    }
+    res.json({ grant });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/grant-engine', (req, res) => {
+  const clientId = req.query.client_id ? String(req.query.client_id) : '';
+  const content = `
+    <div class="dashboard-shell">
+      <section class="page-hero">
+        <p class="page-kicker">JE ROCKER Grant Layer</p>
+        <h1 class="page-hero-title">Grant Engine</h1>
+        <p class="page-hero-subtitle">Federal grant opportunities from Simpler.Grants.gov, enriched with Grants.gov detail.</p>
+      </section>
+
+      <section id="grant-engine" class="polish-panel polish-panel-expanded" data-client-id="${clientId}">
+        <div class="polish-panel-body">Loading grants…</div>
+      </section>
+    </div>
+    <script src="/src/grants/grants_list.js"></script>
+    <script>
+      (function () {
+        const host = document.getElementById('grant-engine');
+        window.GrantList.mountGrantsList(host, { clientId: host.dataset.clientId || null });
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Grant Engine', content }));
+});
+
+app.get('/grant/:oppNum', (req, res) => {
+  const content = `
+    <div class="dashboard-shell">
+      <section class="page-hero">
+        <p class="page-kicker">JE ROCKER Grant Layer</p>
+        <h1 class="page-hero-title">Grant Detail</h1>
+      </section>
+
+      <section id="grant-detail" class="polish-panel polish-panel-expanded" data-opp-num="${String(req.params.oppNum).replace(/"/g, '&quot;')}">
+        <div class="polish-panel-body">Loading grant detail…</div>
+      </section>
+    </div>
+    <script src="/src/grants/grants_list.js"></script>
+    <script src="/src/grants/grants_detail.js"></script>
+    <script>
+      (function () {
+        const host = document.getElementById('grant-detail');
+        window.GrantDetail.mountGrantDetail(host, host.dataset.oppNum);
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Grant Detail', content }));
 });
 
 app.get('/', (req, res) => {

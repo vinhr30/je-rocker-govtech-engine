@@ -1,0 +1,149 @@
+.grant-scope,
+.grant-loading,
+.grant-empty,
+.grant-notice {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.grant-error {
+  color: #ff9d9d;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.grant-list-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.grant-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.grant-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-decoration: none;
+  color: inherit;
+}
+
+.grant-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.grant-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.grant-row-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.grant-row-agency,
+.grant-row-meta {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.grant-row-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.grant-row-status {
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 11px;
+}
+
+.grant-row-status.status-open {
+  background: rgba(80, 200, 120, 0.22);
+  color: #9ff0bd;
+}
+
+.grant-row-score {
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(120, 170, 255, 0.2);
+  color: #bcd6ff;
+  font-size: 11px;
+}
+
+.grant-back,
+.grant-detail-link {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #9fc4ff;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.grant-detail-title {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+
+.grant-detail-sub {
+  margin: 0 0 16px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.grant-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.grant-detail-field--wide {
+  grid-column: 1 / -1;
+}
+
+.grant-detail-field--scroll .grant-detail-value {
+  max-height: 260px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  padding-right: 8px;
+}
+
+.grant-detail-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 4px;
+}
+
+.grant-detail-value {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.grant-detail-muted {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.grant-attachments {
+  margin: 0;
+  padding-left: 18px;
+}

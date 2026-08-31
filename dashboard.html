@@ -413,6 +413,10 @@
 <!-- ================= DASHBOARD PAGE ================= -->
 <div id="dashboardPage">
 
+  <!-- Grant Engine views; markup is rendered by /src/grants/ modules. -->
+  <section id="grant-engine" hidden></section>
+  <section id="grant-detail" hidden></section>
+
   <div class="dashboard-header">
     <button class="back-button" onclick="goBackToCover()">← Back to cover</button>
 
@@ -1579,6 +1583,40 @@ window.onload = () => {
     }
   };
 };
+</script>
+
+<script src="/src/grants/grants_list.js"></script>
+<script src="/src/grants/grants_detail.js"></script>
+<script>
+  (function () {
+    const list = document.getElementById('grant-engine');
+    const detail = document.getElementById('grant-detail');
+
+    window.openGrantEngine = (clientId = null) => {
+      detail.hidden = true;
+      list.hidden = false;
+      window.GrantList.mountGrantsList(list, { clientId });
+    };
+
+    window.openGrantDetail = (oppNum) => {
+      list.hidden = true;
+      detail.hidden = false;
+      window.GrantDetail.mountGrantDetail(detail, oppNum);
+    };
+
+    list.addEventListener('click', (event) => {
+      const row = event.target.closest('.grant-row');
+      if (!row) return;
+      event.preventDefault();
+      window.openGrantDetail(row.dataset.oppNum);
+    });
+
+    detail.addEventListener('click', (event) => {
+      if (!event.target.closest('[data-action="back"]')) return;
+      event.preventDefault();
+      window.openGrantEngine();
+    });
+  })();
 </script>
 
 </body>
