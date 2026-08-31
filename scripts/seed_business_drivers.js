@@ -9,7 +9,7 @@ const JE_ROCKER_DRIVERS = [
   'accelerate digital modernization',
   'improve data interoperability',
   'increase procurement transparency',
-  'deploy AI-driven analytics',
+  'deploy AI-driven decision support',
   'replace manual workflows with automation',
   'modernize public sector dashboards',
   'strengthen compliance and reporting',
@@ -154,6 +154,11 @@ async function seedBusinessDrivers(
       UNIQUE(company_id, driver, mapped_term)
     )
   `);
+
+  // Seeding replaces the company's rows so renamed entries cannot linger.
+  await runAsync(db, 'DELETE FROM business_drivers WHERE company_id = ?', [companyId]);
+  await runAsync(db, 'DELETE FROM capability_map WHERE company_id = ?', [companyId]);
+  await runAsync(db, 'DELETE FROM driver_map WHERE company_id = ?', [companyId]);
 
   for (const driver of drivers) {
     await runAsync(

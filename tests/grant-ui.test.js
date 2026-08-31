@@ -10,7 +10,7 @@ const { listGrants, getGrantDetail, getGrantSignals, getSignalSets, scoreGrantFo
 const { renderList, renderRow, buildListUrl, mountGrantsList } = require('../src/grants/grants_list');
 const { renderDetail, renderSignals, toPlainText } = require('../src/grants/grants_detail');
 const { seedCompanyProfile, JE_ROCKER } = require('../scripts/seed_company_profile');
-const { seedBusinessDrivers, JE_ROCKER_DRIVERS } = require('../scripts/seed_business_drivers');
+const { seedBusinessDrivers, JE_ROCKER_DRIVERS, JE_ROCKER_DRIVER_MAP } = require('../scripts/seed_business_drivers');
 
 const GRANT = {
   agency: 'Animal and Plant Health Inspection Service',
@@ -412,6 +412,43 @@ test('a grant with no text scores zero on every axis', () => {
     capabilityMapTerms: [],
   });
   assert.strictEqual(result.score_total, 0);
+});
+
+test('the AI driver uses the decision support phrasing and drops the old one', async () => {
+  assert.ok(
+    JE_ROCKER_DRIVERS.includes('deploy AI-driven decision support'),
+    'renamed driver is present',
+  );
+  assert.ok(
+    !JE_ROCKER_DRIVERS.includes('deploy AI-driven analytics'),
+    'old driver phrasing is gone',
+  );
+  assert.ok(
+    Object.keys(JE_ROCKER_DRIVER_MAP).includes('deploy AI-driven decision support'),
+    'driver map key matches the driver',
+  );
+
+  const databasePath = path.join(tempDir('rename'), 'business_driver.db');
+  await seedBusinessDrivers(databasePath);
+  const signals = await getSignalSets({ businessDriverDatabasePath: databasePath });
+
+  assert.ok(signals.businessDrivers.includes('deploy AI-driven decision support'));
+  assert.ok(!signals.businessDrivers.includes('deploy AI-driven analytics'));
+});
+
+test('every driver map key names a real driver', () => {
+  for (const key of Object.keys(JE_ROCKER_DRIVER_MAP)) {
+    assert.ok(JE_ROCKER_DRIVERS.includes(key), `driver map key has no matching driver: ${key}`);
+  }
+});
+
+test('seeding replaces prior rows instead of accumulating them', async () => {
+  const databasePath = path.join(tempDir('replace'), 'business_driver.db');
+  await seedBusinessDrivers(databasePath, { drivers: ['old driver'], capabilityMap: [], driverMap: [] });
+  await seedBusinessDrivers(databasePath, { drivers: ['new driver'], capabilityMap: [], driverMap: [] });
+
+  const signals = await getSignalSets({ businessDriverDatabasePath: databasePath });
+  assert.deepStrictEqual(signals.businessDrivers, ['new driver'], 'the renamed row does not linger');
 });
 
 test('driver map terms score on the business driver axis', () => {
