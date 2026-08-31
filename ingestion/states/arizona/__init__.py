@@ -1,0 +1,2 @@
+"""Arizona ingestion module."""
+

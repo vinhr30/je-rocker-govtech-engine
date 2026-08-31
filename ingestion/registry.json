@@ -1,0 +1,32 @@
+[
+  {
+    "state": "AZ",
+    "module": "ingestion.states.arizona",
+    "enabled": true
+  },
+  {
+    "state": "CA",
+    "module": "ingestion.states.california",
+    "enabled": true
+  },
+  {
+    "state": "TX",
+    "module": "ingestion.states.texas",
+    "enabled": true
+  },
+  {
+    "state": "FL",
+    "module": "ingestion.states.florida",
+    "enabled": true
+  },
+  {
+    "state": "VA",
+    "module": "ingestion.states.virginia",
+    "enabled": true
+  },
+  {
+    "state": "NY",
+    "module": "ingestion.states.new_york",
+    "enabled": true
+  }
+]
