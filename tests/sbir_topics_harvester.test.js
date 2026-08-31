@@ -140,6 +140,94 @@ test('text fields are trimmed and collapsed', () => {
   assert.strictEqual(detail.title, 'Spaced Title');
 });
 
+/**
+ * Mirrors the live listing, where pagination is not stably sorted and every page
+ * after the first repeats one topic from the previous page: 337 raw links, 304 unique.
+ */
+function overlappingListingHtml(page) {
+  if (page >= TOTAL_PAGES) return '<html><body><p>No results</p></body></html>';
+
+  const isLast = page === TOTAL_PAGES - 1;
+  const newCount = page === 0 ? PER_PAGE : (isLast ? 6 : PER_PAGE - 1);
+  const firstId = page === 0 ? 1 : PER_PAGE + (page - 1) * (PER_PAGE - 1) + 1;
+
+  const ids = Array.from({ length: newCount }, (_, i) => firstId + i);
+  if (page > 0) ids.unshift(firstId - 1);
+
+  return `<html><body>${ids.map((id) => `<div class="card"><a href="/topics/${id}">Topic ${id}</a></div>`).join('')}</body></html>`;
+}
+
+function createOverlappingFetch() {
+  return async (url) => {
+    const ok = (body) => ({ ok: true, status: 200, text: async () => body });
+    const listing = url.match(/\/topics\?page=(\d+)$/);
+    if (listing) return ok(overlappingListingHtml(Number(listing[1])));
+    const detail = url.match(/\/topics\/(\d+)$/);
+    if (detail) return ok(detailHtml(detail[1]));
+    return { ok: false, status: 404, text: async () => '' };
+  };
+}
+
+test('the listing serves 337 raw links across its pages', () => {
+  let raw = 0;
+  for (let page = 0; page < TOTAL_PAGES; page += 1) raw += parseTopicLinks(overlappingListingHtml(page)).length;
+  assert.strictEqual(raw, 337, 'matches the raw link count seen live');
+});
+
+test('topics repeated across pages are deduplicated to 304 unique', async () => {
+  const db = await openTestDb('crosspage');
+  try {
+    const result = await harvestTopics({
+      db, fetchImpl: createOverlappingFetch(), delayMs: 0, sleep: noSleep,
+    });
+
+    assert.strictEqual(result.pagesFetched, TOTAL_PAGES);
+    assert.strictEqual(result.topicsSeen, 304, '337 raw links collapse to 304 unique topics');
+    assert.strictEqual(result.written, 304);
+
+    const rows = await allAsync(db, 'SELECT COUNT(*) AS total, COUNT(DISTINCT sbir_topic_url) AS unique_urls FROM sbir_topic_sources');
+    assert.strictEqual(rows[0].total, 304);
+    assert.strictEqual(rows[0].unique_urls, 304, 'no duplicate rows reached the table');
+  } finally {
+    await closeAsync(db);
+  }
+});
+
+test('a repeated topic is only fetched once', async () => {
+  const db = await openTestDb('fetchonce');
+  const calls = [];
+  const base = createOverlappingFetch();
+  try {
+    await harvestTopics({
+      db,
+      fetchImpl: async (url) => { calls.push(url); return base(url); },
+      maxPages: 3,
+      delayMs: 0,
+      sleep: noSleep,
+    });
+
+    const detailCalls = calls.filter((url) => /\/topics\/\d+$/.test(url));
+    assert.strictEqual(detailCalls.length, new Set(detailCalls).size, 'no topic page is fetched twice');
+  } finally {
+    await closeAsync(db);
+  }
+});
+
+test('BOTH is a program tag, not a phase', () => {
+  assert.strictEqual(normalizePhase('BOTH'), null);
+  assert.strictEqual(normalizePhase('SBIR'), null);
+  assert.strictEqual(normalizePhase('STTR'), null);
+
+  const detail = parseTopicDetail(
+    detailHtml('9', { title: 'Autonomous Sensing Topic' }).replace(
+      '<h3>Funding Agency</h3>',
+      '<p>BOTH</p><h3>Funding Agency</h3>',
+    ),
+    'https://www.sbir.gov/topics/9',
+  );
+  assert.strictEqual(detail.phase, null, 'a BOTH-tagged topic has no phase');
+});
+
 test('the harvester walks every page and stops when the listing runs out', async () => {
   const db = await openTestDb('pagination');
   const calls = [];
