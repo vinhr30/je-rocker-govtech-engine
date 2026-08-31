@@ -18,11 +18,11 @@ function resolveSourceId(sourceId) {
 }
 
 /** Runs a single named source end to end. Useful for verifying one endpoint. */
-async function runSource(sourceId, { databasePath, fetchImpl, env, detailLimit, maxPages, browserFactory, now } = {}) {
+async function runSource(sourceId, { databasePath, fetchImpl, env, detailLimit, maxPages, browserFactory, log, now } = {}) {
   const resolved = resolveSourceId(sourceId);
   const worker = getWorker(resolved);
   return withDatabase(async (db) => {
-    const ingestion = await worker.run({ db, fetchImpl, env, detailLimit, maxPages, browserFactory, now });
+    const ingestion = await worker.run({ db, fetchImpl, env, detailLimit, maxPages, browserFactory, log, now });
     const normalization = await runNormalization(db, { sourceId: resolved, now });
     const topics = worker.source.category === 'sbir'
       ? await runTopicExtraction(db, { sourceId: resolved, now })
@@ -80,7 +80,12 @@ if (require.main === module) {
   const source = getArg('--source');
   const cadence = getArg('--cadence');
   const maxPages = getArg('--max-pages');
-  const options = { maxPages: maxPages ? Number(maxPages) : Infinity };
+  const detailLimit = getArg('--detail-limit');
+  const options = {
+    maxPages: maxPages ? Number(maxPages) : Infinity,
+    log: (message) => console.log(message),
+  };
+  if (detailLimit) options.detailLimit = Number(detailLimit);
 
   const task = source
     ? runSource(source, options)
