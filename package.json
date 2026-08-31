@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test tests/step1-intake-client.test.js tests/step2-dashboard-activation.test.js tests/step3-intelligence-framework.test.js tests/step4-compliance-engine.test.js tests/step5-modernization-engine.test.js tests/step6-forecasting-engine.test.js tests/step7-opportunity-match-engine.test.js tests/step8-mission-engine.test.js tests/step9-pulse-engine.test.js tests/step10-intelligence-summary.test.js tests/step11-client-briefing.test.js tests/step12-modernization-score.test.js tests/grant-scraper.test.js tests/simpler-browser.test.js tests/grant-ui.test.js tests/sbir_topics_harvester.test.js",
+    "test": "node --test tests/step1-intake-client.test.js tests/step2-dashboard-activation.test.js tests/step3-intelligence-framework.test.js tests/step4-compliance-engine.test.js tests/step5-modernization-engine.test.js tests/step6-forecasting-engine.test.js tests/step7-opportunity-match-engine.test.js tests/step8-mission-engine.test.js tests/step9-pulse-engine.test.js tests/step10-intelligence-summary.test.js tests/step11-client-briefing.test.js tests/step12-modernization-score.test.js tests/grant-scraper.test.js tests/simpler-browser.test.js tests/grant-ui.test.js tests/sbir_topics_harvester.test.js tests/sbir_agency_resolver.test.js",
     "grants": "node grant_scraper/index.js"
   },
   "keywords": [],

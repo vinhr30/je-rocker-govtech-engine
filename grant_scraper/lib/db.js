@@ -176,6 +176,23 @@ async function ensureSbirSchema(db) {
     )
   `);
   await runAsync(db, 'CREATE INDEX IF NOT EXISTS ix_sbir_topic_sources_agency ON sbir_topic_sources(agency)');
+
+  await runAsync(db, 'PRAGMA foreign_keys = ON');
+  await runAsync(db, `
+    CREATE TABLE IF NOT EXISTS sbir_topic_details (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sbir_topic_id INTEGER NOT NULL UNIQUE REFERENCES sbir_topic_sources(id) ON DELETE CASCADE,
+      abstract TEXT,
+      deliverables TEXT,
+      funding_min INTEGER,
+      funding_max INTEGER,
+      component TEXT,
+      command TEXT,
+      phase_hierarchy TEXT,
+      attachments_json TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
 }
 
 async function withSbirDatabase(handler, databasePath) {
