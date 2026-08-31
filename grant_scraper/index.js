@@ -80,7 +80,7 @@ if (require.main === module) {
   const source = getArg('--source');
   const cadence = getArg('--cadence');
   const maxPages = getArg('--max-pages');
-  const options = maxPages ? { maxPages: Number(maxPages) } : {};
+  const options = { maxPages: maxPages ? Number(maxPages) : Infinity };
 
   const task = source
     ? runSource(source, options)

@@ -142,10 +142,22 @@ async function readRows(page, wait, settleMs, attempts = 3) {
 }
 
 /**
- * Walks the paginated result set, stopping on a disabled Next button, an empty
- * page, or a page whose first row did not change after clicking.
+ * A slow render looks identical to the end of the result set, so the first row
+ * is polled a few times before concluding that pagination has stopped.
  */
-async function collectRecords(page, { maxPages, settleMs = 1500, sleep }) {
+async function waitForFirstChange(page, previousFirst, wait, settleMs, attempts = 5) {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    if ((await firstNumberOn(page)) !== previousFirst) return true;
+    await wait(settleMs);
+  }
+  return false;
+}
+
+/**
+ * Walks the paginated result set, stopping on a disabled Next button, an empty
+ * page, a page that adds no new rows, or a first row that did not change.
+ */
+async function collectRecords(page, { maxPages = Infinity, settleMs = 1500, sleep }) {
   const wait = sleep || ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
   const records = new Map();
   let pagesVisited = 0;
@@ -154,8 +166,10 @@ async function collectRecords(page, { maxPages, settleMs = 1500, sleep }) {
     const rows = await readRows(page, wait, settleMs);
     if (!rows.length) break;
 
+    const sizeBefore = records.size;
     for (const row of rows) records.set(row.externalId, row);
     pagesVisited += 1;
+    if (records.size === sizeBefore) break;
 
     const next = await page.$(NEXT_SELECTOR);
     if (!next) break;
@@ -164,7 +178,7 @@ async function collectRecords(page, { maxPages, settleMs = 1500, sleep }) {
     const before = rows[0].externalId;
     await next.click();
     await wait(settleMs);
-    if ((await firstNumberOn(page)) === before) break;
+    if (!(await waitForFirstChange(page, before, wait, settleMs))) break;
   }
 
   return { records: [...records.values()], pagesVisited };
@@ -181,12 +195,16 @@ module.exports = {
   async run({
     db,
     browserFactory = defaultBrowserFactory,
-    maxPages = 5,
+    maxPages = Infinity,
     settleMs,
     sleep,
     now = () => new Date().toISOString(),
   } = {}) {
     if (!db) throw new Error(`Worker ${source.id} requires a database handle`);
+
+    if (maxPages === Infinity) {
+      console.log('[INFO] Ingesting all Simpler pages until pagination stops.');
+    }
 
     const browser = await browserFactory();
     let collected;
