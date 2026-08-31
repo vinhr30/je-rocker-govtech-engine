@@ -1592,10 +1592,10 @@ window.onload = () => {
     const list = document.getElementById('grant-engine');
     const detail = document.getElementById('grant-detail');
 
-    window.openGrantEngine = (clientId = null) => {
+    window.openGrantEngine = () => {
       detail.hidden = true;
       list.hidden = false;
-      window.GrantList.mountGrantsList(list, { clientId });
+      window.GrantList.mountGrantsList(list);
     };
 
     window.openGrantDetail = (oppNum) => {

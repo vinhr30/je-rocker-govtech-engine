@@ -2,10 +2,11 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
 const DEFAULT_GRANTS_DB = path.join(__dirname, '..', '..', 'grant_scraper', 'data', 'grants.db');
-const DEFAULT_CLIENT_DB = path.join(__dirname, '..', '..', 'client.db');
+const DEFAULT_COMPANY_DB = path.join(__dirname, '..', '..', 'company.db');
+const COMPANY_ID = 'jerocker';
 
 const LIST_COLUMNS = `
-  opportunity_number, title, agency, status, posted_date, close_date,
+  opportunity_number, title, agency, agency_code, status, posted_date, close_date,
   award_floor, award_ceiling, url, opportunity_category, applicant_types, description
 `;
 
@@ -41,76 +42,75 @@ const STOPWORDS = new Set([
   'agency', 'administration', 'bureau', 'center', 'management',
 ]);
 
-const MATCH_THRESHOLD = 3;
-
-/** Profile fields are free text, so both the full phrase and its words are matchable. */
+/**
+ * Multi-word profile entries only match as a whole phrase; splitting them would
+ * let a term like "data ingestion pipelines" match on the word "data" alone.
+ */
 function tokenize(value) {
   const phrases = new Set();
   const words = new Set();
   if (!value) return { phrases: [], words: [] };
 
-  for (const part of String(value).split(/[,;|/\n]+/)) {
-    const trimmed = part.trim().toLowerCase();
-    if (trimmed.length > 2) phrases.add(trimmed);
-    for (const word of trimmed.split(/\s+/)) {
-      if (word.length > 3 && !STOPWORDS.has(word)) words.add(word);
+  const parts = Array.isArray(value) ? value : String(value).split(/[,;|\n]+/);
+  for (const part of parts) {
+    const trimmed = String(part).trim().toLowerCase();
+    if (trimmed.length < 3) continue;
+
+    const segments = trimmed.split(/[\s/]+/).filter(Boolean);
+    if (segments.length > 1) {
+      phrases.add(trimmed);
+      for (const segment of segments) {
+        if (segment.includes('-') || /[a-z]{2,}\d|\d[a-z]{2,}/.test(segment)) phrases.add(segment);
+      }
+    } else if (!STOPWORDS.has(trimmed)) {
+      words.add(trimmed);
     }
   }
   return { phrases: [...phrases], words: [...words] };
-}
-
-function mergeTokens(...sets) {
-  return {
-    phrases: [...new Set(sets.flatMap((s) => s.phrases))],
-    words: [...new Set(sets.flatMap((s) => s.words))],
-  };
 }
 
 function haystack(...values) {
   return values.filter(Boolean).join(' ').toLowerCase();
 }
 
-function matchTokens(tokens, text, phraseWeight) {
-  const phraseHits = tokens.phrases.filter((token) => text.includes(token));
-  const wordHits = tokens.words.filter((token) => text.includes(token));
-  return {
-    hits: [...new Set([...phraseHits, ...wordHits])],
-    score: phraseHits.length * phraseWeight + wordHits.length,
-  };
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Whole-token matching keeps short agency codes like DOT and DOE out of ordinary words.
+function containsToken(text, token) {
+  return new RegExp(`(^|[^a-z0-9])${escapeRegExp(token)}([^a-z0-9]|$)`, 'i').test(text);
+}
+
+function matchTokens(tokens, text, weight) {
+  const hits = [...tokens.phrases, ...tokens.words].filter((token) => containsToken(text, token));
+  const unique = [...new Set(hits)];
+  return { hits: unique, score: unique.length * weight };
 }
 
 /**
- * Scores a grant against a client profile on the three axes the dashboard
- * filters by. Returns the matched terms so the UI can explain the match.
+ * Scores a grant against the JE ROCKER LC profile. Every grant keeps a score so
+ * the list can be ranked rather than filtered, and the matched terms explain why.
  */
-function scoreGrantForClient(grant, client) {
-  if (!client) return { score: 0, matched: true, reasons: {} };
+function scoreGrantForCompany(grant, profile) {
+  if (!profile) return { score: 0, reasons: {} };
 
-  const agencyTokens = mergeTokens(tokenize(client.agency), tokenize(client.preferred_agencies));
-  const categoryTokens = mergeTokens(
-    tokenize(client.capability_signals),
-    tokenize(client.targeting_preferences),
-    tokenize(client.keywords),
-  );
-  const eligibilityTokens = mergeTokens(
-    tokenize(client.business_classifications),
-    tokenize(client.business_size),
-  );
+  const subject = haystack(grant.title, grant.opportunity_category, grant.description);
+  const agencyText = haystack(grant.agency, grant.agency_code);
 
-  const agency = matchTokens(agencyTokens, haystack(grant.agency), 4);
-  const category = matchTokens(
-    categoryTokens,
-    haystack(grant.title, grant.opportunity_category, grant.description),
-    3,
-  );
-  const eligibility = matchTokens(eligibilityTokens, haystack(grant.applicant_types), 3);
-
-  const score = agency.score + category.score + eligibility.score;
+  const agency = matchTokens(tokenize(profile.preferred_agencies), agencyText, 4);
+  const capabilities = matchTokens(tokenize(profile.capabilities), subject, 3);
+  const focusAreas = matchTokens(tokenize(profile.focus_areas), subject, 3);
+  const modernization = matchTokens(tokenize(profile.modernization_signals), subject, 2);
 
   return {
-    score,
-    matched: score >= MATCH_THRESHOLD,
-    reasons: { agency: agency.hits, category: category.hits, eligibility: eligibility.hits },
+    score: agency.score + capabilities.score + focusAreas.score + modernization.score,
+    reasons: {
+      agency: agency.hits,
+      capabilities: capabilities.hits,
+      focusAreas: focusAreas.hits,
+      modernizationSignals: modernization.hits,
+    },
   };
 }
 
@@ -130,11 +130,38 @@ function toListItem(row, relevance) {
   };
 }
 
-async function getClientProfile(clientId, { clientDatabasePath = DEFAULT_CLIENT_DB } = {}) {
-  if (!clientId) return null;
-  const db = await openReadOnly(clientDatabasePath);
+function parseList(value) {
+  if (!value) return [];
   try {
-    return await getAsync(db, 'SELECT * FROM clients WHERE client_id = ?', [clientId]);
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return String(value).split(/[,;|\n]+/).map((v) => v.trim()).filter(Boolean);
+  }
+}
+
+async function getCompanyProfile({ companyDatabasePath = DEFAULT_COMPANY_DB, companyId = COMPANY_ID } = {}) {
+  let db;
+  try {
+    db = await openReadOnly(companyDatabasePath);
+  } catch {
+    return null;
+  }
+
+  try {
+    const row = await getAsync(db, 'SELECT * FROM company_profile WHERE id = ?', [companyId]);
+    if (!row) return null;
+    return {
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      capabilities: parseList(row.capabilities),
+      focus_areas: parseList(row.focus_areas),
+      preferred_agencies: parseList(row.preferred_agencies),
+      modernization_signals: parseList(row.modernization_signals),
+    };
+  } catch {
+    return null;
   } finally {
     await closeAsync(db);
   }
@@ -144,11 +171,10 @@ async function getClientProfile(clientId, { clientDatabasePath = DEFAULT_CLIENT_
 async function listGrants({
   limit = 50,
   offset = 0,
-  clientId = null,
   databasePath = DEFAULT_GRANTS_DB,
-  clientDatabasePath = DEFAULT_CLIENT_DB,
+  companyDatabasePath = DEFAULT_COMPANY_DB,
 } = {}) {
-  const client = await getClientProfile(clientId, { clientDatabasePath });
+  const profile = await getCompanyProfile({ companyDatabasePath });
   const db = await openReadOnly(databasePath);
 
   try {
@@ -159,20 +185,17 @@ async function listGrants({
        ORDER BY close_date IS NULL, close_date ASC`,
     );
 
-    const scored = rows
-      .map((row) => ({ row, relevance: scoreGrantForClient(row, client) }))
-      .filter((entry) => entry.relevance.matched);
-
-    if (client) scored.sort((a, b) => b.relevance.score - a.relevance.score);
+    // Every grant is returned; the profile only changes the ordering.
+    const ranked = rows.map((row) => ({ row, relevance: scoreGrantForCompany(row, profile) }));
+    if (profile) ranked.sort((a, b) => b.relevance.score - a.relevance.score);
 
     return {
-      total: scored.length,
-      unfilteredTotal: rows.length,
+      total: ranked.length,
+      ranked: Boolean(profile),
       limit,
       offset,
-      clientId: client ? client.client_id : null,
-      clientName: client ? client.client_name : null,
-      grants: scored.slice(offset, offset + limit).map((entry) => toListItem(entry.row, client ? entry.relevance : null)),
+      company: profile ? { id: profile.id, name: profile.name, type: profile.type } : null,
+      grants: ranked.slice(offset, offset + limit).map((entry) => toListItem(entry.row, profile ? entry.relevance : null)),
     };
   } finally {
     await closeAsync(db);
@@ -230,9 +253,11 @@ async function getGrantDetail(oppNum, { databasePath = DEFAULT_GRANTS_DB } = {})
 }
 
 module.exports = {
-  DEFAULT_CLIENT_DB,
+  COMPANY_ID,
+  DEFAULT_COMPANY_DB,
   DEFAULT_GRANTS_DB,
+  getCompanyProfile,
   getGrantDetail,
   listGrants,
-  scoreGrantForClient,
+  scoreGrantForCompany,
 };

@@ -2234,9 +2234,8 @@ app.get('/api/grants', async (req, res) => {
   try {
     const limit = Math.min(Number.parseInt(String(req.query.limit || '50'), 10) || 50, 200);
     const offset = Math.max(Number.parseInt(String(req.query.offset || '0'), 10) || 0, 0);
-    const clientId = req.query.client_id ? Number.parseInt(String(req.query.client_id), 10) : null;
 
-    res.json(await listGrants({ limit, offset, clientId: Number.isFinite(clientId) ? clientId : null }));
+    res.json(await listGrants({ limit, offset }));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -2255,7 +2254,6 @@ app.get('/api/grants/:oppNum', async (req, res) => {
 });
 
 app.get('/grant-engine', (req, res) => {
-  const clientId = req.query.client_id ? String(req.query.client_id) : '';
   const content = `
     <div class="dashboard-shell">
       <section class="page-hero">
@@ -2264,15 +2262,14 @@ app.get('/grant-engine', (req, res) => {
         <p class="page-hero-subtitle">Federal grant opportunities from Simpler.Grants.gov, enriched with Grants.gov detail.</p>
       </section>
 
-      <section id="grant-engine" class="polish-panel polish-panel-expanded" data-client-id="${clientId}">
+      <section id="grant-engine" class="polish-panel polish-panel-expanded">
         <div class="polish-panel-body">Loading grants…</div>
       </section>
     </div>
     <script src="/src/grants/grants_list.js"></script>
     <script>
       (function () {
-        const host = document.getElementById('grant-engine');
-        window.GrantList.mountGrantsList(host, { clientId: host.dataset.clientId || null });
+        window.GrantList.mountGrantsList(document.getElementById('grant-engine'));
       })();
     </script>
   `;

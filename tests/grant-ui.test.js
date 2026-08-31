@@ -6,12 +6,14 @@ const path = require('node:path');
 const sqlite3 = require('sqlite3').verbose();
 
 const { ensureSchema, openDatabase, runAsync, closeAsync } = require('../grant_scraper/lib/db');
-const { listGrants, getGrantDetail, scoreGrantForClient } = require('../src/grants/grants_service');
+const { listGrants, getGrantDetail, scoreGrantForCompany, getCompanyProfile } = require('../src/grants/grants_service');
 const { renderList, renderRow, buildListUrl } = require('../src/grants/grants_list');
 const { renderDetail, toPlainText } = require('../src/grants/grants_detail');
+const { seedCompanyProfile, JE_ROCKER } = require('../scripts/seed_company_profile');
 
 const GRANT = {
   agency: 'Animal and Plant Health Inspection Service',
+  agency_code: 'USDA-APHIS',
   title: 'Chronic Wasting Disease Surveillance',
   opportunity_category: 'Discretionary',
   description: 'wildlife disease surveillance',
@@ -51,6 +53,26 @@ async function seedGrantsDb(dir) {
        'NOAA', 'BBB-2', 'Open', '2026-10-15', 'https://simpler.grants.gov/opportunity/bbb', '2026-08-31T00:00:00Z')`,
   );
 
+  // Capability match only: no preferred agency.
+  await runAsync(
+    db,
+    `INSERT INTO grants_normalized (
+       merge_key, list_raw_id, source_id, category, external_id, title, agency,
+       opportunity_number, status, close_date, url, normalized_at
+     ) VALUES ('FED:CCC-3', 5, 'simpler_browser', 'grants_gov', 'CCC-3', 'Dashboard Intelligence Pilot',
+       'Smithsonian Institution', 'CCC-3', 'Open', '2026-11-01', 'https://simpler.grants.gov/opportunity/ccc', '2026-08-31T00:00:00Z')`,
+  );
+
+  // Generic noise: matches nothing in the profile.
+  await runAsync(
+    db,
+    `INSERT INTO grants_normalized (
+       merge_key, list_raw_id, source_id, category, external_id, title, agency,
+       opportunity_number, status, close_date, url, normalized_at
+     ) VALUES ('FED:DDD-4', 7, 'simpler_browser', 'grants_gov', 'DDD-4', 'Community Theatre Outreach',
+       'Smithsonian Institution', 'DDD-4', 'Open', '2026-12-01', 'https://simpler.grants.gov/opportunity/ddd', '2026-08-31T00:00:00Z')`,
+  );
+
   // Not a list-layer row; must never appear in the list view.
   await runAsync(
     db,
@@ -63,29 +85,24 @@ async function seedGrantsDb(dir) {
   return databasePath;
 }
 
-function seedClientDb(dir, client) {
-  const databasePath = path.join(dir, 'client.db');
-  return new Promise((resolve, reject) => {
-    const db = new sqlite3.Database(databasePath);
-    db.serialize(() => {
-      db.run(`CREATE TABLE clients (
-        client_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        client_name TEXT, keywords TEXT, preferred_agencies TEXT
-      )`);
-      db.run(
-        'INSERT INTO clients (client_name, keywords, preferred_agencies) VALUES (?, ?, ?)',
-        [client.name, client.keywords, client.agencies],
-        (err) => (err ? reject(err) : db.close(() => resolve(databasePath))),
-      );
-    });
-  });
+async function seedCompanyDb(dir) {
+  const databasePath = path.join(dir, 'company.db');
+  await seedCompanyProfile(databasePath);
+  return databasePath;
 }
+
+// Keeps list-shape tests independent of the seeded company profile.
+const NO_COMPANY = { companyDatabasePath: '/tmp/grant-ui-no-company.db' };
 
 test('list view returns Simpler-browser list fields only', async () => {
   const databasePath = await seedGrantsDb(tempDir('list'));
-  const payload = await listGrants({ databasePath });
+  const payload = await listGrants({ databasePath, ...NO_COMPANY });
 
-  assert.strictEqual(payload.total, 2, 'SBIR single-layer rows are excluded from the grant list');
+  assert.strictEqual(payload.total, 4);
+  assert.ok(
+    !payload.grants.some((g) => g.oppNum === 'T-1'),
+    'SBIR single-layer rows are excluded from the grant list',
+  );
   const [first] = payload.grants;
   assert.deepStrictEqual(Object.keys(first).sort(), [
     'agency', 'awardMax', 'awardMin', 'deadline', 'href', 'oppNum', 'postedDate', 'relevance', 'status', 'title', 'url',
@@ -99,10 +116,10 @@ test('list view returns Simpler-browser list fields only', async () => {
   assert.strictEqual(first.href, '/grant/AAA-1');
 });
 
-test('list view sorts by soonest deadline', async () => {
+test('list view sorts by soonest deadline when unranked', async () => {
   const databasePath = await seedGrantsDb(tempDir('sort'));
-  const payload = await listGrants({ databasePath });
-  assert.deepStrictEqual(payload.grants.map((g) => g.oppNum), ['AAA-1', 'BBB-2']);
+  const payload = await listGrants({ databasePath, ...NO_COMPANY });
+  assert.deepStrictEqual(payload.grants.map((g) => g.oppNum), ['AAA-1', 'BBB-2', 'CCC-3', 'DDD-4']);
 });
 
 test('detail view returns Grants.gov full fields', async () => {
@@ -130,55 +147,82 @@ test('unknown opportunity numbers resolve to null', async () => {
   assert.strictEqual(await getGrantDetail('NOPE', { databasePath }), null);
 });
 
-test('client relevance matches on agency, category, and eligibility', () => {
-  const cases = [
-    [{ preferred_agencies: 'Animal and Plant Health Inspection Service' }, 'agency'],
-    [{ capability_signals: 'wildlife disease surveillance' }, 'category'],
-    [{ business_classifications: 'institutions of higher education' }, 'eligibility'],
-  ];
+test('JE ROCKER LC profile loads from company.db', async () => {
+  const companyDatabasePath = await seedCompanyDb(tempDir('profile'));
+  const profile = await getCompanyProfile({ companyDatabasePath });
 
-  for (const [client, axis] of cases) {
-    const result = scoreGrantForClient(GRANT, client);
-    assert.strictEqual(result.matched, true, `${axis} should match`);
-    assert.ok(result.reasons[axis].length > 0, `${axis} should report why`);
-  }
+  assert.strictEqual(profile.id, 'jerocker');
+  assert.strictEqual(profile.name, 'JE ROCKER LC');
+  assert.strictEqual(profile.type, 'primary_contractor');
+  assert.deepStrictEqual(profile.capabilities, JE_ROCKER.capabilities);
+  assert.deepStrictEqual(profile.focus_areas, JE_ROCKER.focus_areas);
+  assert.deepStrictEqual(profile.preferred_agencies, JE_ROCKER.preferred_agencies);
+  assert.deepStrictEqual(profile.modernization_signals, JE_ROCKER.modernization_signals);
 });
 
-test('generic procurement vocabulary does not create false matches', () => {
-  for (const keywords of ['program management, department support', 'federal services, national office']) {
-    const result = scoreGrantForClient(GRANT, { keywords });
-    assert.strictEqual(result.matched, false, `"${keywords}" must not match`);
-    assert.strictEqual(result.score, 0);
-  }
-});
+test('a missing company profile leaves grants unranked rather than failing', async () => {
+  const databasePath = await seedGrantsDb(tempDir('noprofile'));
+  const payload = await listGrants({ databasePath, ...NO_COMPANY });
 
-test('unrelated capabilities do not match', () => {
-  const result = scoreGrantForClient(GRANT, { keywords: 'cloud migration, cybersecurity' });
-  assert.strictEqual(result.matched, false);
-});
-
-test('no client means no filtering', async () => {
-  const databasePath = await seedGrantsDb(tempDir('noclient'));
-  const payload = await listGrants({ databasePath });
-  assert.strictEqual(payload.clientId, null);
+  assert.strictEqual(payload.company, null);
+  assert.strictEqual(payload.ranked, false);
   assert.strictEqual(payload.grants[0].relevance, null);
+  assert.strictEqual(payload.total, 4, 'all list-layer grants are still returned');
 });
 
-test('selecting a client filters the list and reports the unfiltered total', async () => {
-  const dir = tempDir('client');
-  const databasePath = await seedGrantsDb(dir);
-  const clientDatabasePath = await seedClientDb(dir, {
-    name: 'Wildlife Analytics',
-    keywords: 'wildlife disease surveillance',
-    agencies: '',
-  });
+test('JE ROCKER scoring ranks agency above capability above generic noise', () => {
+  const agencyMatch = scoreGrantForCompany(GRANT, JE_ROCKER);
+  const capabilityMatch = scoreGrantForCompany(
+    { agency: 'Smithsonian Institution', title: 'Dashboard Intelligence Pilot' },
+    JE_ROCKER,
+  );
+  const noise = scoreGrantForCompany(
+    { agency: 'Smithsonian Institution', title: 'Community Theatre Outreach' },
+    JE_ROCKER,
+  );
 
-  const payload = await listGrants({ databasePath, clientDatabasePath, clientId: 1 });
-  assert.strictEqual(payload.clientName, 'Wildlife Analytics');
-  assert.strictEqual(payload.unfilteredTotal, 2);
-  assert.strictEqual(payload.total, 1, 'only the relevant grant survives the filter');
-  assert.strictEqual(payload.grants[0].oppNum, 'AAA-1');
-  assert.ok(payload.grants[0].relevance.score > 0);
+  assert.ok(agencyMatch.score > capabilityMatch.score, 'agency match outranks capability match');
+  assert.ok(capabilityMatch.score > noise.score, 'capability match outranks generic noise');
+  assert.strictEqual(noise.score, 0);
+
+  assert.deepStrictEqual(agencyMatch.reasons.agency, ['usda'], 'agency code drives the match');
+  assert.deepStrictEqual(capabilityMatch.reasons.capabilities, ['dashboard intelligence']);
+});
+
+test('short agency codes do not match ordinary words', () => {
+  const result = scoreGrantForCompany(
+    { agency: 'Department of Commerce', title: 'Connecting the dots in rural broadband' },
+    JE_ROCKER,
+  );
+  assert.deepStrictEqual(result.reasons.agency, [], '"DOT" must not match the word "dots"');
+});
+
+test('multi-word capabilities do not match on a single common word', () => {
+  const result = scoreGrantForCompany(
+    { agency: 'Smithsonian Institution', title: 'Open data for community museums' },
+    JE_ROCKER,
+  );
+  assert.deepStrictEqual(result.reasons.capabilities, [], '"data ingestion pipelines" must not match on "data"');
+});
+
+test('the list is ranked by JE ROCKER relevance and returns every grant', async () => {
+  const dir = tempDir('ranked');
+  const databasePath = await seedGrantsDb(dir);
+  const companyDatabasePath = await seedCompanyDb(dir);
+
+  const payload = await listGrants({ databasePath, companyDatabasePath });
+
+  assert.strictEqual(payload.ranked, true);
+  assert.strictEqual(payload.company.name, 'JE ROCKER LC');
+  assert.strictEqual(payload.total, 4, 'ranking never drops a grant');
+
+  const order = payload.grants.map((g) => g.oppNum);
+  assert.strictEqual(order[0], 'AAA-1', 'preferred agency ranks first');
+  assert.strictEqual(order[1], 'CCC-3', 'capability match ranks second');
+
+  const scores = payload.grants.map((g) => g.relevance.score);
+  assert.deepStrictEqual([...scores].sort((a, b) => b - a), scores, 'scores are non-increasing');
+  assert.strictEqual(scores[scores.length - 1], 0, 'generic noise ranks last');
 });
 
 test('list module renders the six required row fields', async () => {
@@ -196,9 +240,32 @@ test('list module renders the six required row fields', async () => {
   assert.match(html, /\$413,380/);
   assert.match(html, /href="\/grant\/AAA-1"/, 'row links to the detail page');
 
-  const empty = renderList({ grants: [], clientName: 'Acme', unfilteredTotal: 50 });
-  assert.match(empty, /No grants match/);
-  assert.match(empty, /50 open opportunities/);
+  const ranked = renderList({
+    grants: [{ oppNum: 'A', title: 'T', agency: 'A', href: '/grant/A', relevance: { score: 5 } }],
+    company: { id: 'jerocker', name: 'JE ROCKER LC', type: 'primary_contractor' },
+    total: 50,
+    ranked: true,
+  });
+  assert.match(ranked, /Ranked by relevance to/);
+  assert.match(ranked, /JE ROCKER LC/);
+  assert.ok(!ranked.includes('No grants match'), 'the no-match message is gone');
+  assert.ok(!ranked.includes('client'), 'no client wording remains');
+
+  const empty = renderList({ grants: [] });
+  assert.match(empty, /No grants have been ingested yet/);
+  assert.ok(!empty.includes('No grants match'));
+});
+
+test('relevance badge is hidden when a grant scores zero', () => {
+  const zero = renderRow({
+    oppNum: 'A', title: 'T', agency: 'A', href: '/grant/A', relevance: { score: 0 },
+  });
+  assert.ok(!zero.includes('grant-row-score'), 'no badge for unscored grants');
+
+  const scored = renderRow({
+    oppNum: 'B', title: 'T', agency: 'A', href: '/grant/B', relevance: { score: 7 },
+  });
+  assert.match(scored, /match 7/);
 });
 
 test('list module escapes untrusted grant text', async () => {
@@ -243,8 +310,9 @@ test('detail module reports missing grants and missing detail layers', async () 
   assert.match(pending, /No attachments published/);
 });
 
-test('list url carries the selected client', async () => {
+test('list url carries only paging parameters', async () => {
   assert.strictEqual(buildListUrl(), '/api/grants');
-  assert.strictEqual(buildListUrl({ clientId: 7 }), '/api/grants?client_id=7');
-  assert.strictEqual(buildListUrl({ clientId: 7, limit: 10 }), '/api/grants?client_id=7&limit=10');
+  assert.strictEqual(buildListUrl({ limit: 10 }), '/api/grants?limit=10');
+  assert.strictEqual(buildListUrl({ limit: 10, offset: 20 }), '/api/grants?limit=10&offset=20');
+  assert.ok(!buildListUrl({ clientId: 7 }).includes('client'), 'client scoping is gone');
 });

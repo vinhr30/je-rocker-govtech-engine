@@ -35,7 +35,7 @@
 
   function renderRow(grant) {
     const status = grant.status ? escapeHtml(grant.status) : 'Unknown';
-    const relevance = grant.relevance
+    const relevance = grant.relevance && grant.relevance.score > 0
       ? `<span class="grant-row-score" title="Client relevance score">match ${grant.relevance.score}</span>`
       : '';
 
@@ -58,14 +58,11 @@
   function renderList(payload) {
     const grants = (payload && payload.grants) || [];
     if (!grants.length) {
-      const scoped = payload && payload.clientName
-        ? `No grants match <strong>${escapeHtml(payload.clientName)}</strong> out of ${payload.unfilteredTotal || 0} open opportunities.`
-        : 'No grants match the current view.';
-      return `<p class="grant-empty">${scoped}</p>`;
+      return '<p class="grant-empty">No grants have been ingested yet.</p>';
     }
 
-    const scope = payload.clientName
-      ? `<p class="grant-scope">Filtered for <strong>${escapeHtml(payload.clientName)}</strong> — ${payload.total} of ${payload.unfilteredTotal || payload.total} relevant.</p>`
+    const scope = payload.company
+      ? `<p class="grant-scope">Ranked by relevance to <strong>${escapeHtml(payload.company.name)}</strong> · ${payload.total} opportunities.</p>`
       : `<p class="grant-scope">${payload.total} open opportunities.</p>`;
 
     return `
@@ -79,9 +76,8 @@
   }
 
   function buildListUrl(options) {
-    const { clientId, limit, offset } = options || {};
+    const { limit, offset } = options || {};
     const params = new URLSearchParams();
-    if (clientId) params.set('client_id', clientId);
     if (limit) params.set('limit', limit);
     if (offset) params.set('offset', offset);
     const query = params.toString();
@@ -89,12 +85,12 @@
   }
 
   async function mountGrantsList(container, options) {
-    const { fetchImpl = globalThis.fetch, clientId, limit, offset } = options || {};
+    const { fetchImpl = globalThis.fetch, limit, offset } = options || {};
     if (!container) return null;
     container.innerHTML = '<p class="grant-loading">Loading grants…</p>';
 
     try {
-      const response = await fetchImpl(buildListUrl({ clientId, limit, offset }));
+      const response = await fetchImpl(buildListUrl({ limit, offset }));
       if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
       const payload = await response.json();
       container.innerHTML = renderList(payload);
