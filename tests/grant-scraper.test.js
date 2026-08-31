@@ -176,7 +176,9 @@ test('sources without a confirmed feed are disabled rather than pointed at guess
   for (const id of ['arizona_grants', 'florida_grants', 'virginia_grants']) {
     const source = engine.getSource(id);
     assert.strictEqual(source.enabled, false, `${id} should be disabled`);
-    assert.strictEqual(source.liveStatus, 'no_machine_readable_source');
+    assert.strictEqual(source.liveStatus, 'disabled');
+    assert.strictEqual(source.liveNote, 'no public grant feed available');
+    assert.ok(source.liveDetail, `${id} should record why no feed exists`);
   }
 });
 

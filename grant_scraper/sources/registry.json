@@ -171,8 +171,9 @@
     "fetchMode": "html",
     "method": "GET",
     "endpoint": "https://grants.az.gov/",
-    "liveStatus": "no_machine_readable_source",
-    "liveNote": "grants.az.gov returns HTTP 200 but is a grants training/resources hub with no opportunity listing. Disabled until a real AZ feed is identified.",
+    "liveStatus": "disabled",
+    "liveNote": "no public grant feed available",
+    "liveDetail": "grants.az.gov returns HTTP 200 but is a grants training/resources hub with no opportunity listing.",
     "enabled": false
   },
   {
@@ -201,8 +202,9 @@
     "fetchMode": "html",
     "method": "GET",
     "endpoint": "https://apps.fldfs.com/fsaa/searchCatalog.aspx",
-    "liveStatus": "no_machine_readable_source",
-    "liveNote": "Official FSAA catalog is an ASP.NET form requiring VIEWSTATE POST to return rows. flgrants.com is a private lead-generation site, not a state portal. Disabled pending a supported access path.",
+    "liveStatus": "disabled",
+    "liveNote": "no public grant feed available",
+    "liveDetail": "Official FSAA catalog is an ASP.NET form requiring a VIEWSTATE POST to return rows. flgrants.com is a private lead-generation site, not a state portal.",
     "enabled": false
   },
   {
@@ -215,8 +217,9 @@
     "fetchMode": "html",
     "method": "GET",
     "endpoint": "https://www.dhcd.virginia.gov/",
-    "liveStatus": "no_machine_readable_source",
-    "liveNote": "No statewide Virginia grants portal found. dhcd.virginia.gov/grants and commonwealthgrants.virginia.gov do not resolve. Disabled pending a confirmed source.",
+    "liveStatus": "disabled",
+    "liveNote": "no public grant feed available",
+    "liveDetail": "No statewide Virginia grants portal found. dhcd.virginia.gov/grants and commonwealthgrants.virginia.gov do not resolve.",
     "enabled": false
   }
 ]
