@@ -10,7 +10,7 @@ const { listGrants, getGrantDetail, getGrantSignals, getSignalSets, scoreGrantFo
 const { renderList, renderRow, buildListUrl } = require('../src/grants/grants_list');
 const { renderDetail, renderSignals, toPlainText } = require('../src/grants/grants_detail');
 const { seedCompanyProfile, JE_ROCKER } = require('../scripts/seed_company_profile');
-const { seedBusinessDrivers } = require('../scripts/seed_business_drivers');
+const { seedBusinessDrivers, JE_ROCKER_DRIVERS } = require('../scripts/seed_business_drivers');
 
 const GRANT = {
   agency: 'Animal and Plant Health Inspection Service',
@@ -337,6 +337,74 @@ test('the detail view includes the signal section when signals are supplied', ()
 
   assert.match(withSignals, /Why this matches JE ROCKER LC/);
   assert.ok(!renderDetail(grant).includes('Why this matches'), 'section is omitted without signals');
+});
+
+test('business drivers match modernization language inside the synopsis', () => {
+  const drivers = ['improve data interoperability', 'reduce legacy system risk'];
+  const grant = {
+    agency: 'Smithsonian Institution',
+    title: 'Regional Health Capacity Program',
+    synopsis: '<p>Recipients must <b>improve data interoperability</b> across partner systems.</p>',
+  };
+
+  const result = scoreGrantForCompany(grant, JE_ROCKER, { businessDrivers: drivers, capabilityMapTerms: [] });
+  assert.strictEqual(result.score_business_driver, WEIGHTS.businessDriver, 'synopsis text is scored');
+  assert.deepStrictEqual(result.reasons.businessDrivers, ['improve data interoperability']);
+});
+
+test('synopsis markup does not break phrase matching', () => {
+  const grant = {
+    agency: 'Smithsonian Institution',
+    title: 'Program',
+    description: 'Agencies must <em>reduce</em> legacy system risk this cycle.',
+  };
+  const spanning = scoreGrantForCompany(grant, JE_ROCKER, {
+    businessDrivers: ['legacy system risk'],
+    capabilityMapTerms: [],
+  });
+  assert.strictEqual(spanning.score_business_driver, WEIGHTS.businessDriver, 'tags are stripped before matching');
+});
+
+test('description and synopsis are scored identically', () => {
+  const drivers = ['deploy AI-driven analytics'];
+  const text = 'The award will deploy AI-driven analytics for field staff.';
+  const base = { agency: 'Smithsonian Institution', title: 'Program' };
+
+  const viaDescription = scoreGrantForCompany({ ...base, description: text }, JE_ROCKER, { businessDrivers: drivers, capabilityMapTerms: [] });
+  const viaSynopsis = scoreGrantForCompany({ ...base, synopsis: text }, JE_ROCKER, { businessDrivers: drivers, capabilityMapTerms: [] });
+
+  assert.strictEqual(viaDescription.score_business_driver, WEIGHTS.businessDriver);
+  assert.strictEqual(viaSynopsis.score_business_driver, viaDescription.score_business_driver);
+});
+
+test('title, category, and description still score without a synopsis', () => {
+  const byTitle = scoreGrantForCompany(
+    { agency: 'X', title: 'Accelerate digital modernization of case systems' },
+    JE_ROCKER,
+    { businessDrivers: ['accelerate digital modernization'], capabilityMapTerms: [] },
+  );
+  const byCategory = scoreGrantForCompany(
+    { agency: 'X', title: 'Program', opportunity_category: 'dashboard intelligence' },
+    JE_ROCKER,
+    { businessDrivers: [], capabilityMapTerms: [] },
+  );
+  const byDescription = scoreGrantForCompany(
+    { agency: 'X', title: 'Program', description: 'work to strengthen compliance and reporting' },
+    JE_ROCKER,
+    { businessDrivers: ['strengthen compliance and reporting'], capabilityMapTerms: [] },
+  );
+
+  assert.strictEqual(byTitle.score_business_driver, WEIGHTS.businessDriver, 'title still matches');
+  assert.strictEqual(byCategory.score_capabilities, WEIGHTS.capabilities, 'category still matches');
+  assert.strictEqual(byDescription.score_business_driver, WEIGHTS.businessDriver, 'description still matches');
+});
+
+test('a grant with no text scores zero on every axis', () => {
+  const result = scoreGrantForCompany({ agency: 'Smithsonian Institution' }, JE_ROCKER, {
+    businessDrivers: JE_ROCKER_DRIVERS,
+    capabilityMapTerms: [],
+  });
+  assert.strictEqual(result.score_total, 0);
 });
 
 test('hyphenated words inside a phrase do not match on their own', () => {

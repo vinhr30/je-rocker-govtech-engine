@@ -79,6 +79,24 @@ function haystack(...values) {
   return values.filter(Boolean).join(' ').toLowerCase();
 }
 
+// Synopsis text arrives as HTML; tags would otherwise split phrases apart.
+function stripMarkup(value) {
+  return value ? String(value).replace(/<[^>]+>/g, ' ') : '';
+}
+
+/**
+ * Text a grant is matched against. `description` holds the Grants.gov synopsis,
+ * and `synopsis` is accepted too so either shape scores identically.
+ */
+function subjectText(grant) {
+  return haystack(
+    grant.title,
+    grant.opportunity_category,
+    stripMarkup(grant.description),
+    stripMarkup(grant.synopsis),
+  );
+}
+
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -112,7 +130,7 @@ function scoreGrantForCompany(grant, profile, signals = {}) {
   };
   if (!profile) return empty;
 
-  const subject = haystack(grant.title, grant.opportunity_category, grant.description);
+  const subject = subjectText(grant);
   const agencyText = haystack(grant.agency, grant.agency_code);
 
   const agency = matchTokens(tokenize(profile.preferred_agencies), agencyText, WEIGHTS.agency);
@@ -379,4 +397,5 @@ module.exports = {
   getSignalSets,
   listGrants,
   scoreGrantForCompany,
+  subjectText,
 };
