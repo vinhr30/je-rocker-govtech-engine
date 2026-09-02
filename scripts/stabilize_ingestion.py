@@ -5,7 +5,10 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
-from drift_suppression import apply_drift_suppression, log_drift_events
+try:
+    from .drift_suppression import apply_drift_suppression, log_drift_events
+except ImportError:
+    from drift_suppression import apply_drift_suppression, log_drift_events
 
 DASHBOARD_ROOT = Path(__file__).resolve().parent.parent
 PIPELINE_ROOT = Path("/Volumes/Data Drive/Govtech/JE ROCKER")

@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 import re
 
 from playwright.sync_api import sync_playwright
+from drift_suppression import apply_drift_suppression, log_drift_events
 
 # ---------------------------------------------------------
 # Config
@@ -285,8 +286,25 @@ def extract_detail_from_page(page, url: str) -> Dict:
         "response_date": response_date,
     }
 
+    stable = apply_drift_suppression({
+        "naics": record["naics_code"],
+        "psc": record["psc_code"],
+        "agency": record["agency"],
+        "grantCategory": record["set_aside"],
+    })
+    log_drift_events(stable["driftEvents"])
+    final_opportunity = {
+        **record,
+        "stableNaics": stable["stableNaics"],
+        "stablePsc": stable["stablePsc"],
+        "stableAgency": stable["stableAgency"],
+        "stableModernization": stable["stableModernization"],
+        "stableGrantCategory": stable["stableGrantCategory"],
+        "stableCapabilityZone": stable["stableCapabilityZone"],
+    }
+
     logging.info(f"Extracted record for {url}: {record['notice_id']} / {record['title']}")
-    return record
+    return final_opportunity
 
 
 def upsert_record(record: Dict):
