@@ -79,6 +79,47 @@ function applyDriftSuppression(raw = {}) {
   return result;
 }
 
+function stabilizeItems(items) {
+  if (!Array.isArray(items)) return [];
+  return items.map((item) => {
+    if (!item || typeof item !== 'object') return item;
+    const stable = applyDriftSuppression({
+      ...item,
+      naics: item.naics ?? item.naics_code,
+      psc: item.psc ?? item.psc_code,
+      grantCategory: item.grantCategory ?? item.grant_category,
+      capabilityZone: item.capabilityZone ?? item.capability_zone,
+    });
+    return {
+      ...item,
+      naics: stable.stableNaics,
+      psc: stable.stablePsc,
+      agency: stable.stableAgency,
+      modernization: stable.stableModernization,
+      grantCategory: stable.stableGrantCategory,
+      capabilityZone: stable.stableCapabilityZone,
+      stableNaics: stable.stableNaics,
+      stablePsc: stable.stablePsc,
+      stableAgency: stable.stableAgency,
+      stableModernization: stable.stableModernization,
+      stableGrantCategory: stable.stableGrantCategory,
+      stableCapabilityZone: stable.stableCapabilityZone,
+      driftEvents: stable.driftEvents,
+    };
+  });
+}
+
+function stabilizeSearchRows(rows) {
+  if (Array.isArray(rows)) return stabilizeItems(rows);
+  if (rows && typeof rows === 'object') {
+    return Object.fromEntries(Object.entries(rows).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? stabilizeItems(value) : value,
+    ]));
+  }
+  return rows;
+}
+
 app.use(express.json());
 app.use(express.static(__dirname));
 
@@ -1079,7 +1120,7 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY obligated DESC
         LIMIT 20
       `, [like]);
-      return res.json({ type, rows });
+      return res.json({ type, rows: stabilizeSearchRows(rows) });
     }
 
     if (type === 'vendor') {
@@ -1091,7 +1132,7 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY obligated DESC
         LIMIT 20
       `, [like]);
-      return res.json({ type, rows });
+      return res.json({ type, rows: stabilizeSearchRows(rows) });
     }
 
     if (type === 'naics') {
@@ -1103,7 +1144,7 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY obligated DESC
         LIMIT 20
       `, [`%${query.replace(/[^0-9]/g, '')}%`]);
-      return res.json({ type, rows });
+      return res.json({ type, rows: stabilizeSearchRows(rows) });
     }
 
     if (type === 'psc') {
@@ -1116,7 +1157,7 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY obligated DESC
         LIMIT 20
       `, [`%${p}%`]);
-      return res.json({ type, rows });
+      return res.json({ type, rows: stabilizeSearchRows(rows) });
     }
 
     if (type === 'opportunity') {
@@ -1136,7 +1177,10 @@ app.get('/api/internal_search', async (req, res) => {
         LIMIT 20
       `, [like, like]);
 
-      return res.json({ type, rows: { opportunities: oppRows, matches: matchRows } });
+      return res.json({
+        type,
+        rows: stabilizeSearchRows({ opportunities: oppRows, matches: matchRows }),
+      });
     }
 
     if (type === 'award') {
@@ -1147,7 +1191,7 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY id DESC
         LIMIT 20
       `, [like, like]);
-      return res.json({ type, rows });
+      return res.json({ type, rows: stabilizeSearchRows(rows) });
     }
 
     if (type === 'fiscal_year') {
@@ -1159,7 +1203,7 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY timestamp DESC
         LIMIT 30
       `, [`%${yy}%`]);
-      return res.json({ type, rows });
+      return res.json({ type, rows: stabilizeSearchRows(rows) });
     }
 
     const includeDeepKeywordScan = query.length >= 4;
@@ -1188,7 +1232,9 @@ app.get('/api/internal_search', async (req, res) => {
     const pipelineRows = rows.length ? [] : await searchPipelineOpportunities(query);
     res.json({
       type: 'keyword',
-      rows: pipelineRows.length ? pipelineRows.map((row) => ({ bucket: 'opportunity', ...row })) : rows,
+      rows: stabilizeSearchRows(
+        pipelineRows.length ? pipelineRows.map((row) => ({ bucket: 'opportunity', ...row })) : rows,
+      ),
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -2338,6 +2384,7 @@ app.get('/api/client/intel/:module', async (req, res) => {
 
     res.json({
       ...payload,
+      opportunities: stabilizeItems(payload.opportunities),
       context: {
         client_id: context.clientId,
         naics: context.naicsList,
@@ -2443,8 +2490,8 @@ app.get('/api/grants/:oppNum/signals', async (req, res) => {
   }
 });
 
-app.get('/api/grants/intelligence', (req, res) => res.json({ items: [] }));
-app.get('/api/grants/opportunities', (req, res) => res.json({ items: [] }));
+app.get('/api/grants/intelligence', (req, res) => res.json({ items: stabilizeItems([]) }));
+app.get('/api/grants/opportunities', (req, res) => res.json({ items: stabilizeItems([]) }));
 
 app.get('/api/grants/:oppNum', async (req, res) => {
   try {
@@ -3132,10 +3179,10 @@ const BUSINESS_DRIVER_ENDPOINTS = [
 ];
 
 BUSINESS_DRIVER_ENDPOINTS.forEach((endpoint) => {
-  app.get(endpoint, (req, res) => res.json({ items: [] }));
+  app.get(endpoint, (req, res) => res.json({ items: stabilizeItems([]) }));
 });
 
-app.get('/api/business/detail/:id', (req, res) => res.json({ items: [] }));
+app.get('/api/business/detail/:id', (req, res) => res.json({ items: stabilizeItems([]) }));
 
 app.get('/business-driver', (req, res) => {
   const content = `
@@ -3301,7 +3348,7 @@ const PRIMARY_PIPELINE_ENDPOINTS = [
 ];
 
 PRIMARY_PIPELINE_ENDPOINTS.forEach((endpoint) => {
-  app.get(endpoint, (req, res) => res.json({ items: [] }));
+  app.get(endpoint, (req, res) => res.json({ items: stabilizeItems([]) }));
 });
 
 app.get('/primary-dashboard', (req, res) => {
