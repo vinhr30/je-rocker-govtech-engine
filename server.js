@@ -3343,6 +3343,113 @@ app.get('/primary-dashboard', (req, res) => {
 });
 
 app.get('/client-dashboard', (req, res) => {
+  const clientId = Number.parseInt(String(req.query.client_id || ''), 10);
+  const activeClientId = Number.isFinite(clientId) && clientId > 0 ? clientId : null;
+  const content = `
+    <div id="status-strip" class="client-status-strip" aria-live="polite">Loading client dashboard status...</div>
+
+    <main class="client-blueprint" data-client-id="${activeClientId || ''}">
+      <div class="dashboard-container">
+        <section class="panel panel-left">
+          <h2>Client Profile</h2>
+          <div id="client-info">${activeClientId ? 'Loading client profile...' : 'Open this dashboard with a client_id to activate client intelligence.'}</div>
+        </section>
+
+        <section class="panel panel-middle">
+          <h2>Intelligence Feed</h2>
+          <div id="intelligence-feed" class="feed">${activeClientId ? 'Loading intelligence feed...' : 'Client intelligence will appear after a client context is selected.'}</div>
+        </section>
+
+        <section class="panel panel-right">
+          <h2>Actions</h2>
+          <button type="button" onclick="triggerScraper()">Run Scraper</button>
+          <button type="button" onclick="triggerMatcher()">Run Matcher</button>
+          <button type="button" onclick="refreshEngine()">Refresh Engine</button>
+          <button type="button" onclick="syncCluster()">Sync Cluster</button>
+          <p id="client-action-status" class="client-action-status">Execution controls are inactive on this wiring node.</p>
+        </section>
+      </div>
+
+      <div class="indicators-container" aria-label="Engine indicators">
+        <div><div id="scraper-indicator" class="indicator"></div><span>Scraper</span></div>
+        <div><div id="matcher-indicator" class="indicator"></div><span>Matcher</span></div>
+        <div><div id="engine-indicator" class="indicator"></div><span>Engine</span></div>
+        <div><div id="cluster-indicator" class="indicator"></div><span>Cluster</span></div>
+      </div>
+
+      <div id="cluster-banner" aria-live="polite">Loading cluster roles...</div>
+    </main>
+
+    <footer class="client-blueprint-footer">JE ROCKER LC • GovTech Intelligence Platform</footer>
+
+    <script>
+      (() => {
+        const clientId = document.querySelector('.client-blueprint').dataset.clientId;
+        const setText = (id, text) => {
+          const element = document.getElementById(id);
+          if (element) element.textContent = text;
+        };
+        const setIndicator = (id, active) => {
+          const element = document.getElementById(id);
+          if (element) element.classList.toggle('indicator-active', active);
+        };
+        const renderClient = (client) => {
+          const fields = [
+            ['Name', client.client_name], ['UEI', client.uei], ['NAICS', client.naics],
+            ['Keywords', client.keywords], ['Preferred agencies', client.preferred_agencies],
+          ];
+          document.getElementById('client-info').innerHTML = fields.map(([key, value]) =>
+            '<div class="client-blueprint-kv"><span>' + key + '</span><strong>' + (value || 'N/A') + '</strong></div>'
+          ).join('');
+        };
+        const renderFeed = (payload) => {
+          const opportunities = payload.opportunities || [];
+          document.getElementById('intelligence-feed').innerHTML = opportunities.length
+            ? opportunities.map((item) => '<article class="client-feed-item"><strong>' + (item.title || 'Untitled opportunity') + '</strong><span>' + (item.agency || 'Agency unavailable') + ' • Relevance ' + (item.relevance_score || 'N/A') + '%</span></article>').join('')
+            : 'No client-fit opportunities are available.';
+        };
+        const commandUnavailable = (name) => {
+          setText('client-action-status', name + ' is not enabled on MacMiller. Macklemore remains the driver node.');
+        };
+        window.triggerScraper = () => commandUnavailable('Run Scraper');
+        window.triggerMatcher = () => commandUnavailable('Run Matcher');
+        window.refreshEngine = () => commandUnavailable('Refresh Engine');
+        window.syncCluster = () => commandUnavailable('Sync Cluster');
+
+        Promise.all([
+          fetch('/api/system/state').then((response) => response.json()),
+          fetch('/api/engine/last-refresh').then((response) => response.json()),
+          fetch('/api/scraper/last-run').then((response) => response.json()),
+          fetch('/api/matcher/last-run').then((response) => response.json()),
+        ]).then(([system, refresh, scraper, matcher]) => {
+          setText('status-strip', 'System: ' + (system.status || 'Unknown') + ' • Refresh: ' + (refresh.last_refresh || 'Unknown') + ' • Scraper: ' + (scraper.last_run || 'Unknown') + ' • Matcher: ' + (matcher.last_run || 'Unknown'));
+          setIndicator('scraper-indicator', scraper.status === 'Ready');
+          setIndicator('matcher-indicator', matcher.status === 'Ready');
+          setIndicator('engine-indicator', refresh.pipeline_status === 'Ready');
+          setIndicator('cluster-indicator', (system.cluster_nodes || []).some((node) => node.status === 'Active'));
+          setText('cluster-banner', (system.cluster_nodes || []).map((node) => node.name + ' — ' + node.role + ': ' + node.status).join(' • '));
+        }).catch(() => setText('status-strip', 'System status unavailable.'));
+
+        if (!clientId) return;
+        fetch('/api/client/' + encodeURIComponent(clientId), { cache: 'no-store' })
+          .then((response) => response.ok ? response.json() : Promise.reject())
+          .then(renderClient)
+          .catch(() => setText('client-info', 'Client profile unavailable.'));
+        fetch('/api/client/intel/opportunities?client_id=' + encodeURIComponent(clientId) + '&view=deep', { cache: 'no-store' })
+          .then((response) => response.ok ? response.json() : Promise.reject())
+          .then(renderFeed)
+          .catch(() => setText('intelligence-feed', 'Client intelligence feed unavailable.'));
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({
+    title: 'JE ROCKER LC - Client Dashboard',
+    content,
+    extraHead: '<link rel="stylesheet" href="/src/styles/client.css" />',
+  }));
+});
+
+app.get('/client-dashboard-legacy', (req, res) => {
   const content = `
     <div class="dashboard-shell">
       <section class="page-hero">
