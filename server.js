@@ -28,6 +28,57 @@ function loadDSM() {
 
 const DSM = loadDSM();
 
+function applyDriftSuppression(raw = {}) {
+  const result = {
+    stableNaics: raw.naics || null,
+    stablePsc: raw.psc || null,
+    stableAgency: raw.agency || null,
+    stableModernization: raw.modernization || null,
+    stableGrantCategory: raw.grantCategory || null,
+    stableCapabilityZone: raw.capabilityZone || null,
+    driftEvents: [],
+  };
+
+  function suppress(field, value, dsmMap) {
+    if (!value) return value;
+
+    if (dsmMap.canonical.includes(value)) return value;
+
+    if (dsmMap.synonyms[value]) {
+      const corrected = dsmMap.synonyms[value];
+      result.driftEvents.push({ field, original: value, corrected, reason: 'synonym', timestamp: Date.now() });
+      return corrected;
+    }
+
+    for (const pattern in dsmMap.driftPatterns) {
+      if (value.includes(pattern)) {
+        const corrected = dsmMap.driftPatterns[pattern];
+        result.driftEvents.push({ field, original: value, corrected, reason: 'pattern', timestamp: Date.now() });
+        return corrected;
+      }
+    }
+
+    for (const rule in dsmMap.suppressionRules) {
+      if (value === rule) {
+        const corrected = dsmMap.suppressionRules[rule];
+        result.driftEvents.push({ field, original: value, corrected, reason: 'rule', timestamp: Date.now() });
+        return corrected;
+      }
+    }
+
+    return value;
+  }
+
+  result.stableNaics = suppress('naics', result.stableNaics, DSM.naics);
+  result.stablePsc = suppress('psc', result.stablePsc, DSM.psc);
+  result.stableAgency = suppress('agency', result.stableAgency, DSM.agency);
+  result.stableModernization = suppress('modernization', result.stableModernization, DSM.modernization);
+  result.stableGrantCategory = suppress('grantCategory', result.stableGrantCategory, DSM.grants);
+  result.stableCapabilityZone = suppress('capabilityZone', result.stableCapabilityZone, DSM.capability);
+
+  return result;
+}
+
 app.use(express.json());
 app.use(express.static(__dirname));
 
@@ -976,6 +1027,10 @@ app.get('/api/dashboard_summary', async (req, res) => {
 
 app.get('/api/drift/dsm', (req, res) => {
   res.json({ DSM });
+});
+
+app.post('/api/drift/test', (req, res) => {
+  res.json(applyDriftSuppression(req.body || {}));
 });
 
 app.get('/api/internal_search', async (req, res) => {
