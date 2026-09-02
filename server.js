@@ -13,6 +13,7 @@ const opp = new sqlite3.Database('./db/opportunities.db');
 const matches = new sqlite3.Database('./db/matches.db');
 const clientDb = new sqlite3.Database('./client.db');
 const PIPELINE_ROOT = process.env.JE_ROCKER_PIPELINE_ROOT || '/Volumes/Data Drive/Govtech/JE ROCKER';
+const FORECAST_DB_PATH = path.join(__dirname, 'data', 'forecast.db');
 
 function loadDSM() {
   const base = path.join(__dirname, 'dsm');
@@ -1088,6 +1089,46 @@ app.get('/api/dashboard_summary', async (req, res) => {
 
 app.get('/api/drift/dsm', (req, res) => {
   res.json({ DSM });
+});
+
+async function loadForecastTimeseries(table) {
+  const allowed = new Set([
+    'forecast_pipeline_timeseries',
+    'forecast_grants_timeseries',
+    'forecast_modernization_timeseries',
+  ]);
+  if (!allowed.has(table) || !fs.existsSync(FORECAST_DB_PATH)) return [];
+
+  const database = new sqlite3.Database(FORECAST_DB_PATH, sqlite3.OPEN_READONLY);
+  try {
+    return await allAsync(database, `SELECT * FROM ${table} ORDER BY bucket_date ASC, id ASC`);
+  } finally {
+    database.close();
+  }
+}
+
+app.get('/api/forecast/data/pipeline', async (req, res) => {
+  try {
+    res.json({ items: await loadForecastTimeseries('forecast_pipeline_timeseries') });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/forecast/data/grants', async (req, res) => {
+  try {
+    res.json({ items: await loadForecastTimeseries('forecast_grants_timeseries') });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/forecast/data/modernization', async (req, res) => {
+  try {
+    res.json({ items: await loadForecastTimeseries('forecast_modernization_timeseries') });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.post('/api/drift/test', (req, res) => {
