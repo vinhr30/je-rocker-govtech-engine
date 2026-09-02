@@ -2322,6 +2322,9 @@ app.get('/api/grants/:oppNum/signals', async (req, res) => {
   }
 });
 
+app.get('/api/grants/intelligence', (req, res) => res.json({ items: [] }));
+app.get('/api/grants/opportunities', (req, res) => res.json({ items: [] }));
+
 app.get('/api/grants/:oppNum', async (req, res) => {
   try {
     const grant = await getGrantDetail(String(req.params.oppNum || ''));
@@ -3000,7 +3003,119 @@ app.get('/business-driver', (req, res) => {
   res.send(htmlLayout({ title: 'JE ROCKER LC - Business Driver', content }));
 });
 
+const PRIMARY_PIPELINE_ENDPOINTS = [
+  '/api/pipeline/matched',
+  '/api/pipeline/ingested',
+  '/api/mission/today',
+  '/api/pulse/state',
+];
+
+PRIMARY_PIPELINE_ENDPOINTS.forEach((endpoint) => {
+  app.get(endpoint, (req, res) => res.json({ items: [] }));
+});
+
 app.get('/primary-dashboard', (req, res) => {
+  const content = `
+    <div id="status-strip" class="primary-status-strip" aria-live="polite">Loading Primary Dashboard status...</div>
+
+    <main class="primary-blueprint">
+      <div class="primary-container">
+        <section class="panel panel-left">
+          <h2>Opportunity Pipeline</h2>
+
+          <h3>Matched Opportunities</h3>
+          <div id="matched-opportunities" class="feed">Loading matched opportunities...</div>
+
+          <h3>Ingested Opportunities</h3>
+          <div id="ingested-opportunities" class="feed">Loading ingested opportunities...</div>
+
+          <h3>Grant Engine Intelligence</h3>
+          <div id="grant-intelligence" class="feed">Loading grant intelligence...</div>
+
+          <h3>Grant Opportunity Zone</h3>
+          <div id="grant-opportunities" class="feed">Loading grant opportunities...</div>
+        </section>
+
+        <section class="panel panel-middle">
+          <h2>Daily Mission</h2>
+          <div id="daily-mission" class="feed">Loading daily mission...</div>
+        </section>
+
+        <section class="panel panel-right">
+          <h2>Pulse</h2>
+          <div id="pulse-state" class="feed">Loading system pulse...</div>
+        </section>
+      </div>
+
+      <div class="indicators-container" aria-label="Engine indicators">
+        <div><div id="scraper-indicator" class="indicator"></div><span>Scraper</span></div>
+        <div><div id="matcher-indicator" class="indicator"></div><span>Matcher</span></div>
+        <div><div id="engine-indicator" class="indicator"></div><span>Engine</span></div>
+        <div><div id="cluster-indicator" class="indicator"></div><span>Cluster</span></div>
+      </div>
+
+      <div id="cluster-banner" aria-live="polite">Loading cluster roles...</div>
+    </main>
+
+    <footer class="primary-blueprint-footer">JE ROCKER LC • GovTech Intelligence Platform</footer>
+
+    <script>
+      (() => {
+        const setText = (id, value) => {
+          const element = document.getElementById(id);
+          if (element) element.textContent = value;
+        };
+        const setIndicator = (id, active) => {
+          const element = document.getElementById(id);
+          if (element) element.classList.toggle('indicator-active', active);
+        };
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderList = (id, items) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = items && items.length
+            ? items.map((item) => '<article class="primary-feed-item">' + escapeHtml(typeof item === 'string' ? item : item.title || JSON.stringify(item)) + '</article>').join('')
+            : '<p class="primary-feed-empty">No items available.</p>';
+        };
+        const load = async (endpoint, target) => {
+          try {
+            const response = await fetch(endpoint, { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderList(target, data.items || []);
+          } catch (_) {
+            setText(target, 'Feed unavailable.');
+          }
+        };
+        async function loadMatched() { await load('/api/pipeline/matched', 'matched-opportunities'); }
+        async function loadIngested() { await load('/api/pipeline/ingested', 'ingested-opportunities'); }
+        async function loadGrantIntelligence() { await load('/api/grants/intelligence', 'grant-intelligence'); }
+        async function loadGrantOpportunities() { await load('/api/grants/opportunities', 'grant-opportunities'); }
+        async function loadDailyMission() { await load('/api/mission/today', 'daily-mission'); }
+        async function loadPulse() { await load('/api/pulse/state', 'pulse-state'); }
+
+        Promise.all([
+          fetch('/api/system/state').then((response) => response.json()),
+          fetch('/api/engine/last-refresh').then((response) => response.json()),
+          fetch('/api/scraper/last-run').then((response) => response.json()),
+          fetch('/api/matcher/last-run').then((response) => response.json()),
+        ]).then(([system, refresh, scraper, matcher]) => {
+          setText('status-strip', 'System: ' + (system.status || 'Unknown') + ' • Refresh: ' + (refresh.last_refresh || 'Unknown') + ' • Scraper: ' + (scraper.last_run || 'Unknown') + ' • Matcher: ' + (matcher.last_run || 'Unknown'));
+          setIndicator('scraper-indicator', scraper.status === 'Ready');
+          setIndicator('matcher-indicator', matcher.status === 'Ready');
+          setIndicator('engine-indicator', refresh.pipeline_status === 'Ready');
+          setIndicator('cluster-indicator', (system.cluster_nodes || []).some((node) => node.status === 'Active'));
+          setText('cluster-banner', (system.cluster_nodes || []).map((node) => node.name + ' — ' + node.role + ': ' + node.status).join(' • '));
+        }).catch(() => setText('status-strip', 'System status unavailable.'));
+
+        Promise.all([loadMatched(), loadIngested(), loadGrantIntelligence(), loadGrantOpportunities(), loadDailyMission(), loadPulse()]);
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Primary Dashboard', content }));
+});
+
+app.get('/primary-dashboard-legacy', (req, res) => {
   const content = `
     <div class="dashboard-shell">
       <section class="page-hero">

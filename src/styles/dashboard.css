@@ -1154,3 +1154,141 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Blueprint v3.5 Primary Dashboard */
+.primary-blueprint {
+  padding: 20px 0;
+}
+
+.primary-status-strip {
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 13px;
+}
+
+.primary-blueprint .primary-container {
+  display: flex;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.primary-blueprint .panel {
+  flex: 1;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.primary-blueprint .panel-left {
+  flex: 1.2;
+}
+
+.primary-blueprint .panel-middle {
+  flex: 1;
+}
+
+.primary-blueprint .panel-right {
+  flex: 0.8;
+}
+
+.primary-blueprint .panel h2 {
+  margin: 0 0 16px;
+  font-size: 16px;
+}
+
+.primary-blueprint .panel h3 {
+  margin: 18px 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.primary-blueprint .panel h3:first-of-type {
+  margin-top: 0;
+}
+
+.primary-blueprint .feed {
+  height: 250px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.primary-blueprint .panel-left .feed {
+  height: 150px;
+}
+
+.primary-feed-item {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.primary-feed-empty {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.primary-blueprint .indicators-container {
+  display: flex;
+  gap: 18px;
+  padding: 0 0 20px;
+}
+
+.primary-blueprint .indicators-container > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+
+.primary-blueprint .indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #7c838f;
+}
+
+.primary-blueprint .indicator-active {
+  background: #63d297;
+  box-shadow: 0 0 8px rgba(99, 210, 151, 0.55);
+}
+
+.primary-blueprint #cluster-banner {
+  padding: 12px 14px;
+  border: 1px solid rgba(156, 190, 255, 0.32);
+  border-radius: 8px;
+  background: rgba(104, 154, 237, 0.12);
+  color: #d7e5ff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.primary-blueprint-footer {
+  margin: 20px 0 8px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .primary-blueprint .primary-container {
+    flex-direction: column;
+  }
+
+  .primary-blueprint .panel-left,
+  .primary-blueprint .panel-middle,
+  .primary-blueprint .panel-right {
+    flex: 1;
+  }
+}
