@@ -5,6 +5,8 @@ import importlib
 import json
 from pathlib import Path
 
+from scripts.stabilize_ingestion import stabilize_states
+
 STATE_RUNNERS = {
     "AZ": "ingestion.states.arizona.run",
     "CA": "ingestion.states.california.run",
@@ -92,3 +94,6 @@ if __name__ == "__main__":
         run_all_states()
     else:
         run_scheduled_states(args.state)
+
+    for name, result in stabilize_states().items():
+        print(f"DSM stabilized {name}: {result['rows']} rows, {result['events']} drift events")

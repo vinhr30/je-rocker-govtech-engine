@@ -5,6 +5,8 @@ import time
 from difflib import SequenceMatcher
 from datetime import datetime
 
+from drift_suppression import apply_drift_suppression, log_drift_events
+
 # Paths
 OPPS_DB = "/Volumes/Data Drive/Govtech/JE ROCKER/db/opportunities.db"
 FPDS_DB = "/Volumes/Data Drive/Govtech/JE ROCKER/db/fpds.db"
@@ -128,6 +130,12 @@ def ensure_matches_schema(matches_conn):
         "fpds_naics_code": "TEXT",
         "fpds_agency": "TEXT",
         "fpds_place_state": "TEXT",
+        "stableNaics": "TEXT",
+        "stablePsc": "TEXT",
+        "stableAgency": "TEXT",
+        "stableModernization": "TEXT",
+        "stableGrantCategory": "TEXT",
+        "stableCapabilityZone": "TEXT",
     }
 
     for col_name, col_type in required_cols.items():
@@ -135,6 +143,29 @@ def ensure_matches_schema(matches_conn):
             matches_conn.execute(f"ALTER TABLE matches ADD COLUMN {col_name} {col_type}")
 
     matches_conn.commit()
+
+def ensure_stable_match_columns(matches_conn, table_name: str):
+    existing_cols = {
+        row[1]
+        for row in matches_conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+    }
+    for col_name in (
+        "stableNaics", "stablePsc", "stableAgency", "stableModernization",
+        "stableGrantCategory", "stableCapabilityZone",
+    ):
+        if col_name not in existing_cols:
+            matches_conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {col_name} TEXT")
+    matches_conn.commit()
+
+def stable_metadata_for_opportunity(opp):
+    stable = apply_drift_suppression({
+        "naics": opp["naics_code"],
+        "psc": opp["psc_code"],
+        "agency": opp["agency"],
+        "grantCategory": opp["set_aside"],
+    })
+    log_drift_events(stable["driftEvents"])
+    return stable
 
 def is_locked_error(err: Exception) -> bool:
     msg = str(err).lower()
@@ -219,6 +250,7 @@ def connect_dbs():
         );
     """)
     ensure_matches_schema(matches)
+    ensure_stable_match_columns(matches, "matches_low_confidence")
     commit_with_lock_retries(matches)
     
     return opps, fpds, matches
@@ -567,6 +599,7 @@ def run_matching_engine():
         
         try:
             matches_found = find_matches_for_opportunity(opps, fpds, opp)
+            stable = stable_metadata_for_opportunity(opp)
             
             if matches_found:
                 matched_count += 1
@@ -584,8 +617,9 @@ def run_matching_engine():
                          incumbent_award_value, incumbent_period_end, match_reason, timestamp,
                          opportunity_url, opportunity_title, fpds_contract_key, fpds_title,
                          matching_strategy, fpds_psc_code, fpds_naics_code, fpds_agency,
-                         fpds_place_state)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                         fpds_place_state, stableNaics, stablePsc, stableAgency,
+                         stableModernization, stableGrantCategory, stableCapabilityZone)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, (
                         opportunity_id,
                         fpds_contract_id,
@@ -604,6 +638,12 @@ def run_matching_engine():
                         match.get("fpds_naics_code"),
                         match.get("fpds_agency"),
                         match.get("fpds_place_state"),
+                        stable["stableNaics"],
+                        stable["stablePsc"],
+                        stable["stableAgency"],
+                        stable["stableModernization"],
+                        stable["stableGrantCategory"],
+                        stable["stableCapabilityZone"],
                     ))
 
                 if idx % 200 == 0:
