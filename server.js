@@ -2,6 +2,8 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const { createClient, clientEvents } = require('./src/utils/db');
 const { listGrants, getGrantDetail, getGrantSignals } = require('./src/grants/grants_service');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = 3000;
@@ -10,6 +12,7 @@ const fpds = new sqlite3.Database('./db/fpds.db');
 const opp = new sqlite3.Database('./db/opportunities.db');
 const matches = new sqlite3.Database('./db/matches.db');
 const clientDb = new sqlite3.Database('./client.db');
+const PIPELINE_ROOT = process.env.JE_ROCKER_PIPELINE_ROOT || '/Volumes/Data Drive/Govtech/JE ROCKER';
 
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -401,6 +404,7 @@ function htmlLayout({ title, content, includeNav = true, extraHead = '' }) {
       <div class="global-status-item"><span class="global-status-label">Last Scraper</span><span class="global-status-value" id="global-last-scraper">Loading...</span></div>
       <div class="global-status-item"><span class="global-status-label">Last Matcher</span><span class="global-status-value" id="global-last-matcher">Loading...</span></div>
       <div class="global-status-item"><span class="global-status-label">Last Updated</span><span class="global-status-value" id="global-last-updated">Loading...</span></div>
+      <div class="global-status-item global-status-nodes"><span class="global-status-label">Cluster</span><span class="global-status-value" id="global-cluster-nodes">Loading...</span></div>
     </section>
   `;
 
@@ -426,24 +430,29 @@ function htmlLayout({ title, content, includeNav = true, extraHead = '' }) {
       </div>
       <script>
         (() => {
-          fetch('/api/dashboard_summary')
-            .then((r) => r.json())
-            .then((data) => {
+          Promise.all([
+            fetch('/api/system/state').then((r) => r.json()),
+            fetch('/api/engine/last-refresh').then((r) => r.json()),
+            fetch('/api/scraper/last-run').then((r) => r.json()),
+            fetch('/api/matcher/last-run').then((r) => r.json()),
+          ])
+            .then(([system, refresh, scraper, matcher]) => {
               const setText = (id, value) => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = value;
               };
-              const pipeline = data.pipeline_status || 'Unknown';
-              const scraper = data.last_scraper_run || 'Unknown';
-              const matcher = data.last_matcher_run || 'Unknown';
-              const lastUpdated = matcher !== 'Unknown' ? matcher : scraper;
-              setText('global-system-status', pipeline);
-              setText('global-last-scraper', scraper);
-              setText('global-last-matcher', matcher);
+              const lastUpdated = refresh.last_refresh || scraper.last_run || 'Unknown';
+              setText('global-system-status', system.status || 'Unknown');
+              setText('global-last-scraper', scraper.last_run || 'Unknown');
+              setText('global-last-matcher', matcher.last_run || 'Unknown');
               setText('global-last-updated', lastUpdated || 'Unknown');
+              setText(
+                'global-cluster-nodes',
+                (system.cluster_nodes || []).map((node) => node.name + ': ' + node.status).join(' · ') || 'Unavailable',
+              );
             })
             .catch(() => {
-              const fallback = ['global-system-status', 'global-last-scraper', 'global-last-matcher', 'global-last-updated'];
+              const fallback = ['global-system-status', 'global-last-scraper', 'global-last-matcher', 'global-last-updated', 'global-cluster-nodes'];
               fallback.forEach((id) => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = 'Unavailable';
@@ -813,28 +822,37 @@ app.get('/api/review_feed', async (req, res) => {
   }
 });
 
-app.get('/api/dashboard_summary', async (req, res) => {
-  try {
-    const oppCols = await getTableColumns(opp, 'opportunities');
-    const updatedCol = pickFirstAvailable(oppCols, ['updated_at', 'updated', 'scraped_at', 'created_at', 'response_date']);
+async function loadSystemState() {
+  function lastModifiedAt(filePath) {
+    try {
+      return fs.statSync(filePath).mtime.toISOString();
+    } catch {
+      return null;
+    }
+  }
 
-    const [oppCountRow, primaryCountRow, reviewCountRow, latestOppRow, latestMatchRow] = await Promise.all([
-      getAsync(opp, 'SELECT COUNT(*) AS count FROM opportunities'),
-      getAsync(matches, 'SELECT COUNT(*) AS count FROM matches'),
-      getAsync(matches, 'SELECT COUNT(*) AS count FROM matches_low_confidence'),
-      updatedCol ? getAsync(opp, `SELECT MAX(${updatedCol}) AS last_scraper_run FROM opportunities`) : Promise.resolve({ last_scraper_run: null }),
-      getAsync(matches, 'SELECT MAX(timestamp) AS last_matcher_run FROM matches'),
-    ]);
+  const oppCols = await getTableColumns(opp, 'opportunities');
+  const updatedCol = pickFirstAvailable(oppCols, ['updated_at', 'updated', 'scraped_at', 'created_at', 'response_date']);
 
-    const totalMatches = toNumber(primaryCountRow?.count) + toNumber(reviewCountRow?.count);
-    const matchedOpportunities = toNumber(primaryCountRow?.count);
-    const totalOpportunities = toNumber(oppCountRow?.count);
-    const matchCoverage = totalOpportunities > 0 ? ((matchedOpportunities / totalOpportunities) * 100).toFixed(1) : '0.0';
+  const [oppCountRow, primaryCountRow, reviewCountRow, latestOppRow, latestMatchRow] = await Promise.all([
+    getAsync(opp, 'SELECT COUNT(*) AS count FROM opportunities'),
+    getAsync(matches, 'SELECT COUNT(*) AS count FROM matches'),
+    getAsync(matches, 'SELECT COUNT(*) AS count FROM matches_low_confidence'),
+    updatedCol ? getAsync(opp, `SELECT MAX(${updatedCol}) AS last_scraper_run FROM opportunities`) : Promise.resolve({ last_scraper_run: null }),
+    getAsync(matches, 'SELECT MAX(timestamp) AS last_matcher_run FROM matches'),
+  ]);
 
-    res.json({
+  const totalMatches = toNumber(primaryCountRow?.count) + toNumber(reviewCountRow?.count);
+  const matchedOpportunities = toNumber(primaryCountRow?.count);
+  const totalOpportunities = toNumber(oppCountRow?.count);
+  const matchCoverage = totalOpportunities > 0 ? ((matchedOpportunities / totalOpportunities) * 100).toFixed(1) : '0.0';
+    const pipelineScraperRun = lastModifiedAt(path.join(PIPELINE_ROOT, 'db', 'opportunities.db'));
+    const pipelineMatcherRun = lastModifiedAt(path.join(PIPELINE_ROOT, 'db', 'matches.db'));
+
+  return {
       total_opportunities: totalOpportunities,
-      last_scraper_run: latestOppRow?.last_scraper_run || 'Unknown',
-      last_matcher_run: latestMatchRow?.last_matcher_run || 'Unknown',
+      last_scraper_run: pipelineScraperRun || latestOppRow?.last_scraper_run || 'Unknown',
+      last_matcher_run: pipelineMatcherRun || latestMatchRow?.last_matcher_run || 'Unknown',
       pipeline_status: 'Ready',
       spend_ingestion_status: 'Loaded',
       years_loaded: '2019-2026',
@@ -844,7 +862,55 @@ app.get('/api/dashboard_summary', async (req, res) => {
       matched_opportunities: matchedOpportunities,
       match_coverage: `${matchCoverage}%`,
       forecasting_signals: 'Active',
+  };
+}
+
+app.get('/api/system/state', async (req, res) => {
+  try {
+    const state = await loadSystemState();
+    res.json({
+      status: state.pipeline_status,
+      cluster_nodes: [
+        { name: 'MacMiller', role: 'Wiring + Intelligence Node', status: 'Active' },
+        { name: 'Macklemore', role: 'Driver Node', status: 'Ready' },
+        { name: 'MacMal (M6)', role: 'Future Ingestion Node', status: 'Planned' },
+      ],
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/engine/last-refresh', async (req, res) => {
+  try {
+    const state = await loadSystemState();
+    res.json({ last_refresh: state.last_scraper_run, pipeline_status: state.pipeline_status });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/scraper/last-run', async (req, res) => {
+  try {
+    const state = await loadSystemState();
+    res.json({ last_run: state.last_scraper_run, status: state.pipeline_status });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/matcher/last-run', async (req, res) => {
+  try {
+    const state = await loadSystemState();
+    res.json({ last_run: state.last_matcher_run, status: state.pipeline_status });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/dashboard_summary', async (req, res) => {
+  try {
+    res.json(await loadSystemState());
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -2664,8 +2730,8 @@ app.get('/business-driver', (req, res) => {
           historyEl.textContent = 'History: none yet';
           return;
         }
-        historyEl.textContent = 'History: ' + searchHistory.join(' • ');
-      }
+              last_scraper_run: pipelineScraperRun || latestOppRow?.last_scraper_run || 'Unknown',
+              last_matcher_run: pipelineMatcherRun || latestMatchRow?.last_matcher_run || 'Unknown',
 
       function setKv(target, rows) {
         target.innerHTML = rows.map((row) => {
