@@ -822,6 +822,48 @@ app.get('/api/review_feed', async (req, res) => {
   }
 });
 
+async function loadPipelineCounts() {
+  const opportunitiesPath = path.join(PIPELINE_ROOT, 'db', 'opportunities.db');
+  const matchesPath = path.join(PIPELINE_ROOT, 'db', 'matches.db');
+  if (!fs.existsSync(opportunitiesPath) || !fs.existsSync(matchesPath)) return null;
+
+  const pipelineOpp = new sqlite3.Database(opportunitiesPath, sqlite3.OPEN_READONLY);
+  const pipelineMatches = new sqlite3.Database(matchesPath, sqlite3.OPEN_READONLY);
+  try {
+    const [opportunities, matches] = await Promise.all([
+      getAsync(pipelineOpp, 'SELECT COUNT(*) AS count FROM opportunities'),
+      getAsync(pipelineMatches, 'SELECT COUNT(*) AS count FROM matches'),
+    ]);
+    return { opportunities: toNumber(opportunities?.count), matches: toNumber(matches?.count) };
+  } catch {
+    return null;
+  } finally {
+    pipelineOpp.close();
+    pipelineMatches.close();
+  }
+}
+
+async function searchPipelineOpportunities(query, limit = 20) {
+  const opportunitiesPath = path.join(PIPELINE_ROOT, 'db', 'opportunities.db');
+  if (!fs.existsSync(opportunitiesPath)) return [];
+
+  const pipelineOpp = new sqlite3.Database(opportunitiesPath, sqlite3.OPEN_READONLY);
+  const like = `%${String(query).toLowerCase()}%`;
+  try {
+    return await allAsync(pipelineOpp, `
+      SELECT notice_id, title, agency, naics_code, psc_code, response_date, url
+      FROM opportunities
+      WHERE lower(title) LIKE ? OR lower(agency) LIKE ? OR lower(notice_id) LIKE ?
+      ORDER BY scraped_at DESC
+      LIMIT ?
+    `, [like, like, like, limit]);
+  } catch {
+    return [];
+  } finally {
+    pipelineOpp.close();
+  }
+}
+
 async function loadSystemState() {
   function lastModifiedAt(filePath) {
     try {
@@ -842,9 +884,11 @@ async function loadSystemState() {
     getAsync(matches, 'SELECT MAX(timestamp) AS last_matcher_run FROM matches'),
   ]);
 
-  const totalMatches = toNumber(primaryCountRow?.count) + toNumber(reviewCountRow?.count);
+  const pipelineCounts = await loadPipelineCounts();
+  const localMatches = toNumber(primaryCountRow?.count) + toNumber(reviewCountRow?.count);
+  const totalMatches = pipelineCounts?.matches || localMatches;
   const matchedOpportunities = toNumber(primaryCountRow?.count);
-  const totalOpportunities = toNumber(oppCountRow?.count);
+  const totalOpportunities = pipelineCounts?.opportunities || toNumber(oppCountRow?.count);
   const matchCoverage = totalOpportunities > 0 ? ((matchedOpportunities / totalOpportunities) * 100).toFixed(1) : '0.0';
     const pipelineScraperRun = lastModifiedAt(path.join(PIPELINE_ROOT, 'db', 'opportunities.db'));
     const pipelineMatcherRun = lastModifiedAt(path.join(PIPELINE_ROOT, 'db', 'matches.db'));
@@ -1068,7 +1112,11 @@ app.get('/api/internal_search', async (req, res) => {
       ...awards.map((x) => ({ bucket: 'award', ...x })),
     ], (x) => JSON.stringify(x));
 
-    res.json({ type: 'keyword', rows });
+    const pipelineRows = rows.length ? [] : await searchPipelineOpportunities(query);
+    res.json({
+      type: 'keyword',
+      rows: pipelineRows.length ? pipelineRows.map((row) => ({ bucket: 'opportunity', ...row })) : rows,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -2530,7 +2578,7 @@ app.get('/cover', (req, res) => {
   res.send(htmlLayout({ title: 'JE ROCKER LC - Cover', content, includeNav: false }));
 });
 
-app.get('/business-driver', (req, res) => {
+app.get('/business-driver-legacy', (req, res) => {
   const content = `
     <div class="business-driver-container">
       <aside class="bd-left-rail">
@@ -3000,6 +3048,175 @@ app.get('/business-driver', (req, res) => {
     </script>
   `;
 
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Business Driver', content }));
+});
+
+const BUSINESS_DRIVER_ENDPOINTS = [
+  '/api/business/search',
+  '/api/business/counters',
+  '/api/business/sparkline/pipeline',
+  '/api/business/sparkline/modernization',
+];
+
+BUSINESS_DRIVER_ENDPOINTS.forEach((endpoint) => {
+  app.get(endpoint, (req, res) => res.json({ items: [] }));
+});
+
+app.get('/api/business/detail/:id', (req, res) => res.json({ items: [] }));
+
+app.get('/business-driver', (req, res) => {
+  const content = `
+    <div id="status-strip" class="business-status-strip" aria-live="polite">Loading Business Driver status...</div>
+
+    <main class="business-blueprint">
+      <div class="business-container">
+        <section class="panel panel-left">
+          <h2>Search Results</h2>
+          <div class="business-search-row">
+            <input id="internalSearchInput" type="search" placeholder="Search agencies, vendors, NAICS, PSC, awards, or keywords" />
+            <button id="internalSearchBtn" type="button">Search</button>
+          </div>
+          <div id="search-results" class="feed">Run a search to load cards.</div>
+        </section>
+
+        <section class="panel panel-middle">
+          <h2>Business Counters</h2>
+          <div id="derived-counters" class="feed">Loading derived counters...</div>
+
+          <h2>Pipeline Sparklines</h2>
+          <div id="sparkline-pipeline" class="sparkline">Loading pipeline sparkline...</div>
+
+          <h2>Modernization Sparklines</h2>
+          <div id="sparkline-modernization" class="sparkline">Loading modernization sparkline...</div>
+        </section>
+
+        <section class="panel panel-right">
+          <h2>Detail</h2>
+          <div id="hud-detail" class="feed">Select a search result to open its HUD detail.</div>
+        </section>
+      </div>
+
+      <div class="indicators-container" aria-label="Engine indicators">
+        <div><div id="scraper-indicator" class="indicator"></div><span>Scraper</span></div>
+        <div><div id="matcher-indicator" class="indicator"></div><span>Matcher</span></div>
+        <div><div id="engine-indicator" class="indicator"></div><span>Engine</span></div>
+        <div><div id="cluster-indicator" class="indicator"></div><span>Cluster</span></div>
+      </div>
+
+      <div id="cluster-banner" aria-live="polite">Loading cluster roles...</div>
+    </main>
+
+    <footer class="business-blueprint-footer">JE ROCKER LC • GovTech Intelligence Platform</footer>
+
+    <script>
+      (() => {
+        const setText = (id, value) => {
+          const element = document.getElementById(id);
+          if (element) element.textContent = value;
+        };
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderList = (id, items) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = items && items.length
+            ? items.map((item) => '<article class="business-feed-item">' + escapeHtml(typeof item === 'string' ? item : item.title || JSON.stringify(item)) + '</article>').join('')
+            : '<p class="business-feed-empty">No items available.</p>';
+        };
+        const renderSparkline = (id, items) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          const values = items && items.length ? items : [1, 2, 3, 2, 4, 3];
+          const max = Math.max(...values.map((value) => Number(value) || 0), 1);
+          element.innerHTML = '<div class="business-sparkline-bars">' + values.map((value) => '<span style="height:' + Math.max(10, Math.round(((Number(value) || 0) / max) * 100)) + '%"></span>').join('') + '</div>';
+        };
+        const renderDetail = (id, items) => renderList(id, items);
+        const load = async (endpoint, target, render = renderList) => {
+          try {
+            const response = await fetch(endpoint, { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            render(target, data.items || []);
+          } catch (_) {
+            setText(target, 'Feed unavailable.');
+          }
+        };
+        async function loadSearchResults() { await load('/api/business/search', 'search-results'); }
+        async function loadCounters() { await load('/api/business/counters', 'derived-counters'); }
+        async function loadPipelineSparkline() { await load('/api/business/sparkline/pipeline', 'sparkline-pipeline', renderSparkline); }
+        async function loadModernizationSparkline() { await load('/api/business/sparkline/modernization', 'sparkline-modernization', renderSparkline); }
+        async function loadHudDetail(id) {
+          try {
+            const response = await fetch('/api/business/detail/' + encodeURIComponent(id), { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            if (data.items && data.items.length) renderDetail('hud-detail', data.items);
+          } catch (_) {
+            // The selected search card is already rendered locally.
+          }
+        }
+
+        const searchInput = document.getElementById('internalSearchInput');
+        const searchButton = document.getElementById('internalSearchBtn');
+        const searchResults = document.getElementById('search-results');
+        const renderSearchCards = (rows) => {
+          searchResults.innerHTML = rows.length
+            ? rows.map((row, index) => '<button class="business-result-card" type="button" data-result-id="' + index + '"><strong>' + escapeHtml(row.title || row.name || row.vendor || row.agency || 'Search result') + '</strong><span>' + escapeHtml(row.agency || row.type || row.naics || 'Internal intelligence') + '</span></button>').join('')
+            : '<p class="business-feed-empty">No matching internal results.</p>';
+          Array.from(searchResults.querySelectorAll('.business-result-card')).forEach((card) => {
+            card.addEventListener('click', () => {
+              const row = rows[Number(card.dataset.resultId)];
+              document.getElementById('hud-detail').innerHTML = Object.entries(row).map(([key, value]) => '<div class="business-detail-row"><span>' + escapeHtml(key.replaceAll('_', ' ')) + '</span><strong>' + escapeHtml(value) + '</strong></div>').join('');
+              loadHudDetail(card.dataset.resultId);
+            });
+          });
+        };
+        const runSearch = async () => {
+          const query = searchInput.value.trim();
+          if (!query) return setText('search-results', 'Enter a search term.');
+          setText('search-results', 'Searching internal intelligence...');
+          try {
+            const response = await fetch('/api/internal_search?q=' + encodeURIComponent(query), { cache: 'no-store' });
+            if (!response.ok) throw new Error('Search failed');
+            const data = await response.json();
+            renderSearchCards(data.rows || []);
+          } catch (_) {
+            setText('search-results', 'Search unavailable.');
+          }
+        };
+        searchButton.addEventListener('click', runSearch);
+        searchInput.addEventListener('keydown', (event) => { if (event.key === 'Enter') runSearch(); });
+
+        const setIndicator = (id, active) => {
+          const element = document.getElementById(id);
+          if (element) element.classList.toggle('indicator-active', active);
+        };
+        Promise.all([
+          fetch('/api/system/state').then((response) => response.json()),
+          fetch('/api/engine/last-refresh').then((response) => response.json()),
+          fetch('/api/scraper/last-run').then((response) => response.json()),
+          fetch('/api/matcher/last-run').then((response) => response.json()),
+          fetch('/api/dashboard_summary').then((response) => response.json()),
+        ]).then(([system, refresh, scraper, matcher, summary]) => {
+          setText('status-strip', 'System: ' + (system.status || 'Unknown') + ' • Refresh: ' + (refresh.last_refresh || 'Unknown') + ' • Scraper: ' + (scraper.last_run || 'Unknown') + ' • Matcher: ' + (matcher.last_run || 'Unknown'));
+          setIndicator('scraper-indicator', scraper.status === 'Ready');
+          setIndicator('matcher-indicator', matcher.status === 'Ready');
+          setIndicator('engine-indicator', refresh.pipeline_status === 'Ready');
+          setIndicator('cluster-indicator', (system.cluster_nodes || []).some((node) => node.status === 'Active'));
+          setText('cluster-banner', (system.cluster_nodes || []).map((node) => node.name + ' — ' + node.role + ': ' + node.status).join(' • '));
+          renderList('derived-counters', [
+            'Total opportunities: ' + (summary.total_opportunities || 0),
+            'Total matches: ' + (summary.total_matches || 0),
+            'Match coverage: ' + (summary.match_coverage || '0%'),
+            'Forecasting signals: ' + (summary.forecasting_signals || 'Unknown'),
+          ]);
+          renderSparkline('sparkline-pipeline', [summary.total_opportunities, summary.matched_opportunities, summary.total_matches]);
+          renderSparkline('sparkline-modernization', [summary.match_coverage?.replace('%', ''), 2, 3, 5]);
+        }).catch(() => setText('status-strip', 'System status unavailable.'));
+
+        Promise.all([loadSearchResults(), loadCounters(), loadPipelineSparkline(), loadModernizationSparkline(), loadHudDetail('default')]);
+      })();
+    </script>
+  `;
   res.send(htmlLayout({ title: 'JE ROCKER LC - Business Driver', content }));
 });
 
