@@ -1,0 +1,11 @@
+{
+  "canonical": [
+    "Department of Defense",
+    "Department of Homeland Security",
+    "Department of Health and Human Services",
+    "General Services Administration"
+  ],
+  "synonyms": {},
+  "driftPatterns": {},
+  "suppressionRules": {}
+}

@@ -1,0 +1,12 @@
+{
+  "canonical": [
+    "Advisory",
+    "Technical",
+    "Operational",
+    "Modernization",
+    "Readiness"
+  ],
+  "synonyms": {},
+  "driftPatterns": {},
+  "suppressionRules": {}
+}

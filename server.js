@@ -14,6 +14,20 @@ const matches = new sqlite3.Database('./db/matches.db');
 const clientDb = new sqlite3.Database('./client.db');
 const PIPELINE_ROOT = process.env.JE_ROCKER_PIPELINE_ROOT || '/Volumes/Data Drive/Govtech/JE ROCKER';
 
+function loadDSM() {
+  const base = path.join(__dirname, 'dsm');
+  return {
+    naics: JSON.parse(fs.readFileSync(path.join(base, 'naics.json'), 'utf8')),
+    psc: JSON.parse(fs.readFileSync(path.join(base, 'psc.json'), 'utf8')),
+    agency: JSON.parse(fs.readFileSync(path.join(base, 'agency.json'), 'utf8')),
+    modernization: JSON.parse(fs.readFileSync(path.join(base, 'modernization.json'), 'utf8')),
+    grants: JSON.parse(fs.readFileSync(path.join(base, 'grants.json'), 'utf8')),
+    capability: JSON.parse(fs.readFileSync(path.join(base, 'capability.json'), 'utf8')),
+  };
+}
+
+const DSM = loadDSM();
+
 app.use(express.json());
 app.use(express.static(__dirname));
 
@@ -958,6 +972,10 @@ app.get('/api/dashboard_summary', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+app.get('/api/drift/dsm', (req, res) => {
+  res.json({ DSM });
 });
 
 app.get('/api/internal_search', async (req, res) => {
