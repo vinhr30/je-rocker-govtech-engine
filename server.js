@@ -27,6 +27,25 @@ function loadDSM() {
 }
 
 const DSM = loadDSM();
+const driftLogPath = path.join(__dirname, 'logs', 'drift.log');
+
+fs.mkdirSync(path.dirname(driftLogPath), { recursive: true });
+
+function logDriftEvents(events) {
+  if (!events || events.length === 0) return;
+
+  const lines = events.map((event) => JSON.stringify({
+    field: event.field,
+    original: event.original,
+    corrected: event.corrected,
+    reason: event.reason,
+    timestamp: event.timestamp,
+    node: process.env.NODE_NAME || 'unknown',
+    role: process.env.NODE_ROLE || 'unknown',
+  }));
+
+  fs.appendFileSync(driftLogPath, `${lines.join('\n')}\n`);
+}
 
 function applyDriftSuppression(raw = {}) {
   const result = {
@@ -90,6 +109,7 @@ function stabilizeItems(items) {
       grantCategory: item.grantCategory ?? item.grant_category,
       capabilityZone: item.capabilityZone ?? item.capability_zone,
     });
+    logDriftEvents(stable.driftEvents);
     return {
       ...item,
       naics: stable.stableNaics,

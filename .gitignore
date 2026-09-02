@@ -4,3 +4,4 @@ __pycache__/
 /data/
 grant_scraper/data/
 sbir_scraper/data/
+logs/drift.log
