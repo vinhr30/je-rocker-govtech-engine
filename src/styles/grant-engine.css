@@ -1,0 +1,108 @@
+.grant-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+  color: #e6e6e6;
+}
+
+.grant-header {
+  text-align: center;
+}
+
+.grant-page .outer-block {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #1e1f22;
+  border: 1px solid #3a3d42;
+  border-radius: 8px;
+}
+
+.grant-page .panel-title {
+  margin: 0 0 12px;
+  color: #e6e6e6;
+}
+
+.grant-page .grant-header .panel-title {
+  font-size: 32px;
+}
+
+.grant-page .inner-frame {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 15px;
+  background: #1b1c1f;
+  border: 1px solid #4a4d52;
+  border-radius: 6px;
+}
+
+.grant-content {
+  font-size: 16px;
+  color: #c7cbd1;
+}
+
+.grant-page .system-status,
+.grant-page .grant-stats {
+  margin-bottom: 20px;
+}
+
+.grant-page .grant-all button {
+  padding: 9px 12px;
+  color: #e6e6e6;
+  background: #25262a;
+  border: 1px solid #4a4d52;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.grant-page .prioritized-grants {
+  margin-bottom: 20px;
+}
+
+.grant-page #grant-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.grant-page #grant-list.scrollable {
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.grant-page #grant-list[hidden] {
+  display: none;
+}
+
+.grant-page .grant-list-item {
+  display: grid;
+  gap: 3px;
+  padding: 10px 0;
+  border-top: 1px solid #3a3d42;
+  color: #e6e6e6;
+}
+
+.grant-page .grant-list-item span {
+  color: #aeb4bd;
+  font-size: 0.9rem;
+}
+
+.grant-header .inner-frame p {
+  margin: 0;
+  font-size: 18px;
+  color: #c7cbd1;
+}
+
+@media (max-width: 760px) {
+  .grant-page {
+    padding: 24px 16px 36px;
+  }
+
+  .grant-header h1 {
+    font-size: 28px;
+  }
+
+  .grant-page .outer-block {
+    padding: 16px;
+  }
+}

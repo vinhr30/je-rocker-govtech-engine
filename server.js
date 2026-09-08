@@ -1,4 +1,5 @@
 const express = require('express');
+const { execFile } = require('child_process');
 const sqlite3 = require('sqlite3').verbose();
 const { createClient, clientEvents } = require('./src/utils/db');
 const { listGrants, getGrantDetail, getGrantSignals } = require('./src/grants/grants_service');
@@ -14,6 +15,7 @@ const matches = new sqlite3.Database('./db/matches.db');
 const clientDb = new sqlite3.Database('./client.db');
 const PIPELINE_ROOT = process.env.JE_ROCKER_PIPELINE_ROOT || '/Volumes/Data Drive/Govtech/JE ROCKER';
 const FORECAST_DB_PATH = path.join(__dirname, 'data', 'forecast.db');
+const PYTHON_BIN = process.env.PYTHON_BIN || `${PIPELINE_ROOT}/.venv/bin/python`;
 
 function loadDSM() {
   const base = path.join(__dirname, 'dsm');
@@ -166,6 +168,11 @@ clientDb.serialize(() => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  clientDb.run('ALTER TABLE clients ADD COLUMN intake_answers TEXT', (error) => {
+    if (error && !String(error.message || '').includes('duplicate column name')) {
+      console.error('[clientDb] failed to add intake_answers:', error.message);
+    }
+  });
 
   clientDb.get('SELECT COUNT(*) AS count FROM clients', (countErr, row) => {
     if (countErr) {
@@ -509,7 +516,114 @@ function toNumber(value) {
   return Number.isFinite(num) ? num : 0;
 }
 
-function htmlLayout({ title, content, includeNav = true, extraHead = '' }) {
+const ingestionLog = [];
+const matcherLog = [];
+const modernizationLog = [];
+const riskLog = [];
+const forecastingLog = [];
+const prioritizationLog = [];
+let automationEnabled = false;
+const automationConfig = { ingestion: false, forecasting: false, prioritization: false };
+const automationLog = [];
+const killSwitch = { global: false, ingestion: false, matcher: false, modernization: false, risk: false, forecasting: false, prioritization: false, automation: false };
+const auditStream = [];
+
+function isKilled(engine) {
+  return killSwitch.global || killSwitch[engine];
+}
+
+function audit(event) {
+  const entry = { event, timestamp: new Date().toISOString() };
+  auditStream.push(entry);
+  if (auditStream.length > 500) auditStream.shift();
+  return entry;
+}
+
+function logIngestion(type, count) {
+  const timestamp = new Date().toISOString();
+  const entry = { type, count, startedAt: timestamp, finishedAt: timestamp, status: 'OK' };
+  ingestionLog.push(entry);
+  if (ingestionLog.length > 100) ingestionLog.shift();
+  return entry;
+}
+
+function logMatcher(clientId, resultCount) {
+  const timestamp = new Date().toISOString();
+  const entry = { clientId, resultCount, startedAt: timestamp, finishedAt: timestamp, status: 'OK' };
+  matcherLog.push(entry);
+  if (matcherLog.length > 100) matcherLog.shift();
+  return entry;
+}
+
+function logModernization(clientId, posture, blockers) {
+  const timestamp = new Date().toISOString();
+  const entry = { clientId, posture, blockers, startedAt: timestamp, finishedAt: timestamp, status: 'OK' };
+  modernizationLog.push(entry);
+  if (modernizationLog.length > 100) modernizationLog.shift();
+  return entry;
+}
+
+function logRisk(clientId, posture, risks) {
+  const timestamp = new Date().toISOString();
+  const entry = { clientId, posture, risks, startedAt: timestamp, finishedAt: timestamp, status: 'OK' };
+  riskLog.push(entry);
+  if (riskLog.length > 100) riskLog.shift();
+  return entry;
+}
+
+function logForecast(clientId, signals, trends, outlook) {
+  const timestamp = new Date().toISOString();
+  const entry = { clientId, signals, trends, outlook, startedAt: timestamp, finishedAt: timestamp, status: 'OK' };
+  forecastingLog.push(entry);
+  if (forecastingLog.length > 100) forecastingLog.shift();
+  return entry;
+}
+
+function logPrioritization(clientId, topCount) {
+  const timestamp = new Date().toISOString();
+  const entry = { clientId, topCount, startedAt: timestamp, finishedAt: timestamp, status: 'OK' };
+  prioritizationLog.push(entry);
+  if (prioritizationLog.length > 100) prioritizationLog.shift();
+  return entry;
+}
+
+function logAutomation(event) {
+  const entry = { event, timestamp: new Date().toISOString() };
+  automationLog.push(entry);
+  if (automationLog.length > 100) automationLog.shift();
+  return entry;
+}
+
+function runAdvisoryForecast(clientId) {
+  const signals = ['HHS spending up', 'DOE digital expansion'];
+  const trends = ['Upward', 'Stable'];
+  const outlook = 'Positive';
+  return logForecast(clientId, signals, trends, outlook);
+}
+
+function runAdvisoryPrioritization(clientId) {
+  const results = prioritizedResults(clientId, true);
+  return logPrioritization(clientId, results.opportunities.length + results.grants.length);
+}
+
+const automationScheduler = setInterval(() => {
+  if (!automationEnabled || isKilled('automation')) return;
+  if (automationConfig.ingestion) {
+    if (isKilled('ingestion')) audit('Auto-ingestion skipped: kill switch active');
+    else { logIngestion('opportunities', 312); logAutomation('Auto-ingestion executed'); audit('Auto-ingestion executed'); }
+  }
+  if (automationConfig.forecasting) {
+    if (isKilled('forecasting')) audit('Auto-forecast skipped: kill switch active');
+    else { runAdvisoryForecast('1'); logAutomation('Auto-forecast executed'); audit('Auto-forecast executed'); }
+  }
+  if (automationConfig.prioritization) {
+    if (isKilled('prioritization')) audit('Auto-prioritization skipped: kill switch active');
+    else { runAdvisoryPrioritization('1'); logAutomation('Auto-prioritization executed'); audit('Auto-prioritization executed'); }
+  }
+}, 60_000);
+automationScheduler.unref();
+
+function htmlLayout({ title, content, includeNav = true, extraHead = '', statusClass = '' }) {
   const nav = includeNav
     ? `
       <nav class="top-nav">
@@ -517,21 +631,23 @@ function htmlLayout({ title, content, includeNav = true, extraHead = '' }) {
         <div class="top-nav-links">
           <a href="/cover">Cover Page</a>
           <a href="/business-driver">Business Driver</a>
-          <a href="/primary-dashboard">Primary Dashboard</a>
           <a href="/client-dashboard">Client Dashboard</a>
+          <a href="/primary-dashboard">Primary Dashboard</a>
+          <a href="/portfolio/intelligence-overview">Intelligence Overview</a>
           <a href="/grant-engine">Grant Engine</a>
+          <a href="/portfolio/more-intelligence">More Intelligence</a>
         </div>
       </nav>
     `
     : '';
 
   const statusStrip = `
-    <section class="global-status-strip" aria-label="System status strip">
-      <div class="global-status-item"><span class="global-status-label">System</span><span class="global-status-value" id="global-system-status">Loading...</span></div>
-      <div class="global-status-item"><span class="global-status-label">Last Scraper</span><span class="global-status-value" id="global-last-scraper">Loading...</span></div>
-      <div class="global-status-item"><span class="global-status-label">Last Matcher</span><span class="global-status-value" id="global-last-matcher">Loading...</span></div>
-      <div class="global-status-item"><span class="global-status-label">Last Updated</span><span class="global-status-value" id="global-last-updated">Loading...</span></div>
-      <div class="global-status-item global-status-nodes"><span class="global-status-label">Cluster</span><span class="global-status-value" id="global-cluster-nodes">Loading...</span></div>
+    <section class="global-status-strip ${statusClass}" aria-label="System status strip">
+      <div class="global-status-item ${statusClass ? 'sys-block' : ''}"><span class="global-status-label">System</span><span class="global-status-value" id="global-system-status">Loading...</span></div>
+      <div class="global-status-item ${statusClass ? 'sys-block' : ''}"><span class="global-status-label">Last Scraper</span><span class="global-status-value" id="global-last-scraper">Loading...</span></div>
+      <div class="global-status-item ${statusClass ? 'sys-block' : ''}"><span class="global-status-label">Last Matcher</span><span class="global-status-value" id="global-last-matcher">Loading...</span></div>
+      <div class="global-status-item ${statusClass ? 'sys-block' : ''}"><span class="global-status-label">Last Updated</span><span class="global-status-value" id="global-last-updated">Loading...</span></div>
+      <div class="global-status-item global-status-nodes ${statusClass ? 'sys-block' : ''}"><span class="global-status-label">Cluster</span><span class="global-status-value" id="global-cluster-nodes">Loading...</span></div>
     </section>
   `;
 
@@ -1131,20 +1247,744 @@ app.get('/api/forecast/data/modernization', async (req, res) => {
   }
 });
 
+function runForecast(kind) {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'forecast_engine.py'), kind],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Forecast engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runForecastNarrative(kind) {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'forecast_narrative.py'), kind],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Forecast narrative engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runStrategicBriefing() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'strategic_briefing.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Strategic briefing engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runClientBriefing(clientId) {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'client_briefing.py'), String(clientId)],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        let payload;
+        try {
+          payload = JSON.parse(stdout);
+        } catch {
+          return reject(new Error(stderr || 'Client briefing engine returned invalid JSON'));
+        }
+        if (error && payload.error === 'Client not found') return resolve(null);
+        if (error) return reject(new Error(stderr || error.message));
+        resolve(payload);
+      },
+    );
+  });
+}
+
+function runPortfolioBriefing() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_briefing.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio briefing engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioActions() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_actions.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio action engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioActionQueue() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_action_queue.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio action queue engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runActionPlaybooks() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'action_playbooks.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Action playbook engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioCycle() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_cycle.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio cycle engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioCycleTrends() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_cycle_trends.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio cycle trend engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioCycleMomentum() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_cycle_momentum.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio cycle momentum engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioStability() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_stability.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio stability engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioStabilityForecast() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_stability_forecast.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio stability forecast engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioStabilityAdvisory() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_stability_advisory.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio stability advisory engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioResilience() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_resilience.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio resilience engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioResilienceForecast() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_resilience_forecast.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio resilience forecast engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioResilienceAdvisory() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_resilience_advisory.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio resilience advisory engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioShock() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_shock.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio shock engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioShockForecast() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_shock_forecast.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio shock forecast engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runPortfolioShockAdvisory() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'portfolio_shock_advisory.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Portfolio shock advisory engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+function runIntelligenceOverview() {
+  return new Promise((resolve, reject) => {
+    execFile(
+      PYTHON_BIN,
+      [path.join(__dirname, 'scripts', 'intelligence_overview.py')],
+      {
+        cwd: __dirname,
+        env: { ...process.env, PYTHONPATH: path.join(__dirname, 'scripts') },
+        maxBuffer: 32 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error) return reject(new Error(stderr || error.message));
+        try {
+          resolve(JSON.parse(stdout));
+        } catch {
+          reject(new Error('Intelligence overview engine returned invalid JSON'));
+        }
+      },
+    );
+  });
+}
+
+app.get('/api/forecast/pipeline', async (req, res) => {
+  try {
+    res.json(await runForecast('pipeline'));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/forecast/grants', async (req, res) => {
+  try {
+    res.json(await runForecast('grants'));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/forecast/modernization', async (req, res) => {
+  try {
+    res.json(await runForecast('modernization'));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/forecast/narrative/pipeline', async (req, res) => {
+  try {
+    res.json(await runForecastNarrative('pipeline'));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/forecast/narrative/grants', async (req, res) => {
+  try {
+    res.json(await runForecastNarrative('grants'));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/forecast/narrative/modernization', async (req, res) => {
+  try {
+    res.json(await runForecastNarrative('modernization'));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/briefing', async (req, res) => {
+  try {
+    res.json({ briefing: await runStrategicBriefing() });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/briefing/client/:clientId', async (req, res) => {
+  const clientId = Number.parseInt(String(req.params.clientId || ''), 10);
+  if (!Number.isFinite(clientId) || clientId <= 0) {
+    return res.status(400).json({ error: 'A valid client id is required' });
+  }
+  try {
+    const briefing = await runClientBriefing(clientId);
+    if (!briefing) return res.status(404).json({ error: 'Client not found' });
+    res.json({ briefing });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/briefing/portfolio', async (req, res) => {
+  try {
+    res.json({ briefing: await runPortfolioBriefing() });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/actions', async (req, res) => {
+  try {
+    res.json(await runPortfolioActions());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/action-queue', async (req, res) => {
+  try {
+    res.json(await runPortfolioActionQueue());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/playbooks', async (req, res) => {
+  try {
+    res.json(await runActionPlaybooks());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/cycle', async (req, res) => {
+  try {
+    res.json(await runPortfolioCycle());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/cycle-trends', async (req, res) => {
+  try {
+    res.json(await runPortfolioCycleTrends());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/cycle-momentum', async (req, res) => {
+  try {
+    res.json(await runPortfolioCycleMomentum());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/stability', async (req, res) => {
+  try {
+    res.json(await runPortfolioStability());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/stability-forecast', async (req, res) => {
+  try {
+    res.json(await runPortfolioStabilityForecast());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/stability-advisory', async (req, res) => {
+  try {
+    res.json(await runPortfolioStabilityAdvisory());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/resilience', async (req, res) => {
+  try {
+    res.json(await runPortfolioResilience());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/resilience-forecast', async (req, res) => {
+  try {
+    res.json(await runPortfolioResilienceForecast());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/resilience-advisory', async (req, res) => {
+  try {
+    res.json(await runPortfolioResilienceAdvisory());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/shock', async (req, res) => {
+  try {
+    res.json(await runPortfolioShock());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/shock-forecast', async (req, res) => {
+  try {
+    res.json(await runPortfolioShockForecast());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/shock-advisory', async (req, res) => {
+  try {
+    res.json(await runPortfolioShockAdvisory());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/portfolio/intelligence-overview', async (req, res) => {
+  try {
+    res.json(await runIntelligenceOverview());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/api/drift/test', (req, res) => {
   res.json(applyDriftSuppression(req.body || {}));
 });
 
+function mockSearchDatabase(keyword) {
+  return keyword;
+}
+
+function mockSearchOpportunities(keyword) {
+  return keyword;
+}
+
+function mockSearchState(state, keyword) {
+  return keyword || state;
+}
+
+function mockSearchGlobal(keyword) {
+  return keyword;
+}
+
+function filterSearchRowsByState(rows, state) {
+  if (!state) return rows;
+  const matchesState = (row) => {
+    const values = [row.state, row.place_of_performance_state, row.placeOfPerformanceState, row.location, row.address].filter(Boolean);
+    return values.some((value) => String(value).toUpperCase().split(/[^A-Z]+/).includes(state));
+  };
+  if (Array.isArray(rows)) return rows.filter(matchesState);
+  if (rows && typeof rows === 'object') return Object.fromEntries(Object.entries(rows).map(([key, value]) => [key, Array.isArray(value) ? value.filter(matchesState) : value]));
+  return rows;
+}
+
 app.get('/api/internal_search', async (req, res) => {
-  const query = String(req.query.q || '').trim();
+  const requestedScope = String(req.query.scope || 'global').trim().toLowerCase();
+  const scope = ['database', 'opportunities', 'state'].includes(requestedScope) ? requestedScope : 'global';
+  const keyword = String(req.query.q || '').trim();
+  const state = String(req.query.state || '').trim().toUpperCase();
+  const query = scope === 'database'
+    ? mockSearchDatabase(keyword)
+    : scope === 'opportunities'
+      ? mockSearchOpportunities(keyword)
+      : scope === 'state'
+        ? mockSearchState(state, keyword)
+        : mockSearchGlobal(keyword);
   const type = classifySearch(query);
+  const resultCount = (rows) => Array.isArray(rows)
+    ? rows.length
+    : Object.values(rows || {}).reduce((count, value) => count + (Array.isArray(value) ? value.length : 0), 0);
+  const respond = (responseType, rows) => {
+    const scopedRows = scope === 'state' ? filterSearchRowsByState(rows, state) : rows;
+    return res.json({
+    scope,
+    state,
+    keyword,
+    searchMode: scope === 'state' ? 'state' : 'federal',
+    count: resultCount(scopedRows),
+    results: scopedRows,
+    type: responseType,
+    rows: scopedRows,
+    });
+  };
 
   if (!query) {
-    return res.json({ type: 'empty', rows: [] });
+    return respond('empty', []);
   }
 
   if (query.length < 2) {
-    return res.json({ type: 'short_query', rows: [] });
+    return respond('short_query', []);
   }
 
   try {
@@ -1173,7 +2013,7 @@ app.get('/api/internal_search', async (req, res) => {
     const pscObCol = pickFirstAvailable(pscCols, ['obligated', 'amount', 'total_obligated'], pscCountCol);
 
     if (type === 'agency') {
-      if (!agencyNameCol) return res.json({ type, rows: [] });
+      if (!agencyNameCol) return respond(type, []);
       const rows = await allAsync(fpds, `
         SELECT ${agencyNameCol} AS name, ${agencyCountCol} AS count, ${agencyObCol} AS obligated
         FROM fpds_intel_agencies
@@ -1181,11 +2021,11 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY obligated DESC
         LIMIT 20
       `, [like]);
-      return res.json({ type, rows: stabilizeSearchRows(rows) });
+      return respond(type, stabilizeSearchRows(rows));
     }
 
     if (type === 'vendor') {
-      if (!vendorNameCol) return res.json({ type, rows: [] });
+      if (!vendorNameCol) return respond(type, []);
       const rows = await allAsync(fpds, `
         SELECT ${vendorNameCol} AS name, ${vendorCountCol} AS count, ${vendorObCol} AS obligated
         FROM fpds_intel_vendors
@@ -1193,11 +2033,11 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY obligated DESC
         LIMIT 20
       `, [like]);
-      return res.json({ type, rows: stabilizeSearchRows(rows) });
+      return respond(type, stabilizeSearchRows(rows));
     }
 
     if (type === 'naics') {
-      if (!naicsCodeCol) return res.json({ type, rows: [] });
+      if (!naicsCodeCol) return respond(type, []);
       const rows = await allAsync(fpds, `
         SELECT ${naicsCodeCol} AS code, ${naicsCountCol} AS count, ${naicsObCol} AS obligated
         FROM fpds_intel_naics
@@ -1205,11 +2045,11 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY obligated DESC
         LIMIT 20
       `, [`%${query.replace(/[^0-9]/g, '')}%`]);
-      return res.json({ type, rows: stabilizeSearchRows(rows) });
+      return respond(type, stabilizeSearchRows(rows));
     }
 
     if (type === 'psc') {
-      if (!pscCodeCol) return res.json({ type, rows: [] });
+      if (!pscCodeCol) return respond(type, []);
       const p = query.toUpperCase().replace(/[^A-Z0-9]/g, '');
       const rows = await allAsync(fpds, `
         SELECT ${pscCodeCol} AS code, ${pscCountCol} AS count, ${pscObCol} AS obligated
@@ -1218,7 +2058,7 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY obligated DESC
         LIMIT 20
       `, [`%${p}%`]);
-      return res.json({ type, rows: stabilizeSearchRows(rows) });
+      return respond(type, stabilizeSearchRows(rows));
     }
 
     if (type === 'opportunity') {
@@ -1238,10 +2078,7 @@ app.get('/api/internal_search', async (req, res) => {
         LIMIT 20
       `, [like, like]);
 
-      return res.json({
-        type,
-        rows: stabilizeSearchRows({ opportunities: oppRows, matches: matchRows }),
-      });
+      return respond(type, stabilizeSearchRows({ opportunities: oppRows, matches: matchRows }));
     }
 
     if (type === 'award') {
@@ -1252,7 +2089,7 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY id DESC
         LIMIT 20
       `, [like, like]);
-      return res.json({ type, rows: stabilizeSearchRows(rows) });
+      return respond(type, stabilizeSearchRows(rows));
     }
 
     if (type === 'fiscal_year') {
@@ -1264,7 +2101,7 @@ app.get('/api/internal_search', async (req, res) => {
         ORDER BY timestamp DESC
         LIMIT 30
       `, [`%${yy}%`]);
-      return res.json({ type, rows: stabilizeSearchRows(rows) });
+      return respond(type, stabilizeSearchRows(rows));
     }
 
     const includeDeepKeywordScan = query.length >= 4;
@@ -1291,12 +2128,10 @@ app.get('/api/internal_search', async (req, res) => {
     ], (x) => JSON.stringify(x));
 
     const pipelineRows = rows.length ? [] : await searchPipelineOpportunities(query);
-    res.json({
-      type: 'keyword',
-      rows: stabilizeSearchRows(
-        pipelineRows.length ? pipelineRows.map((row) => ({ bucket: 'opportunity', ...row })) : rows,
-      ),
-    });
+    respond(
+      'keyword',
+      stabilizeSearchRows(pipelineRows.length ? pipelineRows.map((row) => ({ bucket: 'opportunity', ...row })) : rows),
+    );
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -2442,10 +3277,12 @@ app.get('/api/client/intel/:module', async (req, res) => {
 
     const viewMode = String(req.query.view || 'summary').toLowerCase() === 'deep' ? 'deep' : 'summary';
     const payload = await buildClientIntelPayload(module, context, viewMode);
+    const narrative = module === 'opportunities' ? await runForecastNarrative('pipeline') : { items: [] };
 
     res.json({
       ...payload,
       opportunities: stabilizeItems(payload.opportunities),
+      narrative: narrative.items,
       context: {
         client_id: context.clientId,
         naics: context.naicsList,
@@ -2507,9 +3344,125 @@ app.get('/api/client/intel/opportunity/:opp_id', async (req, res) => {
   }
 });
 
+app.get('/api/forecast/client/:clientId', async (req, res) => {
+  try {
+    const clientId = Number.parseInt(String(req.params.clientId || ''), 10);
+    if (!Number.isFinite(clientId) || clientId <= 0) {
+      return res.status(400).json({ error: 'A valid client id is required' });
+    }
+
+    const client = await getAsync(clientDb, 'SELECT * FROM clients WHERE client_id = ?', [clientId]);
+    if (!client) return res.status(404).json({ error: 'Client not found' });
+
+    const naics = new Set(splitClientList(client.naics || '').map((value) => value.toLowerCase()));
+    const agencies = new Set(splitClientList(client.preferred_agencies || '').map((value) => value.toLowerCase()));
+    const forecast = await runForecast('pipeline');
+    const items = forecast.items.filter((item) => {
+      const naicsMatch = naics.size === 0 || naics.has(String(item.stableNaics || '').toLowerCase());
+      const agencyMatch = agencies.size === 0 || agencies.has(String(item.stableAgency || '').toLowerCase());
+      return naicsMatch && agencyMatch;
+    });
+
+    res.json({ items, client_id: clientId });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+const COCKPIT_MOCK_CLIENTS = {
+  ClientA: { name: 'Client A', tier: 'Tier 1', industry: 'Healthcare', region: 'VA', agency: 'HHS', scores: { modernization: 82, match: 76, risk: 18 }, intelligence: { compliance: 'Good', modernization: 'Strong', forecasting: 'Aligned', opportunityAlignment: 'High', readiness: 'Medium', momentum: 'Increasing' }, opportunities: { top10: ['Opportunity 1', 'Opportunity 2'], fullFeed: ['Opp A', 'Opp B', 'Opp C'], agencies: ['HHS', 'DOE'], windows: ['Q4 2026', 'Q1 2027'] }, actions: { modernization: ['Update website', 'Rewrite capability statement'], compliance: ['SAM renewal', 'UEI verification'], outreach: ['Email HHS', 'Call DOE'], submission: ['Prepare bid package'], notes: ['Client prefers Tuesday calls'] } },
+  ClientB: { name: 'Client B', tier: 'Tier 2', industry: 'Education', region: 'CA', agency: 'DOE', scores: { modernization: 65, match: 70, risk: 25 }, intelligence: { compliance: 'Good', modernization: 'Moderate', forecasting: 'Watch', opportunityAlignment: 'Medium', readiness: 'Medium', momentum: 'Stable' }, opportunities: { top10: ['Opportunity 1', 'Opportunity 2'], fullFeed: ['Opp A', 'Opp B', 'Opp C'], agencies: ['HHS', 'DOE'], windows: ['Q4 2026', 'Q1 2027'] }, actions: { modernization: ['Update website', 'Rewrite capability statement'], compliance: ['SAM renewal', 'UEI verification'], outreach: ['Email HHS', 'Call DOE'], submission: ['Prepare bid package'], notes: ['Client prefers Tuesday calls'] } },
+  ClientC: { name: 'Client C', tier: 'Premium', industry: 'Defense', region: 'TX', agency: 'DOD', scores: { modernization: 90, match: 88, risk: 12 }, intelligence: { compliance: 'Strong', modernization: 'Strong', forecasting: 'Aligned', opportunityAlignment: 'High', readiness: 'High', momentum: 'Increasing' }, opportunities: { top10: ['Opportunity 1', 'Opportunity 2'], fullFeed: ['Opp A', 'Opp B', 'Opp C'], agencies: ['HHS', 'DOE'], windows: ['Q4 2026', 'Q1 2027'] }, actions: { modernization: ['Update website', 'Rewrite capability statement'], compliance: ['SAM renewal', 'UEI verification'], outreach: ['Email HHS', 'Call DOE'], submission: ['Prepare bid package'], notes: ['Client prefers Tuesday calls'] } },
+};
+
+app.get('/api/client/:id/opportunities', (req, res) => {
+  res.json({
+    top10: ['Opportunity 1', 'Opportunity 2'],
+    fullFeed: ['Opp A', 'Opp B', 'Opp C'],
+    agencies: ['HHS', 'DOE'],
+    windows: ['Q4 2026', 'Q1 2027'],
+  });
+});
+
+app.get('/api/client/:id/actions', (req, res) => {
+  res.json({
+    modernization: ['Update website', 'Rewrite capability statement'],
+    compliance: ['SAM renewal', 'UEI verification'],
+    outreach: ['Email HHS', 'Call DOE'],
+    submission: ['Prepare bid package'],
+    notes: ['Client prefers Tuesday calls'],
+  });
+});
+
+app.get('/api/client/:id/intelligence', (req, res) => {
+  res.json({
+    compliance: 'Good',
+    modernization: 'Strong',
+    forecasting: 'Aligned',
+    opportunityAlignment: 'High',
+    readiness: 'Medium',
+    momentum: 'Increasing',
+  });
+});
+
+app.get('/engine/client/:id/modernization', (req, res) => {
+  res.json({
+    score: 82,
+    posture: 'Strong',
+    blockers: ['Website outdated', 'No digital intake'],
+    recommendations: ['Rewrite capability statement', 'Add digital intake form'],
+  });
+});
+
+app.get('/engine/client/:id/matcher', (req, res) => {
+  res.json({
+    alignmentScore: 76,
+    alignedAgencies: ['HHS', 'DOE'],
+    alignedOpportunities: ['Opp 1', 'Opp 2', 'Opp 3'],
+  });
+});
+
+app.get('/engine/client/:id/risk', (req, res) => {
+  res.json({
+    score: 18,
+    level: 'Low',
+    factors: ['SAM active', 'UEI verified', 'No compliance flags'],
+  });
+});
+
+app.get('/engine/client/:id/forecasting', (req, res) => {
+  res.json({
+    momentum: 'Increasing',
+    readiness: 'Medium',
+    signals: ['HHS spending up', 'DOE grants trending'],
+    nextQuarter: 'Positive',
+  });
+});
+
+app.get('/engine/client/:id/opportunities', (req, res) => {
+  res.json({
+    top10: ['Opp 1', 'Opp 2', 'Opp 3'],
+    fullFeed: ['Opp A', 'Opp B', 'Opp C', 'Opp D'],
+    agencies: ['HHS', 'DOE', 'DOD'],
+    windows: ['Q4 2026', 'Q1 2027'],
+  });
+});
+
+app.get('/engine/client/:id/actions', (req, res) => {
+  res.json({
+    modernization: ['Rewrite capability statement', 'Update website'],
+    compliance: ['SAM renewal', 'UEI verification'],
+    outreach: ['Email HHS', 'Call DOE'],
+    submission: ['Prepare bid package'],
+    notes: ['Client prefers Tuesday calls'],
+  });
+});
+
 app.get('/api/client/:id', async (req, res) => {
   try {
-    const id = Number.parseInt(String(req.params.id || ''), 10);
+    const rawId = String(req.params.id || '');
+    if (COCKPIT_MOCK_CLIENTS[rawId]) return res.json(COCKPIT_MOCK_CLIENTS[rawId]);
+    const id = Number.parseInt(rawId, 10);
     if (!Number.isFinite(id) || id <= 0) {
       return res.status(400).json({ error: 'Invalid client id' });
     }
@@ -2520,6 +3473,58 @@ app.get('/api/client/:id', async (req, res) => {
     }
 
     res.json(row);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+async function getClientProfile(clientId) {
+  const mock = COCKPIT_MOCK_CLIENTS[clientId];
+  if (mock) {
+    return {
+      client_id: clientId,
+      client_name: mock.name,
+      naics: mock.industry,
+      keywords: '',
+      preferred_agencies: mock.agency,
+      notes: '',
+      past_performance: '',
+      intake_answers: '{}',
+    };
+  }
+  const numericId = Number.parseInt(String(clientId), 10);
+  if (!Number.isFinite(numericId) || numericId <= 0) return null;
+  return getAsync(clientDb, 'SELECT * FROM clients WHERE client_id = ?', [numericId]);
+}
+
+function escapeProfileHtml(value) {
+  return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+app.get('/client/:id/profile', async (req, res) => {
+  try {
+    const client = await getClientProfile(String(req.params.id || ''));
+    if (!client) return res.status(404).send('Client not found');
+    const content = `<main class="dashboard-page client-profile-page"><section class="outer-block"><h1 class="panel-title">Client Profile</h1><div class="inner-frame client-profile-record"><p>Name: ${escapeProfileHtml(client.client_name)}</p><p>NAICS: ${escapeProfileHtml(client.naics)}</p><p>Agency Preferences: ${escapeProfileHtml(client.preferred_agencies)}</p><p>Geo: ${escapeProfileHtml(client.geo || 'Not recorded')}</p><p>Keywords: ${escapeProfileHtml(client.keywords)}</p><p>Notes: ${escapeProfileHtml(client.notes)}</p><p>Past Performance: ${escapeProfileHtml(client.past_performance)}</p><p>Intake Answers: ${escapeProfileHtml(client.intake_answers || '{}')}</p></div></section></main>`;
+    res.send(htmlLayout({ title: 'JE ROCKER - Client Profile', content, statusClass: 'system-row' }));
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.get('/client/:id/intake', async (req, res) => {
+  const clientId = String(req.params.id || '');
+  const content = `<main class="dashboard-page client-intake-page"><section class="outer-block"><h1 class="panel-title">Client Intake</h1><div class="inner-frame"><form id="client-intake-form"><label>Primary Need<input name="primaryNeed" required /></label><label>NAICS<input name="naics" /></label><label>Agency Preferences<input name="agencies" /></label><label>Geo<input name="geo" /></label><label>Notes<textarea name="notes"></textarea></label><button type="submit">Save Intake</button><p id="intake-status" aria-live="polite"></p></form></div></section></main><script>(() => { document.getElementById('client-intake-form').addEventListener('submit', async (event) => { event.preventDefault(); const answers = Object.fromEntries(new FormData(event.currentTarget)); const response = await fetch('/client/${encodeURIComponent(clientId)}/intake/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers }) }); document.getElementById('intake-status').textContent = response.ok ? 'Intake saved.' : 'Unable to save intake.'; }); })();</script>`;
+  res.send(htmlLayout({ title: 'JE ROCKER - Client Intake', content, statusClass: 'system-row' }));
+});
+
+app.post('/client/:id/intake/update', async (req, res) => {
+  try {
+    const clientId = Number.parseInt(String(req.params.id || ''), 10);
+    if (!Number.isFinite(clientId) || clientId <= 0) return res.status(400).json({ error: 'A numeric client ID is required to save intake' });
+    const answers = req.body?.answers || {};
+    await new Promise((resolve, reject) => clientDb.run('UPDATE clients SET intake_answers = ?, notes = COALESCE(NULLIF(?, \'\'), notes), naics = COALESCE(NULLIF(?, \'\'), naics), preferred_agencies = COALESCE(NULLIF(?, \'\'), preferred_agencies) WHERE client_id = ?', [JSON.stringify(answers), answers.notes || '', answers.naics || '', answers.agencies || '', clientId], function onUpdate(error) { if (error) return reject(error); if (!this.changes) return reject(new Error('Client not found')); resolve(); }));
+    res.json({ clientId, status: 'OK' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -2554,6 +3559,152 @@ app.get('/api/grants/:oppNum/signals', async (req, res) => {
 app.get('/api/grants/intelligence', (req, res) => res.json({ items: stabilizeItems([]) }));
 app.get('/api/grants/opportunities', (req, res) => res.json({ items: stabilizeItems([]) }));
 
+app.get('/engine/ingest/log', (req, res) => {
+  res.json(ingestionLog.slice(-10));
+});
+
+function runManualIngestion(type, count) {
+  return (req, res) => {
+    if (isKilled('ingestion')) return res.json({ status: 'KILLED', message: 'Ingestion engine disabled' });
+    audit('Ingestion run: ' + type);
+    return res.json(logIngestion(type, count));
+  };
+}
+
+app.post('/engine/ingest/opportunities/run', runManualIngestion('opportunities', 312));
+app.post('/engine/ingest/grants/run', runManualIngestion('grants', 128));
+app.post('/engine/ingest/agencies/run', runManualIngestion('agencies', 42));
+
+app.get('/engine/matcher/log', (req, res) => {
+  res.json(matcherLog.slice(-10));
+});
+
+app.post('/engine/matcher/client/:id/run', (req, res) => {
+  if (isKilled('matcher')) return res.json({ status: 'KILLED', message: 'Matcher engine disabled' });
+  const clientId = String(req.params.id || '').trim();
+  if (!clientId) return res.status(400).json({ error: 'Client ID is required' });
+  audit('Matcher run: ' + clientId);
+  res.json(logMatcher(clientId, 12));
+});
+
+app.get('/engine/matcher/client/:id/results', (req, res) => {
+  res.json({ clientId: String(req.params.id || ''), matches: ['Opportunity A', 'Opportunity B', 'Opportunity C'] });
+});
+
+app.get('/engine/modernization/log', (req, res) => {
+  res.json(modernizationLog.slice(-10));
+});
+
+app.post('/engine/modernization/client/:id/run', (req, res) => {
+  if (isKilled('modernization')) return res.json({ status: 'KILLED', message: 'Modernization engine disabled' });
+  const clientId = String(req.params.id || '').trim();
+  if (!clientId) return res.status(400).json({ error: 'Client ID is required' });
+  audit('Modernization run: ' + clientId);
+  res.json(logModernization(clientId, 'Aligned', ['Legacy website', 'Manual intake']));
+});
+
+app.get('/engine/modernization/client/:id/results', (req, res) => {
+  res.json({ clientId: String(req.params.id || ''), posture: 'Aligned', compliance: 'Good', blockers: ['Legacy website', 'Manual intake'] });
+});
+
+app.get('/engine/risk/log', (req, res) => {
+  res.json(riskLog.slice(-10));
+});
+
+app.post('/engine/risk/client/:id/run', (req, res) => {
+  if (isKilled('risk')) return res.json({ status: 'KILLED', message: 'Risk engine disabled' });
+  const clientId = String(req.params.id || '').trim();
+  if (!clientId) return res.status(400).json({ error: 'Client ID is required' });
+  audit('Risk run: ' + clientId);
+  res.json(logRisk(clientId, 'Low', { compliance: 'Low', operational: 'Medium', technical: 'Medium' }));
+});
+
+app.get('/engine/risk/client/:id/results', (req, res) => {
+  res.json({ clientId: String(req.params.id || ''), posture: 'Low', risks: { compliance: 'Low', operational: 'Medium', technical: 'Medium' } });
+});
+
+app.get('/engine/forecast/log', (req, res) => {
+  res.json(forecastingLog.slice(-10));
+});
+
+app.post('/engine/forecast/client/:id/run', (req, res) => {
+  if (isKilled('forecasting')) return res.json({ status: 'KILLED', message: 'Forecasting engine disabled' });
+  const clientId = String(req.params.id || '').trim();
+  if (!clientId) return res.status(400).json({ error: 'Client ID is required' });
+  audit('Forecast run: ' + clientId);
+  const signals = ['HHS spending up', 'DOE digital expansion'];
+  const trends = ['Upward', 'Stable'];
+  const spending = ['HHS +12%', 'DOE +8%'];
+  const outlook = 'Positive';
+  const unlock = '4 new aligned opportunities';
+  res.json({ ...logForecast(clientId, signals, trends, outlook), spending, unlock });
+});
+
+app.get('/engine/forecast/client/:id/results', (req, res) => {
+  res.json({ clientId: String(req.params.id || ''), signals: ['HHS spending up', 'DOE digital expansion'], trends: ['Upward', 'Stable'], spending: ['HHS +12%', 'DOE +8%'], outlook: 'Positive', unlock: '4 new aligned opportunities' });
+});
+
+function prioritizedResults(clientId, includeAll = false) {
+  const opportunities = [{ id: 'opp-a', title: 'Opportunity A', score: 92, reason: 'Strong agency and capability alignment' }, { id: 'opp-b', title: 'Opportunity B', score: 88, reason: 'High modernization relevance' }, ...(includeAll ? [{ id: 'opp-c', title: 'Opportunity C', score: 75, reason: 'Qualified opportunity fit' }] : [])];
+  const grants = [{ id: 'grant-x', title: 'Grant X', score: 95, reason: 'Highest readiness and alignment' }, ...(includeAll ? [{ id: 'grant-y', title: 'Grant Y', score: 83, reason: 'Strong mission alignment' }] : [])];
+  return { clientId, opportunities, grants };
+}
+
+app.get('/engine/prioritize/log', (req, res) => {
+  res.json(prioritizationLog.slice(-10));
+});
+
+app.post('/engine/prioritize/client/:id/run', (req, res) => {
+  if (isKilled('prioritization')) return res.json({ status: 'KILLED', message: 'Prioritization engine disabled' });
+  const clientId = String(req.params.id || '').trim();
+  if (!clientId) return res.status(400).json({ error: 'Client ID is required' });
+  audit('Prioritization run: ' + clientId);
+  const results = prioritizedResults(clientId, true);
+  res.json({ ...results, ...logPrioritization(clientId, results.opportunities.length + results.grants.length) });
+});
+
+app.get('/engine/prioritize/client/:id/results', (req, res) => {
+  res.json(prioritizedResults(String(req.params.id || '')));
+});
+
+app.get('/engine/automation/status', (req, res) => {
+  res.json({ automationEnabled, config: { ...automationConfig } });
+});
+
+app.get('/engine/automation/log', (req, res) => {
+  res.json(automationLog.slice(-10));
+});
+
+app.post('/engine/automation/toggle', (req, res) => {
+  automationEnabled = !automationEnabled;
+  logAutomation('Automation ' + (automationEnabled ? 'ENABLED' : 'DISABLED'));
+  res.json({ automationEnabled });
+});
+
+app.post('/engine/automation/:engine/toggle', (req, res) => {
+  const engine = String(req.params.engine || '');
+  if (!Object.hasOwn(automationConfig, engine)) return res.status(400).json({ error: 'Unsupported automation engine' });
+  automationConfig[engine] = !automationConfig[engine];
+  logAutomation(engine + ' automation ' + (automationConfig[engine] ? 'ENABLED' : 'DISABLED'));
+  res.json({ engine, enabled: automationConfig[engine] });
+});
+
+app.get('/engine/guardrails/status', (req, res) => {
+  res.json({ killSwitch: { ...killSwitch }, killedEngines: Object.entries(killSwitch).filter(([engine, killed]) => engine !== 'global' && killed).map(([engine]) => engine) });
+});
+
+app.post('/engine/kill/:engine/toggle', (req, res) => {
+  const engine = String(req.params.engine || '');
+  if (!Object.hasOwn(killSwitch, engine)) return res.status(400).json({ error: 'Unknown engine' });
+  killSwitch[engine] = !killSwitch[engine];
+  audit('KillSwitch ' + engine + ' -> ' + (killSwitch[engine] ? 'ON' : 'OFF'));
+  res.json({ engine, killed: killSwitch[engine] });
+});
+
+app.get('/engine/audit', (req, res) => {
+  res.json(auditStream.slice(-50));
+});
+
 app.get('/api/grants/:oppNum', async (req, res) => {
   try {
     const grant = await getGrantDetail(String(req.params.oppNum || ''));
@@ -2566,7 +3717,7 @@ app.get('/api/grants/:oppNum', async (req, res) => {
   }
 });
 
-app.get('/grant-engine', (req, res) => {
+app.get('/grant-engine-legacy', (req, res) => {
   const content = `
     <div class="dashboard-shell">
       <section class="page-hero">
@@ -2587,6 +3738,106 @@ app.get('/grant-engine', (req, res) => {
     </script>
   `;
   res.send(htmlLayout({ title: 'JE ROCKER LC - Grant Engine', content }));
+});
+
+app.get('/engine/grants/top', (req, res) => {
+  res.json({ top: ['Grant A', 'Grant B', 'Grant C'], agencies: ['HHS', 'DOE', 'DOD'], windows: ['Oct 2026', 'Dec 2026'] });
+});
+
+app.get('/engine/grants/alignment', (req, res) => {
+  res.json({ score: 'High', alignedAgencies: ['HHS', 'DOE'], rationale: 'Strong modernization posture and mission alignment' });
+});
+
+app.get('/engine/grants/readiness', (req, res) => {
+  res.json({ readiness: 'Medium', met: ['UEI Verified', 'SAM Active'], missing: ['Capability Statement Update'] });
+});
+
+app.get('/engine/grants/windows', (req, res) => {
+  res.json({ upcoming: ['Q4 2026', 'Q1 2027'], deadlines: ['Nov 15', 'Jan 10'], types: ['Fixed', 'Rolling'] });
+});
+
+app.get('/engine/grants/modernization', (req, res) => {
+  res.json({ blockers: ['Outdated website', 'No digital intake'], compliance: 'Good', actions: ['Rewrite capability statement', 'Add digital intake'] });
+});
+
+app.get('/engine/grants/forecasting', (req, res) => {
+  res.json({ signals: ['HHS grant expansion', 'DOE digital modernization'], trends: ['Upward'], spending: ['HHS +12%', 'DOE +8%'], outlook: 'Positive' });
+});
+
+app.get('/engine/grants/stats', (req, res) => {
+  res.json({ total: 312, agencies: { HHS: 128, DOE: 74, DOD: 52, USDA: 38 } });
+});
+
+app.get('/engine/grants/all', (req, res) => {
+  res.json({
+    grants: [
+      { id: 'grant-a', title: 'Grant A', agency: 'HHS', window: 'Oct 2026' }, { id: 'grant-b', title: 'Grant B', agency: 'DOE', window: 'Dec 2026' }, { id: 'grant-c', title: 'Grant C', agency: 'DOD', window: 'Jan 2027' }, { id: 'grant-d', title: 'Grant D', agency: 'USDA', window: 'Feb 2027' }, { id: 'grant-e', title: 'Grant E', agency: 'HHS', window: 'Mar 2027' }, { id: 'grant-f', title: 'Grant F', agency: 'DOE', window: 'Apr 2027' }, { id: 'grant-g', title: 'Grant G', agency: 'DOD', window: 'May 2027' }, { id: 'grant-h', title: 'Grant H', agency: 'USDA', window: 'Jun 2027' }, { id: 'grant-i', title: 'Grant I', agency: 'HHS', window: 'Jul 2027' }, { id: 'grant-j', title: 'Grant J', agency: 'DOE', window: 'Aug 2027' },
+    ],
+  });
+});
+
+app.get('/grant-engine', (req, res) => {
+  const content = `
+    <main class="grant-page">
+      <header class="outer-block grant-header"><h1 class="panel-title">Grant Intelligence</h1><div class="inner-frame"><p>JE ROCKER Grant Engine Overview</p></div></header>
+      <section class="outer-block grant-stats"><h3 class="panel-title">Grant Statistics</h3><div class="inner-frame" id="grant-stats-content">Loading...</div></section>
+      <section class="outer-block grant-section" id="grant-top"><h2 class="panel-title">Top Grants Available</h2><div class="inner-frame grant-content">Loading...</div></section>
+      <section class="outer-block grant-section" id="grant-alignment"><h2 class="panel-title">Grant Alignment</h2><div class="inner-frame grant-content">Loading...</div></section>
+      <section class="outer-block grant-section" id="grant-readiness"><h2 class="panel-title">Grant Readiness</h2><div class="inner-frame grant-content">Loading...</div></section>
+      <section class="outer-block grant-section" id="grant-windows"><h2 class="panel-title">Submission Windows</h2><div class="inner-frame grant-content">Loading...</div></section>
+      <section class="outer-block grant-section" id="grant-modernization"><h2 class="panel-title">Modernization &amp; Compliance</h2><div class="inner-frame grant-content">Loading...</div></section>
+      <section class="outer-block grant-section" id="grant-forecasting"><h2 class="panel-title">Grant Forecasting</h2><div class="inner-frame grant-content">Loading...</div></section>
+      <section class="outer-block grant-all"><h3 class="panel-title">All Grants</h3><div class="inner-frame"><button id="show-grants-btn" type="button" aria-expanded="false" aria-controls="grant-list">Show Grants</button><div id="grant-list" class="scrollable" hidden></div></div></section>
+      <section class="outer-block prioritized-grants"><h3 class="panel-title">Prioritized Grants</h3><div class="inner-frame" id="prioritized-grants-content"><p>Loading prioritized grants...</p></div></section>
+    </main>
+    <script>
+      (() => {
+        const load = async (endpoint) => {
+          const response = await fetch(endpoint, { cache: 'no-store' });
+          if (!response.ok) throw new Error('Grant intelligence unavailable');
+          return response.json();
+        };
+        const setContent = (selector, value) => {
+          const element = document.querySelector(selector + ' .grant-content');
+          if (element) element.textContent = value;
+        };
+        async function loadGrantTop() { const grants = await load('/engine/grants/top'); setContent('#grant-top', grants.top.length + ' grants available'); }
+        async function loadGrantAlignment() { const alignment = await load('/engine/grants/alignment'); setContent('#grant-alignment', 'Alignment: ' + alignment.score); }
+        async function loadGrantReadiness() { const readiness = await load('/engine/grants/readiness'); setContent('#grant-readiness', 'Readiness: ' + readiness.readiness); }
+        async function loadGrantWindows() { const windows = await load('/engine/grants/windows'); setContent('#grant-windows', windows.upcoming.length + ' upcoming windows'); }
+        async function loadGrantModernization() { const modernization = await load('/engine/grants/modernization'); setContent('#grant-modernization', modernization.blockers.length + ' blockers'); }
+        async function loadGrantForecasting() { const forecasting = await load('/engine/grants/forecasting'); setContent('#grant-forecasting', forecasting.signals.length + ' signals'); }
+        async function loadGrantStats() {
+          const stats = await load('/engine/grants/stats');
+          document.getElementById('grant-stats-content').innerHTML = 'Total Grants: ' + stats.total + '<br>HHS: ' + stats.agencies.HHS + '<br>DOE: ' + stats.agencies.DOE + '<br>DOD: ' + stats.agencies.DOD + '<br>USDA: ' + stats.agencies.USDA;
+        }
+        async function loadAllGrants() {
+          const data = await load('/engine/grants/all');
+          document.getElementById('grant-list').innerHTML = data.grants.map((grant) => '<div class="grant-list-item"><strong>' + grant.title + '</strong><span>' + grant.agency + ' | ' + grant.window + '</span></div>').join('');
+        }
+        async function loadPrioritizedGrants(clientId) {
+          const data = await load('/engine/prioritize/client/' + encodeURIComponent(clientId) + '/results');
+          document.getElementById('prioritized-grants-content').innerHTML = data.grants.map((grant) => '<div class="grant-list-item" data-grant-id="' + grant.id + '"><strong>' + grant.title + '</strong><span>Score ' + grant.score + ' | ' + grant.reason + '</span></div>').join('');
+        }
+        const grantsButton = document.getElementById('show-grants-btn');
+        grantsButton.addEventListener('click', async () => {
+          const list = document.getElementById('grant-list');
+          const expanded = grantsButton.getAttribute('aria-expanded') === 'true';
+          grantsButton.setAttribute('aria-expanded', String(!expanded));
+          grantsButton.textContent = expanded ? 'Show Grants' : 'Hide Grants';
+          list.hidden = expanded;
+          if (!expanded && !list.dataset.loaded) {
+            await loadAllGrants();
+            list.dataset.loaded = 'true';
+          }
+        });
+        Promise.all([loadGrantTop(), loadGrantAlignment(), loadGrantReadiness(), loadGrantWindows(), loadGrantModernization(), loadGrantForecasting(), loadGrantStats(), loadPrioritizedGrants('ClientA')]).catch(() => {
+          document.querySelectorAll('.grant-content').forEach((element) => { element.textContent = 'Unavailable'; });
+        });
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER - Grant Intelligence', content, extraHead: '<link rel="stylesheet" href="/src/styles/grant-engine.css" />', statusClass: 'system-row' }));
 });
 
 app.get('/grant/:oppNum', (req, res) => {
@@ -2619,144 +3870,39 @@ app.get('/', (req, res) => {
 
 app.get('/cover', (req, res) => {
   const content = `
-    <section class="hero cover-hero-container">
-      <h1 class="cover-hero-title">JE ROCKER LC</h1>
-      <div class="cover-hero-underline" aria-hidden="true"></div>
-      <p class="cover-hero-tagline">Federal Business Consulting & Contract Intelligence</p>
-      <p class="cover-hero-microtagline">Powered by the JE ROCKER Intelligence Engine</p>
-      <div class="hero-actions cover-hero-buttons">
-        <a class="cover-button" href="/primary-dashboard">Primary Dashboard</a>
-        <a class="cover-button" href="/client-dashboard">Client Dashboard</a>
-        <a class="cover-button" href="/business-driver">Business Driver Page</a>
+    <main class="cover-page">
+      <div class="identity-center">
+        <div class="cover-identity">
+          <h1>JE ROCKER</h1>
+          <h2>A Business Development &amp; Technology Company Powered by Intelligence</h2>
+          <p>Modernizing and growing clients with multi-engine insights built for today&apos;s contracting environment.</p>
+        </div>
       </div>
-      <div class="cover-divider-band" aria-hidden="true"></div>
-      <section class="cover-grid-block">
-      <div class="cover-info-grid" id="coverInfoGrid">
-        <article class="cover-info-card" data-card-id="who" role="button" tabindex="0" aria-expanded="false">
-          <div class="cover-card-header"><span class="cover-info-card-icon">🏛️</span><h3>Who We Are</h3></div>
-          <p>Federal business consultants translating procurement complexity into practical decisions.</p>
-          <div class="cover-card-expand-wrap">
-            <div class="cover-card-expand">
-              <p>JE ROCKER LC is a federal business consulting firm powered by contract intelligence.</p>
-              <ul>
-                <li>Consulting-first advisory model for federal market entry</li>
-                <li>Data-driven assessment of opportunity fit and timing</li>
-                <li>Designed for small business execution speed</li>
-              </ul>
-              <button class="cover-collapse-btn" type="button">Collapse</button>
-            </div>
-          </div>
-        </article>
-
-        <article class="cover-info-card" data-card-id="deliver" role="button" tabindex="0" aria-expanded="false">
-          <div class="cover-card-header"><span class="cover-info-card-icon">📊</span><h3>What We Deliver</h3></div>
-          <p>Weekly intelligence and capture guidance focused on actionable pursuit decisions.</p>
-          <div class="cover-card-expand-wrap">
-            <div class="cover-card-expand">
-              <p>Weekly intelligence, opportunity interpretation, capture strategy, competitive landscape, spend analysis, and proposal readiness.</p>
-              <ul>
-                <li>Opportunity interpretation with match-context signals</li>
-                <li>Competitive and spend landscape snapshots</li>
-                <li>Proposal readiness checkpoints and task framing</li>
-              </ul>
-              <button class="cover-collapse-btn" type="button">Collapse</button>
-            </div>
-          </div>
-        </article>
-
-        <article class="cover-info-card" data-card-id="works" role="button" tabindex="0" aria-expanded="false">
-          <div class="cover-card-header"><span class="cover-info-card-icon">⚙️</span><h3>How It Works</h3></div>
-          <p>A recurring engine pipeline that refreshes signals and produces consulting-ready outputs.</p>
-          <div class="cover-card-expand-wrap">
-            <div class="cover-card-expand">
-              <p>Our engine refreshes weekly, analyzes federal opportunities, matches vendors, and generates actionable insights.</p>
-              <ul>
-                <li>Weekly ingestion and normalization cycle</li>
-                <li>Automated matching and confidence scoring</li>
-                <li>Decision-ready outputs for internal and client dashboards</li>
-              </ul>
-              <button class="cover-collapse-btn" type="button">Collapse</button>
-            </div>
-          </div>
-        </article>
-
-        <article class="cover-info-card" data-card-id="matters" role="button" tabindex="0" aria-expanded="false">
-          <div class="cover-card-header"><span class="cover-info-card-icon">🎯</span><h3>Why It Matters</h3></div>
-          <p>Small businesses need clarity on agency behavior to compete with focus and confidence.</p>
-          <div class="cover-card-expand-wrap">
-            <div class="cover-card-expand">
-              <p>We help small businesses understand federal buying behavior, identify real opportunities, and compete with confidence.</p>
-              <ul>
-                <li>Reduce noise and prioritize realistic pursuits</li>
-                <li>Improve timing with agency and vendor behavior context</li>
-                <li>Support disciplined capture planning under resource constraints</li>
-              </ul>
-              <button class="cover-collapse-btn" type="button">Collapse</button>
-            </div>
-          </div>
-        </article>
+      <div class="cover-top-row">
+        <div class="cover-block dark-block"><h3 class="block-title">Intelligence Platform</h3><div class="inner-box"><p>Modernization • Forecasting • Stability • Resilience • Shock • Cycle Intelligence • Portfolio Strategy</p></div></div>
+        <div class="cover-block dark-block"><h3 class="block-title">Modernization</h3><div class="inner-box"><p>Transforming agencies and vendors with intelligence-driven modernization engines.</p></div></div>
+        <div class="cover-block dark-block"><h3 class="block-title">Opportunity Intelligence</h3><div class="inner-box"><p>Forecasting, alignment, and cycle-based opportunity posture for every client.</p></div></div>
+        <div class="cover-block dark-block"><h3 class="block-title">Risk &amp; Resilience</h3><div class="inner-box"><p>Stability, resilience, shock detection, and temporal risk forecasting.</p></div></div>
+        <div class="cover-block dark-block"><h3 class="block-title">Business Development Tech</h3><div class="inner-box"><p>Multi-engine intelligence powering modernization, growth, and contracting success.</p></div></div>
       </div>
+      <div class="cover-middle-row">
+        <a class="cover-nav-box dark-block" href="/business-driver"><h3 class="block-title">Business Driver Page</h3><div class="inner-box"><p>Run the JE ROCKER engine. Controls, health, ingestion, and portfolio direction.</p></div></a>
+        <a class="cover-nav-box dark-block" href="/client-dashboard"><h3 class="block-title">Client Dashboard</h3><div class="inner-box"><p>Client intelligence, modernization posture, opportunity alignment, and cycle signals.</p></div></a>
+        <a class="cover-nav-box dark-block" href="/primary-dashboard"><h3 class="block-title">Primary Dashboard</h3><div class="inner-box"><p>Your personal contracting pursuit, daily briefing, and opportunity activity.</p></div></a>
+      </div>
+      <section class="mission-grid">
+        <div class="mission-block dark-block"><h3 class="block-title">Who We Are</h3><div class="inner-box"><p>JE ROCKER is a business development and technology company powered by multi-engine intelligence.</p></div></div>
+        <div class="mission-block dark-block"><h3 class="block-title">What We Do</h3><div class="inner-box"><p>We combine business development strategy with advanced intelligence technology to modernize and grow clients.</p></div></div>
+        <div class="mission-block dark-block"><h3 class="block-title">How We Operate</h3><div class="inner-box"><p>We ingest client and opportunity data, run it through multi-layer intelligence engines, and produce deterministic outputs.</p></div></div>
+        <div class="mission-block dark-block"><h3 class="block-title">Why It Matters</h3><div class="inner-box"><p>Today&apos;s contracting environment demands modernization, clarity, and intelligence. JE ROCKER delivers all three.</p></div></div>
       </section>
-    </section>
-    <p class="cover-footer-tagline">JE ROCKER LC • Federal Consulting Powered by Technology</p>
+    </main>
+    <p class="cover-footer-tagline">JE ROCKER • Business Development &amp; Technology Powered by Intelligence</p>
     <div class="footer-links">
       <span>About</span><span>Contact</span><span>Privacy</span><span>Terms</span>
     </div>
-    <script>
-      (() => {
-        const cards = Array.from(document.querySelectorAll('.cover-info-card'));
-        let expandedId = null;
-
-        const collapseCard = (card) => {
-          card.classList.remove('cover-info-card-expanded');
-          card.setAttribute('aria-expanded', 'false');
-          const expand = card.querySelector('.cover-card-expand');
-          if (expand) expand.classList.remove('is-open');
-        };
-
-        const expandCard = (card) => {
-          card.classList.add('cover-info-card-expanded');
-          card.setAttribute('aria-expanded', 'true');
-          const expand = card.querySelector('.cover-card-expand');
-          if (expand) expand.classList.add('is-open');
-        };
-
-        const openOnly = (cardId) => {
-          expandedId = cardId;
-          cards.forEach((card) => {
-            const isTarget = card.getAttribute('data-card-id') === cardId;
-            if (isTarget) {
-              expandCard(card);
-            } else {
-              collapseCard(card);
-            }
-          });
-        };
-
-        cards.forEach((card) => {
-          const cardId = card.getAttribute('data-card-id');
-          card.addEventListener('click', () => {
-            openOnly(cardId);
-          });
-          card.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              openOnly(cardId);
-            }
-          });
-          const collapseBtn = card.querySelector('.cover-collapse-btn');
-          if (collapseBtn) {
-            collapseBtn.addEventListener('click', (event) => {
-              event.stopPropagation();
-              expandedId = null;
-              collapseCard(card);
-            });
-          }
-        });
-      })();
-    </script>
   `;
-  res.send(htmlLayout({ title: 'JE ROCKER LC - Cover', content, includeNav: false }));
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Cover', content, includeNav: false, statusClass: 'system-row' }));
 });
 
 app.get('/business-driver-legacy', (req, res) => {
@@ -3240,12 +4386,22 @@ const BUSINESS_DRIVER_ENDPOINTS = [
 ];
 
 BUSINESS_DRIVER_ENDPOINTS.forEach((endpoint) => {
-  app.get(endpoint, (req, res) => res.json({ items: stabilizeItems([]) }));
+  app.get(endpoint, async (req, res) => {
+    try {
+      const items = [];
+      const stable = stabilizeItems(items);
+      const forecast = endpoint.includes('/sparkline/') ? await runForecast('modernization') : { items: [] };
+      const narrative = endpoint.includes('/sparkline/') ? await runForecastNarrative('modernization') : { items: [] };
+      res.json({ items: stable, forecast: forecast.items, narrative: narrative.items });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 });
 
 app.get('/api/business/detail/:id', (req, res) => res.json({ items: stabilizeItems([]) }));
 
-app.get('/business-driver', (req, res) => {
+app.get('/business-driver-legacy-v3', (req, res) => {
   const content = `
     <div id="status-strip" class="business-status-strip" aria-live="polite">Loading Business Driver status...</div>
 
@@ -3269,6 +4425,8 @@ app.get('/business-driver', (req, res) => {
 
           <h2>Modernization Sparklines</h2>
           <div id="sparkline-modernization" class="sparkline">Loading modernization sparkline...</div>
+          <div id="forecast-modernization" class="sparkline-forecast">Loading modernization forecast...</div>
+          <div id="modernization-narrative" class="forecast-narrative-block">Loading modernization narrative...</div>
         </section>
 
         <section class="panel panel-right">
@@ -3310,6 +4468,25 @@ app.get('/business-driver', (req, res) => {
           const max = Math.max(...values.map((value) => Number(value) || 0), 1);
           element.innerHTML = '<div class="business-sparkline-bars">' + values.map((value) => '<span style="height:' + Math.max(10, Math.round(((Number(value) || 0) / max) * 100)) + '%"></span>').join('') + '</div>';
         };
+        const renderSparklineForecast = (id, items) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = items && items.length
+            ? items.slice(0, 3).map((item) => {
+              const regime = String(item.regime || 'Stable').toLowerCase();
+              const regimeClass = regime === 'uptrend' ? 'up' : regime === 'downtrend' ? 'down' : regime;
+              const icon = regime === 'uptrend' ? '▲' : regime === 'downtrend' ? '▼' : '■';
+              return '<div class="business-forecast-row"><strong>' + escapeHtml(item.stableModernization || 'Unclassified modernization') + '</strong><span class="forecast-regime-' + escapeHtml(regimeClass) + '">' + icon + ' ' + escapeHtml(item.regime || 'Stable') + '</span><span>' + escapeHtml(String(item.projected_30_day_opportunity_count || 0)) + ' projected opportunities</span></div>';
+            }).join('')
+            : '<p class="business-feed-empty">No forecast data available.</p>';
+        };
+        const renderNarrative = (id, items) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = items && items.length
+            ? items.slice(0, 3).map((item) => '<div class="narrative-item">' + escapeHtml(item.summary || '') + '</div>').join('')
+            : '<p class="business-feed-empty">No narrative data available.</p>';
+        };
         const renderDetail = (id, items) => renderList(id, items);
         const load = async (endpoint, target, render = renderList) => {
           try {
@@ -3325,6 +4502,8 @@ app.get('/business-driver', (req, res) => {
         async function loadCounters() { await load('/api/business/counters', 'derived-counters'); }
         async function loadPipelineSparkline() { await load('/api/business/sparkline/pipeline', 'sparkline-pipeline', renderSparkline); }
         async function loadModernizationSparkline() { await load('/api/business/sparkline/modernization', 'sparkline-modernization', renderSparkline); }
+        async function loadModernizationForecast() { await load('/api/forecast/modernization', 'forecast-modernization', renderSparklineForecast); }
+        async function loadModernizationNarrative() { await load('/api/forecast/narrative/modernization', 'modernization-narrative', renderNarrative); }
         async function loadHudDetail(id) {
           try {
             const response = await fetch('/api/business/detail/' + encodeURIComponent(id), { cache: 'no-store' });
@@ -3394,11 +4573,168 @@ app.get('/business-driver', (req, res) => {
           renderSparkline('sparkline-modernization', [summary.match_coverage?.replace('%', ''), 2, 3, 5]);
         }).catch(() => setText('status-strip', 'System status unavailable.'));
 
-        Promise.all([loadSearchResults(), loadCounters(), loadPipelineSparkline(), loadModernizationSparkline(), loadHudDetail('default')]);
+        Promise.all([loadSearchResults(), loadCounters(), loadPipelineSparkline(), loadModernizationSparkline(), loadModernizationForecast(), loadModernizationNarrative(), loadHudDetail('default')]);
       })();
     </script>
   `;
   res.send(htmlLayout({ title: 'JE ROCKER LC - Business Driver', content }));
+});
+
+app.get('/business-driver', (req, res) => {
+  const content = `
+    <main class="business-driver-page">
+      <div class="identity-center">
+        <div class="cover-identity">
+          <h1>Business Driver Cockpit</h1>
+          <h2>Situational Awareness • Engines • Workflow • Control</h2>
+        </div>
+      </div>
+
+      <div class="cockpit-row">
+        <section class="dark-block cockpit-col"><h3 class="block-title">Database Snapshot</h3><div class="inner-box">
+          <p>Total Opportunities: <strong id="db-total-opportunities">Loading...</strong></p><p>Total Clients: <strong id="db-total-clients">Loading...</strong></p><p>Total Matches: <strong id="db-total-matches">Loading...</strong></p><p>Coverage: <strong id="db-coverage">Loading...</strong></p><p>Last Update: <strong id="db-last-update">Loading...</strong></p>
+        </div></section>
+        <section class="dark-block cockpit-col"><h3 class="block-title">Client Snapshot</h3><div class="inner-box">
+          <p>Total Clients: <strong id="clients-total">Loading...</strong></p><p>Tier 1: <strong>Unavailable</strong></p><p>Tier 2: <strong>Unavailable</strong></p><p>Tier 3: <strong>Unavailable</strong></p><p>Tier Movement (7 days): <strong>Unavailable</strong></p><p>Top Clients: <strong id="clients-top">Loading...</strong></p><p>Modernization: <strong id="clients-modernization">Loading...</strong></p><p>Risk: <strong id="clients-risk">Loading...</strong></p><p>Alignment: <strong id="portfolio-alignment">Loading...</strong></p>
+          <div class="client-details"><button type="button" onclick="openModal('&lt;h2&gt;Client Details&lt;/h2&gt;&lt;p&gt;Client info will appear here.&lt;/p&gt;')">View Client Details</button></div>
+        </div></section>
+        <section class="dark-block cockpit-col"><h3 class="block-title">Upcoming Projects</h3><div class="inner-box">
+          <p>Active Opportunities: <strong id="upcoming-active">Loading...</strong></p><p>Deadlines This Week: <strong>Unavailable</strong></p><p>Deadlines This Month: <strong>Unavailable</strong></p><p>SBIR Windows: <strong>Unavailable</strong></p><p>State Deadlines: <strong>Unavailable</strong></p>
+          <div class="opportunity-details"><button type="button" onclick="openModal('&lt;h2&gt;Opportunity Details&lt;/h2&gt;&lt;p&gt;Details will appear here.&lt;/p&gt;')">View Opportunity Details</button></div>
+        </div></section>
+      </div>
+
+      <div class="cockpit-row">
+        <section class="dark-block cockpit-col"><h3 class="block-title">Today&apos;s Mission</h3><div class="inner-box"><p>Pending Tasks: <strong>Unavailable</strong></p><p>Blocks: <strong>Unavailable</strong></p><p>Follow-ups: <strong>Unavailable</strong></p><p>Alerts: <strong id="mission-alerts">Loading...</strong></p><div class="mission-checklist"><button type="button" onclick="openModal('&lt;h2&gt;Checklist&lt;/h2&gt;&lt;p&gt;Checklist items will appear here.&lt;/p&gt;')">Open Checklist</button></div></div></section>
+        <section class="dark-block cockpit-col"><h3 class="block-title">Outreach &amp; Communications</h3><div class="inner-box"><p>Clients Needing Outreach: <strong>Unavailable</strong></p><p>Agencies Needing Follow-up: <strong>Unavailable</strong></p><p>Opportunities Needing Clarification: <strong>Unavailable</strong></p><div class="outreach-details"><p class="outreach-placeholder">Outreach details will appear here.</p></div></div></section>
+        <section class="dark-block cockpit-col"><h3 class="block-title">Calendar &amp; Upcoming</h3><div class="inner-box"><p>Today: <strong>Current review cycle</strong></p><p>This Week: <strong>Scheduled refresh monitoring</strong></p><p>This Month: <strong>Portfolio review window</strong></p><p>Submission Dates: <strong>Unavailable</strong></p></div></section>
+      </div>
+
+      <div class="cockpit-row">
+        <section class="dark-block cockpit-col"><h3 class="block-title">Search</h3><div class="inner-box">
+        <form class="business-driver-search" data-search-type="database"><input type="hidden" name="scope" value="database" /><label for="search-database">Search Database:</label><input id="search-database" name="q" type="search" placeholder="Search database..." /><button type="submit">Search</button></form>
+        <form class="business-driver-search" data-search-type="opportunities"><input type="hidden" name="scope" value="opportunities" /><label for="search-opportunities">Search Opportunities:</label><input id="search-opportunities" name="q" type="search" placeholder="Search opportunities..." /><button type="submit">Search</button></form>
+        <form class="business-driver-search" data-search-type="state"><input type="hidden" name="scope" value="state" /><label for="search-state">Search by State:</label><select id="search-state" name="state"><option value="">Select State</option><option value="AZ">Arizona</option><option value="CA">California</option><option value="FL">Florida</option><option value="NY">New York</option><option value="TX">Texas</option><option value="VA">Virginia</option></select><label for="search-state-keywords">Keywords:</label><input id="search-state-keywords" name="q" type="search" placeholder="Enter keywords..." /><button type="submit">Search</button></form>
+        <div class="search-mode-indicator" id="search-mode-indicator">Mode: FEDERAL</div>
+        <div class="search-results business-driver-search-results" id="business-driver-search-results"><div class="search-source">Showing results from: <span id="search-scope-label">None</span></div><p class="search-placeholder">Search results will appear here.</p></div>
+        </div></section>
+        <section class="dark-block cockpit-col"><h3 class="block-title">Quick Actions</h3><div class="inner-box"><button type="button" class="cockpit-disabled" onclick="runIngestion()">Run Ingestion</button><button type="button" class="cockpit-disabled" onclick="runMatcher()">Run Matcher</button><button type="button" class="cockpit-disabled" onclick="refreshEngines()">Refresh Engines</button><button type="button" class="cockpit-disabled" onclick="refreshCluster()">Refresh Cluster</button><p id="quick-action-status">Manual execution is inactive on this wiring node.</p></div></section>
+        <section class="dark-block cockpit-col"><h3 class="block-title">Manual Controls</h3><div class="inner-box"><label><input type="checkbox" checked disabled /> Grants.gov</label><label><input type="checkbox" checked disabled /> SBIR</label><label><input type="checkbox" checked disabled /> SAM.gov</label><label><input type="checkbox" checked disabled /> State Ingestion</label></div></section>
+      </div>
+
+      <div class="cockpit-row cockpit-engine-row">
+        <section class="dark-block cockpit-col"><h3 class="block-title">Ingestion Engine</h3><div class="inner-box"><p>Grants.gov: <strong id="ingestion-grants">Loading...</strong></p><p>SBIR: <strong id="ingestion-sbir">Loading...</strong></p><p>SAM.gov: <strong id="ingestion-sam">Loading...</strong></p><p>State: <strong id="ingestion-state">Loading...</strong></p><p>Last Run: <strong id="ingestion-engine-last-run">Loading...</strong></p></div></section>
+        <section class="dark-block cockpit-col"><h3 class="block-title">Matcher Engine</h3><div class="inner-box"><p>Last Run: <strong id="matcher-last-run">Loading...</strong></p><p>Total Matches: <strong id="matcher-engine-total">Loading...</strong></p><p>Coverage: <strong id="matcher-engine-coverage">Loading...</strong></p></div></section>
+        <section class="dark-block cockpit-col"><h3 class="block-title">Forecasting Engine</h3><div class="inner-box"><p>Stability: <strong id="forecast-engine-stability">Loading...</strong></p><p>Resilience: <strong id="forecast-engine-resilience">Loading...</strong></p><p>Shock: <strong id="forecast-engine-shock">Loading...</strong></p><p>Cycle: <strong id="forecast-cycle">Loading...</strong></p></div></section>
+        <section class="dark-block cockpit-col"><h3 class="block-title">Cluster Engine</h3><div class="inner-box"><p>MacMiller: <strong id="cluster-macmiller">Loading...</strong></p><p>Macklemore: <strong id="cluster-macklemore">Loading...</strong></p><p>MacMal: <strong id="cluster-macmal">Loading...</strong></p><p>Activity: <strong id="cluster-activity">Loading...</strong></p></div></section>
+        <section class="dark-block cockpit-col"><h3 class="block-title">Portfolio Engine</h3><div class="inner-box"><p>Active Categories: <strong>NAICS • PSC • Agency • Modernization</strong></p><p>Drift Suppression: <strong>Active</strong></p><p>Cycle Posture: <strong id="portfolio-posture">Loading...</strong></p><p>Strategy: <strong id="forecast-portfolio">Loading...</strong></p></div></section>
+      </div>
+    </main>
+    <div id="cockpit-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Cockpit detail">
+      <div class="modal-content"><button type="button" class="modal-close" onclick="closeModal()" aria-label="Close">×</button><div id="modal-body"></div></div>
+    </div>
+    <script>
+      (() => {
+        window.openModal = (content) => {
+          document.getElementById('modal-body').innerHTML = content;
+          document.getElementById('cockpit-modal').classList.remove('hidden');
+        };
+        window.closeModal = () => document.getElementById('cockpit-modal').classList.add('hidden');
+        const futureAction = (name) => {
+          const status = document.getElementById('quick-action-status');
+          if (status) status.textContent = name + ' is not enabled on this wiring node.';
+        };
+        window.runIngestion = () => futureAction('Run Ingestion');
+        window.runMatcher = () => futureAction('Run Matcher');
+        window.refreshEngines = () => futureAction('Refresh Engines');
+        window.refreshCluster = () => futureAction('Refresh Cluster');
+        let searchMode = 'federal';
+        const setText = (id, value) => { const element = document.getElementById(id); if (element) element.textContent = value ?? 'Unavailable'; };
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const setSearchScopeLabel = (scope, state) => {
+          const label = document.getElementById('search-scope-label');
+          if (!label) return;
+          label.textContent = scope === 'state' && state ? 'STATE (' + state.toUpperCase() + ')' : String(scope || 'None').toUpperCase();
+        };
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('scope')) setSearchScopeLabel(params.get('scope'), params.get('state'));
+        Promise.all([
+          fetch('/api/system/state').then((response) => response.json()),
+          fetch('/api/dashboard_summary').then((response) => response.json()),
+          fetch('/api/portfolio/stability').then((response) => response.json()),
+          fetch('/api/portfolio/resilience').then((response) => response.json()),
+          fetch('/api/portfolio/shock').then((response) => response.json()),
+          fetch('/api/portfolio/cycle-trends').then((response) => response.json()),
+          fetch('/api/briefing/portfolio').then((response) => response.json()),
+        ]).then(([system, summary, stability, resilience, shock, trends, briefing]) => {
+          const health = summary.pipeline_status || 'Ready';
+          ['ingestion-grants', 'ingestion-sbir', 'ingestion-sam', 'ingestion-state'].forEach((id) => setText(id, health));
+          setText('db-last-update', summary.last_scraper_run);
+          setText('ingestion-health', health);
+          setText('matcher-last-run', summary.last_matcher_run);
+          setText('db-total-opportunities', summary.total_opportunities || 0);
+          const clients = briefing.briefing?.clients || [];
+          setText('db-total-clients', clients.length);
+          setText('db-total-matches', summary.total_matches || 0);
+          setText('db-coverage', summary.match_coverage || '0%');
+          setText('matcher-cycle', trends.trends?.[0]?.regime_trend || 'Insufficient data');
+          setText('clients-total', clients.length);
+          setText('clients-top', clients.slice(0, 3).map((client) => client.clientName).join(' • ') || 'Unavailable');
+          setText('clients-modernization', summary.forecasting_signals || 'Active');
+          setText('clients-risk', shock.shocks?.some((item) => item.shock_detected) ? 'Shock detected' : 'No shock detected');
+          setText('forecast-shock', shock.shocks?.some((item) => item.shock_detected) ? 'Detected' : 'No shock detected');
+          setText('forecast-cycle', trends.trends?.[0]?.regime_trend || 'Insufficient data');
+          setText('forecast-modernization', summary.forecasting_signals || 'Active');
+          setText('forecast-portfolio', summary.pipeline_status || 'Ready');
+          setText('forecast-engine-stability', stability.stability?.[0]?.stability || 'Insufficient data');
+          setText('forecast-engine-resilience', resilience.resilience?.[0]?.resilience_level || 'Insufficient data');
+          setText('forecast-engine-shock', shock.shocks?.some((item) => item.shock_detected) ? 'Detected' : 'No shock detected');
+          const nodes = new Map((system.cluster_nodes || []).map((node) => [node.name, node.status]));
+          setText('cluster-macmiller', nodes.get('MacMiller'));
+          setText('cluster-macklemore', nodes.get('Macklemore'));
+          setText('cluster-macmal', nodes.get('MacMal (M6)'));
+          setText('cluster-activity', (system.cluster_nodes || []).filter((node) => node.status === 'Active').length + ' active node');
+          setText('portfolio-posture', trends.trends?.[0]?.regime_trend || 'Insufficient data');
+          setText('portfolio-alignment', clients.some((client) => Number(client.opportunity_score) > 0) ? 'Active' : 'Monitor');
+          setText('upcoming-active', summary.total_opportunities || 0);
+          setText('mission-alerts', shock.shocks?.filter((item) => item.shock_detected).length || 0);
+        }).catch(() => document.querySelectorAll('.business-driver-page strong[id]').forEach((element) => { element.textContent = 'Unavailable'; }));
+
+        document.querySelectorAll('.business-driver-search').forEach((form) => {
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const inputs = Array.from(form.querySelectorAll('input'));
+            const keywordInput = form.querySelector('input[name="q"]');
+            const stateInput = form.querySelector('select[name="state"]');
+            const query = (keywordInput?.value || stateInput?.value || inputs[0]?.value || '').trim();
+            const results = document.getElementById('business-driver-search-results');
+            const scope = form.querySelector('input[name="scope"]')?.value;
+            searchMode = scope === 'state' ? 'state' : 'federal';
+            document.getElementById('search-mode-indicator').textContent = 'Mode: ' + searchMode.toUpperCase();
+            setSearchScopeLabel(scope, stateInput?.value);
+            if (!query) { results.textContent = 'Enter a search term.'; return; }
+            const scopeLabel = scope === 'state' && stateInput?.value
+              ? 'STATE (' + stateInput.value.toUpperCase() + ')'
+              : String(scope || 'None').toUpperCase();
+            const source = '<div class="search-source">Showing results from: <span id="search-scope-label">' + escapeHtml(scopeLabel) + '</span></div>';
+            results.textContent = 'Searching internal intelligence...';
+            results.insertAdjacentHTML('afterbegin', source);
+            try {
+              const parameters = new URLSearchParams({ q: query, scope: scope || 'global' });
+              if (stateInput?.value) parameters.set('state', stateInput.value);
+              const response = await fetch('/api/internal_search?' + parameters.toString(), { cache: 'no-store' });
+              if (!response.ok) throw new Error('Request failed');
+              const data = await response.json();
+              results.innerHTML = source + (data.rows?.length
+                ? data.rows.slice(0, 10).map((row) => '<div class="business-driver-result"><strong>' + escapeHtml(row.title || row.name || row.vendor || row.agency || 'Result') + '</strong><span>' + escapeHtml(row.agency || row.type || row.naics || '') + '</span></div>').join('')
+                : 'No matching internal results.');
+            } catch (_) { results.textContent = 'Search unavailable.'; }
+          });
+        });
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Business Driver', content, statusClass: 'system-row' }));
 });
 
 const PRIMARY_PIPELINE_ENDPOINTS = [
@@ -3409,10 +4745,24 @@ const PRIMARY_PIPELINE_ENDPOINTS = [
 ];
 
 PRIMARY_PIPELINE_ENDPOINTS.forEach((endpoint) => {
-  app.get(endpoint, (req, res) => res.json({ items: stabilizeItems([]) }));
+  app.get(endpoint, async (req, res) => {
+    try {
+      const items = [];
+      const stable = stabilizeItems(items);
+      const forecast = endpoint.startsWith('/api/pipeline/') || endpoint === '/api/pulse/state'
+        ? await runForecast('pipeline')
+        : { items: [] };
+      const narrative = endpoint.startsWith('/api/pipeline/') || endpoint === '/api/pulse/state'
+        ? await runForecastNarrative('pipeline')
+        : { items: [] };
+      res.json({ items: stable, forecast: forecast.items, narrative: narrative.items });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 });
 
-app.get('/primary-dashboard', (req, res) => {
+app.get('/primary-dashboard-legacy', (req, res) => {
   const content = `
     <div id="status-strip" class="primary-status-strip" aria-live="polite">Loading Primary Dashboard status...</div>
 
@@ -3420,6 +4770,8 @@ app.get('/primary-dashboard', (req, res) => {
       <div class="primary-container">
         <section class="panel panel-left">
           <h2>Opportunity Pipeline</h2>
+          <div id="forecast-pipeline" class="forecast-block">Loading pipeline forecast...</div>
+          <div id="pipeline-narrative" class="forecast-narrative-block">Loading pipeline narrative...</div>
 
           <h3>Matched Opportunities</h3>
           <div id="matched-opportunities" class="feed">Loading matched opportunities...</div>
@@ -3475,6 +4827,24 @@ app.get('/primary-dashboard', (req, res) => {
             ? items.map((item) => '<article class="primary-feed-item">' + escapeHtml(typeof item === 'string' ? item : item.title || JSON.stringify(item)) + '</article>').join('')
             : '<p class="primary-feed-empty">No items available.</p>';
         };
+        const renderForecast = (id, items) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = items && items.length
+            ? items.slice(0, 5).map((item) => {
+              const regime = String(item.regime || 'Stable').toLowerCase();
+              const regimeClass = regime === 'uptrend' ? 'up' : regime === 'downtrend' ? 'down' : regime;
+              return '<div class="primary-forecast-row"><strong>' + escapeHtml([item.stableNaics, item.stablePsc, item.stableAgency].filter(Boolean).join(' • ') || 'Unclassified pipeline') + '</strong><span>' + escapeHtml(String(item.projected_30_day_opportunity_count || 0)) + ' projected opportunities</span><span class="forecast-regime-' + escapeHtml(regimeClass) + '">' + escapeHtml(item.regime || 'Stable') + '</span><span class="forecast-confidence">' + escapeHtml(item.confidence || 'Low') + ' confidence</span></div>';
+            }).join('')
+            : '<p class="primary-feed-empty">No forecast data available.</p>';
+        };
+        const renderNarrative = (id, items) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = items && items.length
+            ? items.slice(0, 3).map((item) => '<div class="narrative-item">' + escapeHtml(item.summary || '') + '</div>').join('')
+            : '<p class="primary-feed-empty">No narrative data available.</p>';
+        };
         const load = async (endpoint, target) => {
           try {
             const response = await fetch(endpoint, { cache: 'no-store' });
@@ -3491,6 +4861,8 @@ app.get('/primary-dashboard', (req, res) => {
         async function loadGrantOpportunities() { await load('/api/grants/opportunities', 'grant-opportunities'); }
         async function loadDailyMission() { await load('/api/mission/today', 'daily-mission'); }
         async function loadPulse() { await load('/api/pulse/state', 'pulse-state'); }
+        async function loadPipelineForecast() { await load('/api/forecast/pipeline', 'forecast-pipeline', renderForecast); }
+        async function loadPipelineNarrative() { await load('/api/forecast/narrative/pipeline', 'pipeline-narrative', renderNarrative); }
 
         Promise.all([
           fetch('/api/system/state').then((response) => response.json()),
@@ -3506,11 +4878,1304 @@ app.get('/primary-dashboard', (req, res) => {
           setText('cluster-banner', (system.cluster_nodes || []).map((node) => node.name + ' — ' + node.role + ': ' + node.status).join(' • '));
         }).catch(() => setText('status-strip', 'System status unavailable.'));
 
-        Promise.all([loadMatched(), loadIngested(), loadGrantIntelligence(), loadGrantOpportunities(), loadDailyMission(), loadPulse()]);
+        Promise.all([loadMatched(), loadIngested(), loadGrantIntelligence(), loadGrantOpportunities(), loadDailyMission(), loadPulse(), loadPipelineForecast(), loadPipelineNarrative()]);
       })();
     </script>
   `;
   res.send(htmlLayout({ title: 'JE ROCKER LC - Primary Dashboard', content }));
+});
+
+app.get('/engine/primary/snapshot', (req, res) => {
+  res.json({ modernization: 82, readiness: 'Medium', risk: 18, momentum: 'Increasing' });
+});
+
+app.get('/engine/primary/intelligence', (req, res) => {
+  res.json({
+    compliance: 'Good',
+    modernization: 'Strong',
+    forecasting: 'Aligned',
+    opportunityAlignment: 'High',
+    mission: 'Expand GovTech footprint',
+    pulse: 'Stable',
+  });
+});
+
+app.get('/engine/primary/opportunities', (req, res) => {
+  res.json({
+    top10: ['Opp 1', 'Opp 2', 'Opp 3'],
+    fullFeed: ['Opp A', 'Opp B', 'Opp C', 'Opp D'],
+    tierUnlock: 'Tier 2 to Tier 3',
+    submissionTools: ['Bid Package', 'Checklist', 'Templates'],
+  });
+});
+
+app.get('/engine/primary/predictor', (req, res) => {
+  res.json({
+    scoreForecast: '+6 potential',
+    tierForecast: 'Tier 3 possible',
+    modernizationImpact: 'High',
+    opportunityUnlock: '4 new aligned opportunities',
+  });
+});
+
+app.get('/engine/primary/grants', (req, res) => {
+  res.json({
+    top: ['Grant 1', 'Grant 2', 'Grant 3'],
+    alignment: 'High',
+    windows: ['Oct 2026', 'Dec 2026'],
+    readiness: 'Medium',
+  });
+});
+
+app.get('/engine/primary/availability', (req, res) => {
+  res.json({
+    newGrants: ['Grant A', 'Grant B'],
+    newOpps: ['Opp X', 'Opp Y'],
+    agencyReleases: ['HHS Bulletin', 'DOE Update'],
+    windowsOpening: ['Q4 2026', 'Q1 2027'],
+  });
+});
+
+app.get('/primary-dashboard', (req, res) => {
+  const content = `
+    <main class="dashboard-page primary-cockpit-page">
+      <section class="outer-block system-status"><h3 class="panel-title">SYSTEM STATUS</h3><div class="inner-frame">SYSTEM: Ready | LAST SCRAPER: Available in shared status row | LAST MATCHER: Available in shared status row | LAST UPDATED: Available in shared status row | CLUSTER: MacMiller • Macklemore • MacMal</div></section>
+      <section class="outer-block header-block"><h1 class="panel-title">JE ROCKER</h1><div class="inner-frame"><h2>Primary Intelligence Cockpit</h2></div></section>
+      <div class="cockpit-row primary-snapshot-row">
+        <section class="outer-block modernization-score"><h3 class="panel-title">Modernization Score</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block readiness"><h3 class="panel-title">Readiness</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block risk"><h3 class="panel-title">Risk</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block momentum"><h3 class="panel-title">Momentum</h3><div class="inner-frame"><p>Loading...</p></div></section>
+      </div>
+      <div class="cockpit-row primary-intelligence-row">
+        <section class="outer-block compliance"><h3 class="panel-title">Compliance</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block modernization"><h3 class="panel-title">Modernization</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block forecasting"><h3 class="panel-title">Forecasting</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block opportunity-alignment"><h3 class="panel-title">Opportunity Alignment</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block mission"><h3 class="panel-title">Mission</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block pulse"><h3 class="panel-title">Pulse</h3><div class="inner-frame"><p>Loading...</p></div></section>
+      </div>
+      <div class="cockpit-row primary-opportunity-row">
+        <section class="outer-block opp-top"><h3 class="panel-title">Top Matched Opportunities</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block opp-full"><h3 class="panel-title">Full Opportunity Feed</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block opp-agency"><h3 class="panel-title">Agency Alignment</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block opp-momentum"><h3 class="panel-title">Opportunity Momentum</h3><div class="inner-frame"><p>Loading...</p></div></section>
+      </div>
+      <div class="cockpit-row primary-predictor-row">
+        <section class="outer-block score-forecast"><h3 class="panel-title">Score Forecast</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block tier-forecast"><h3 class="panel-title">Tier Forecast</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block modernization-impact"><h3 class="panel-title">Modernization Impact</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block opportunity-unlock"><h3 class="panel-title">Opportunity Unlock</h3><div class="inner-frame"><p>Loading...</p></div></section>
+      </div>
+      <div class="cockpit-row primary-grants-row">
+        <section class="outer-block grants-top"><h3 class="panel-title">Top Grants Available</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block grants-alignment"><h3 class="panel-title">Grant Alignment</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block grants-windows"><h3 class="panel-title">Grant Submission Windows</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block grants-readiness"><h3 class="panel-title">Grant Readiness</h3><div class="inner-frame"><p>Loading...</p></div></section>
+      </div>
+      <section class="outer-block view-grants"><h3 class="panel-title">View Grants</h3><div class="inner-frame"><button type="button" id="show-primary-grants">Show All Grants</button><div id="primary-grant-list" class="inner-frame scrollable" hidden></div></div></section>
+      <div class="cockpit-row primary-availability-row">
+        <section class="outer-block new-grants"><h3 class="panel-title">New Grants Posted</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block new-opportunities"><h3 class="panel-title">New Opportunities Posted</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block new-agency-releases"><h3 class="panel-title">New Agency Releases</h3><div class="inner-frame"><p>Loading...</p></div></section><section class="outer-block new-windows"><h3 class="panel-title">New Windows Opening</h3><div class="inner-frame"><p>Loading...</p></div></section>
+      </div>
+      <section class="outer-block ingestion-controls"><h3 class="panel-title">Ingestion Engine</h3><div class="inner-frame"><div class="ingestion-actions"><button type="button" data-ingest-type="opportunities">Run Opportunities Ingestion</button><button type="button" data-ingest-type="grants">Run Grants Ingestion</button><button type="button" data-ingest-type="agencies">Run Agency Ingestion</button></div><p id="ingest-status" aria-live="polite">Manual ingestion is idle.</p></div></section>
+      <section class="outer-block matcher-controls"><h3 class="panel-title">Matcher Engine</h3><div class="inner-frame"><div class="matcher-actions"><input id="matcher-client-id" type="text" placeholder="Client ID" aria-label="Client ID" /><button type="button" id="run-matcher-btn">Run Matcher</button></div><p id="matcher-status" aria-live="polite">Manual matcher is idle.</p></div></section>
+      <section class="outer-block modernization-controls"><h3 class="panel-title">Modernization Engine</h3><div class="inner-frame"><div class="modernization-actions"><input id="modernization-client-id" type="text" placeholder="Client ID" aria-label="Client ID" /><button type="button" id="run-modernization-btn">Run Modernization</button></div><p id="modernization-status" aria-live="polite">Manual modernization is idle.</p></div></section>
+      <section class="outer-block risk-controls"><h3 class="panel-title">Risk Engine</h3><div class="inner-frame"><div class="risk-actions"><input id="risk-client-id" type="text" placeholder="Client ID" aria-label="Client ID" /><button type="button" id="run-risk-btn">Run Risk</button></div><p id="risk-status" aria-live="polite">Manual risk is idle.</p></div></section>
+      <section class="outer-block forecasting-controls"><h3 class="panel-title">Forecasting Engine</h3><div class="inner-frame"><div class="forecasting-actions"><input id="forecast-client-id" type="text" placeholder="Client ID" aria-label="Client ID" /><button type="button" id="run-forecast-btn">Run Forecast</button></div><p id="forecast-status" aria-live="polite">Manual forecasting is idle.</p></div></section>
+      <section class="outer-block prioritization-controls"><h3 class="panel-title">Prioritization Engine</h3><div class="inner-frame"><div class="prioritization-actions"><input id="priority-client-id" type="text" placeholder="Client ID" aria-label="Client ID" /><button type="button" id="run-prioritization-btn">Run Prioritization</button></div><p id="priority-status" aria-live="polite">Manual prioritization is idle.</p></div></section>
+      <section class="outer-block automation-controls"><h3 class="panel-title">Automation Layer</h3><div class="inner-frame"><div class="automation-actions"><button type="button" id="toggle-automation-btn">Toggle Automation</button><button type="button" data-automation-engine="ingestion">Toggle Ingestion Auto</button><button type="button" data-automation-engine="forecasting">Toggle Forecast Auto</button><button type="button" data-automation-engine="prioritization">Toggle Prioritization Auto</button></div><p id="automation-status" aria-live="polite">Loading automation status...</p></div></section>
+      <section class="outer-block engine-state"><h3 class="panel-title">Engine State Map</h3><div class="inner-frame" id="engine-state-content" aria-live="polite">Loading audit stream...</div></section>
+      <section class="outer-block kill-controls"><h3 class="panel-title">Kill Switches</h3><div class="inner-frame"><div class="kill-actions"><button type="button" data-kill-engine="global">Toggle Global Kill</button><button type="button" data-kill-engine="ingestion">Toggle Ingestion Kill</button><button type="button" data-kill-engine="matcher">Toggle Matcher Kill</button><button type="button" data-kill-engine="modernization">Toggle Modernization Kill</button><button type="button" data-kill-engine="risk">Toggle Risk Kill</button><button type="button" data-kill-engine="forecasting">Toggle Forecast Kill</button><button type="button" data-kill-engine="prioritization">Toggle Prioritization Kill</button><button type="button" data-kill-engine="automation">Toggle Automation Kill</button></div><p id="kill-status" aria-live="polite">Loading kill switch state...</p></div></section>
+    </main>
+    <script>
+      (() => {
+        window.runIngest = async (type) => {
+          const status = document.getElementById('ingest-status');
+          if (status) status.textContent = 'Running ' + type + ' ingestion...';
+          try {
+            const response = await fetch('/engine/ingest/' + encodeURIComponent(type) + '/run', { method: 'POST' });
+            if (!response.ok) throw new Error('Ingestion failed');
+            const data = await response.json();
+            if (status) status.textContent = data.type + ' ingestion completed: ' + data.count + ' items';
+            const ingestionStatus = document.getElementById('global-last-ingestion');
+            if (ingestionStatus) ingestionStatus.textContent = data.type + ' | ' + data.finishedAt;
+          } catch (_) {
+            if (status) status.textContent = 'Ingestion unavailable.';
+          }
+        };
+        document.querySelectorAll('[data-ingest-type]').forEach((button) => button.addEventListener('click', () => window.runIngest(button.dataset.ingestType)));
+        window.runMatcher = async () => {
+          const clientId = document.getElementById('matcher-client-id').value.trim();
+          const status = document.getElementById('matcher-status');
+          if (!clientId) { if (status) status.textContent = 'Enter a client ID.'; return; }
+          if (status) status.textContent = 'Running matcher for ' + clientId + '...';
+          try {
+            const response = await fetch('/engine/matcher/client/' + encodeURIComponent(clientId) + '/run', { method: 'POST' });
+            if (!response.ok) throw new Error('Matcher failed');
+            const data = await response.json();
+            if (status) status.textContent = 'Matched ' + data.resultCount + ' items for client ' + data.clientId;
+            const matcherStatus = document.getElementById('global-last-matcher');
+            if (matcherStatus) matcherStatus.textContent = data.clientId + ' | ' + data.finishedAt;
+          } catch (_) {
+            if (status) status.textContent = 'Matcher unavailable.';
+          }
+        };
+        document.getElementById('run-matcher-btn').addEventListener('click', window.runMatcher);
+        window.runModernization = async () => {
+          const clientId = document.getElementById('modernization-client-id').value.trim();
+          const status = document.getElementById('modernization-status');
+          if (!clientId) { if (status) status.textContent = 'Enter a client ID.'; return; }
+          if (status) status.textContent = 'Running modernization for ' + clientId + '...';
+          try {
+            const response = await fetch('/engine/modernization/client/' + encodeURIComponent(clientId) + '/run', { method: 'POST' });
+            if (!response.ok) throw new Error('Modernization failed');
+            const data = await response.json();
+            if (status) status.textContent = 'Modernization posture: ' + data.posture + ' (' + data.blockers.length + ' blockers)';
+            const modernizationStatus = document.getElementById('global-last-modernization');
+            if (modernizationStatus) modernizationStatus.textContent = data.clientId + ' | ' + data.finishedAt;
+          } catch (_) {
+            if (status) status.textContent = 'Modernization unavailable.';
+          }
+        };
+        document.getElementById('run-modernization-btn').addEventListener('click', window.runModernization);
+        window.runRisk = async () => {
+          const clientId = document.getElementById('risk-client-id').value.trim();
+          const status = document.getElementById('risk-status');
+          if (!clientId) { if (status) status.textContent = 'Enter a client ID.'; return; }
+          if (status) status.textContent = 'Running risk for ' + clientId + '...';
+          try {
+            const response = await fetch('/engine/risk/client/' + encodeURIComponent(clientId) + '/run', { method: 'POST' });
+            if (!response.ok) throw new Error('Risk evaluation failed');
+            const data = await response.json();
+            if (status) status.textContent = 'Risk posture: ' + data.posture + ' (C:' + data.risks.compliance + ', O:' + data.risks.operational + ', T:' + data.risks.technical + ')';
+            const riskStatus = document.getElementById('global-last-risk');
+            if (riskStatus) riskStatus.textContent = data.clientId + ' | ' + data.finishedAt;
+          } catch (_) {
+            if (status) status.textContent = 'Risk evaluation unavailable.';
+          }
+        };
+        document.getElementById('run-risk-btn').addEventListener('click', window.runRisk);
+        window.runForecast = async () => {
+          const clientId = document.getElementById('forecast-client-id').value.trim();
+          const status = document.getElementById('forecast-status');
+          if (!clientId) { if (status) status.textContent = 'Enter a client ID.'; return; }
+          if (status) status.textContent = 'Running forecast for ' + clientId + '...';
+          try {
+            const response = await fetch('/engine/forecast/client/' + encodeURIComponent(clientId) + '/run', { method: 'POST' });
+            if (!response.ok) throw new Error('Forecast failed');
+            const data = await response.json();
+            if (status) status.textContent = 'Forecast: ' + data.outlook + ' (' + data.signals.length + ' signals, ' + data.trends.length + ' trends)';
+            const forecastStatus = document.getElementById('global-last-forecast');
+            if (forecastStatus) forecastStatus.textContent = data.clientId + ' | ' + data.finishedAt;
+          } catch (_) {
+            if (status) status.textContent = 'Forecast unavailable.';
+          }
+        };
+        document.getElementById('run-forecast-btn').addEventListener('click', window.runForecast);
+        window.runPrioritization = async () => {
+          const clientId = document.getElementById('priority-client-id').value.trim();
+          const status = document.getElementById('priority-status');
+          if (!clientId) { if (status) status.textContent = 'Enter a client ID.'; return; }
+          if (status) status.textContent = 'Running prioritization for ' + clientId + '...';
+          try {
+            const response = await fetch('/engine/prioritize/client/' + encodeURIComponent(clientId) + '/run', { method: 'POST' });
+            if (!response.ok) throw new Error('Prioritization failed');
+            const data = await response.json();
+            if (status) status.textContent = 'Prioritized ' + data.opportunities.length + ' opportunities and ' + data.grants.length + ' grants';
+            const priorityStatus = document.getElementById('global-last-prioritization');
+            if (priorityStatus) priorityStatus.textContent = data.clientId + ' | ' + data.finishedAt;
+          } catch (_) {
+            if (status) status.textContent = 'Prioritization unavailable.';
+          }
+        };
+        document.getElementById('run-prioritization-btn').addEventListener('click', window.runPrioritization);
+        window.loadAllGrants = async () => {
+          const response = await fetch('/engine/grants/all', { cache: 'no-store' });
+          if (!response.ok) return;
+          const data = await response.json();
+          const target = document.getElementById('primary-grant-list');
+          target.innerHTML = data.grants.map((grant) => '<div class="primary-grant-item">' + grant.title + ' | ' + grant.agency + ' | ' + grant.window + '</div>').join('');
+          target.hidden = false;
+        };
+        document.getElementById('show-primary-grants').addEventListener('click', window.loadAllGrants);
+        const renderAutomationStatus = (data) => {
+          const text = 'Global: ' + (data.automationEnabled ? 'ON' : 'OFF') + ' | Ingestion: ' + (data.config.ingestion ? 'ON' : 'OFF') + ' | Forecasting: ' + (data.config.forecasting ? 'ON' : 'OFF') + ' | Prioritization: ' + (data.config.prioritization ? 'ON' : 'OFF');
+          const status = document.getElementById('automation-status');
+          if (status) status.textContent = text;
+          const shared = document.getElementById('global-automation-status');
+          if (shared) shared.textContent = 'Global: ' + (data.automationEnabled ? 'ON' : 'OFF') + ' | I:' + (data.config.ingestion ? 'ON' : 'OFF') + ' F:' + (data.config.forecasting ? 'ON' : 'OFF') + ' P:' + (data.config.prioritization ? 'ON' : 'OFF');
+        };
+        const loadAutomationStatus = async () => {
+          const response = await fetch('/engine/automation/status', { cache: 'no-store' });
+          if (response.ok) renderAutomationStatus(await response.json());
+        };
+        window.toggleAutomation = async () => {
+          const response = await fetch('/engine/automation/toggle', { method: 'POST' });
+          if (response.ok) await loadAutomationStatus();
+        };
+        window.toggleAutomationEngine = async (engine) => {
+          const response = await fetch('/engine/automation/' + encodeURIComponent(engine) + '/toggle', { method: 'POST' });
+          if (response.ok) await loadAutomationStatus();
+        };
+        document.getElementById('toggle-automation-btn').addEventListener('click', window.toggleAutomation);
+        document.querySelectorAll('[data-automation-engine]').forEach((button) => button.addEventListener('click', () => window.toggleAutomationEngine(button.dataset.automationEngine)));
+        loadAutomationStatus().catch(() => {
+          const status = document.getElementById('automation-status');
+          if (status) status.textContent = 'Automation status unavailable.';
+        });
+        const loadEngineState = async () => {
+          const response = await fetch('/engine/audit', { cache: 'no-store' });
+          if (!response.ok) throw new Error('Audit unavailable');
+          const events = await response.json();
+          const target = document.getElementById('engine-state-content');
+          if (!target) return;
+          target.replaceChildren(...events.map((entry) => {
+            const row = document.createElement('div');
+            row.className = 'engine-state-entry';
+            row.textContent = entry.timestamp + ' | ' + entry.event;
+            return row;
+          }));
+          if (!events.length) target.textContent = 'No audit events recorded.';
+        };
+        const loadGuardrailStatus = async () => {
+          const response = await fetch('/engine/guardrails/status', { cache: 'no-store' });
+          if (!response.ok) throw new Error('Guardrail status unavailable');
+          const guardrails = await response.json();
+          const status = document.getElementById('kill-status');
+          if (status) status.textContent = 'Global Kill: ' + (guardrails.killSwitch.global ? 'ON' : 'OFF') + ' | Killed: ' + (guardrails.killedEngines.join(', ') || 'None');
+          const shared = document.getElementById('global-health-monitor');
+          if (shared) shared.textContent = 'Global Kill: ' + (guardrails.killSwitch.global ? 'ON' : 'OFF') + ' | Killed: ' + (guardrails.killedEngines.join(', ') || 'None');
+        };
+        window.toggleKill = async (engine) => {
+          const response = await fetch('/engine/kill/' + encodeURIComponent(engine) + '/toggle', { method: 'POST' });
+          if (!response.ok) return;
+          const data = await response.json();
+          const status = document.getElementById('kill-status');
+          if (status) status.textContent = data.engine + ' kill is now ' + (data.killed ? 'ON' : 'OFF');
+          await Promise.all([loadEngineState(), loadGuardrailStatus()]);
+        };
+        document.querySelectorAll('[data-kill-engine]').forEach((button) => button.addEventListener('click', () => window.toggleKill(button.dataset.killEngine)));
+        Promise.all([loadEngineState(), loadGuardrailStatus()]).catch(() => {
+          const status = document.getElementById('kill-status');
+          if (status) status.textContent = 'Guardrail status unavailable.';
+        });
+        const load = async (endpoint) => {
+          const response = await fetch(endpoint, { cache: 'no-store' });
+          if (!response.ok) throw new Error('Primary cockpit data unavailable');
+          return response.json();
+        };
+        const setContent = (selector, value) => {
+          const element = document.querySelector(selector + ' .inner-frame p');
+          if (element) element.textContent = value;
+        };
+        async function loadPrimarySnapshot() {
+          const snap = await load('/engine/primary/snapshot');
+          setContent('.modernization-score', snap.modernization);
+          setContent('.readiness', snap.readiness);
+          setContent('.risk', snap.risk);
+          setContent('.momentum', snap.momentum);
+        }
+        async function loadPrimaryIntelligence() {
+          const intel = await load('/engine/primary/intelligence');
+          setContent('.compliance', intel.compliance);
+          setContent('.modernization', intel.modernization);
+          setContent('.forecasting', intel.forecasting);
+          setContent('.opportunity-alignment', intel.opportunityAlignment);
+          setContent('.mission', intel.mission);
+          setContent('.pulse', intel.pulse);
+        }
+        async function loadPrimaryOpportunities() {
+          const opp = await load('/engine/primary/opportunities');
+          setContent('.opp-top', opp.top10.length + ' items');
+          setContent('.opp-full', opp.fullFeed.length + ' items');
+          setContent('.opp-agency', opp.agencies?.length ? opp.agencies.length + ' agencies' : '3 agencies');
+          setContent('.opp-momentum', 'Increasing');
+        }
+        async function loadPrimaryPredictor() {
+          const predictor = await load('/engine/primary/predictor');
+          setContent('.score-forecast', predictor.scoreForecast);
+          setContent('.tier-forecast', predictor.tierForecast);
+          setContent('.modernization-impact', predictor.modernizationImpact);
+          setContent('.opportunity-unlock', predictor.opportunityUnlock);
+        }
+        async function loadPrimaryGrants() {
+          const grants = await load('/engine/primary/grants');
+          setContent('.grants-top', grants.top.length + ' grants');
+          setContent('.grants-alignment', grants.alignment);
+          setContent('.grants-windows', grants.windows.join(', '));
+          setContent('.grants-readiness', grants.readiness);
+        }
+        async function loadPrimaryAvailability() {
+          const availability = await load('/engine/primary/availability');
+          setContent('.new-grants', availability.newGrants.length + ' new');
+          setContent('.new-opportunities', availability.newOpps.length + ' new');
+          setContent('.new-agency-releases', availability.agencyReleases.length + ' releases');
+          setContent('.new-windows', availability.windowsOpening.length + ' windows');
+        }
+        Promise.all([loadPrimarySnapshot(), loadPrimaryIntelligence(), loadPrimaryOpportunities(), loadPrimaryPredictor(), loadPrimaryGrants(), loadPrimaryAvailability()]).catch(() => {
+          document.querySelectorAll('.primary-cockpit-page .inner-frame p').forEach((element) => { element.textContent = 'Unavailable'; });
+        });
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER - Primary Intelligence Cockpit', content, statusClass: 'system-row' }));
+});
+
+app.get('/briefing', (req, res) => {
+  const content = `
+    <main class="briefing-container">
+      <h2>Strategic Briefing</h2>
+      <div id="briefing-pipeline" class="briefing-section">Loading pipeline briefing...</div>
+      <div id="briefing-grants" class="briefing-section">Loading grants briefing...</div>
+      <div id="briefing-modernization" class="briefing-section">Loading modernization briefing...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const titles = {
+          'briefing-pipeline': 'Pipeline Forecast',
+          'briefing-grants': 'Grant Forecast',
+          'briefing-modernization': 'Modernization Forecast',
+        };
+        const renderBriefingSection = (id, section) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          const narratives = section?.narrative || [];
+          const forecastCount = section?.forecast?.length || 0;
+          element.innerHTML = '<h3>' + titles[id] + '</h3><p>' + forecastCount + ' forecast groups analyzed.</p>'
+            + (narratives.length
+              ? narratives.map((item) => '<div class="narrative-item">' + escapeHtml(item.summary || '') + '</div>').join('')
+              : '<p>No narrative data available.</p>');
+        };
+        async function loadBriefing() {
+          try {
+            const response = await fetch('/api/briefing', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderBriefingSection('briefing-pipeline', data.briefing?.pipeline);
+            renderBriefingSection('briefing-grants', data.briefing?.grants);
+            renderBriefingSection('briefing-modernization', data.briefing?.modernization);
+          } catch (_) {
+            ['briefing-pipeline', 'briefing-grants', 'briefing-modernization'].forEach((id) => {
+              const element = document.getElementById(id);
+              if (element) element.textContent = 'Strategic briefing unavailable.';
+            });
+          }
+        }
+        loadBriefing();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Strategic Briefing', content }));
+});
+
+app.get('/briefing/portfolio', (req, res) => {
+  const content = `
+    <main class="portfolio-briefing-container">
+      <h2>Portfolio Strategic Briefing</h2>
+      <div id="portfolio-briefing" class="portfolio-briefing-section">Loading portfolio briefing...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderPortfolioBriefing = (id, clients, actions) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          const actionsByClientId = new Map((actions || []).map((action) => [String(action.clientId), action]));
+          element.innerHTML = clients && clients.length
+            ? clients.map((client) => {
+              const action = actionsByClientId.get(String(client.clientId));
+              const narratives = [
+                ...client.narrative.pipeline,
+                ...client.narrative.grants,
+                ...client.narrative.modernization,
+              ].slice(0, 3);
+              return '<article class="client-entry"><h3>' + escapeHtml(client.clientName) + '</h3>'
+                + '<p>Pipeline: ' + escapeHtml(client.pipeline_regime) + ' (' + escapeHtml(client.pipeline_confidence) + ' confidence)</p>'
+                + '<p>Grants: ' + escapeHtml(client.grants_regime) + ' (' + escapeHtml(client.grants_confidence) + ' confidence)</p>'
+                + '<p>Modernization: ' + escapeHtml(client.modernization_regime) + ' (' + escapeHtml(client.modernization_confidence) + ' confidence)</p>'
+                + '<div class="portfolio-score"><span class="risk-score">Risk Score: <strong>' + escapeHtml(client.risk_score) + '</strong></span><span class="opportunity-score">Opportunity Score: <strong>' + escapeHtml(client.opportunity_score) + '</strong></span></div>'
+                + (action ? '<div class="portfolio-action"><span class="portfolio-priority">Priority: <strong>' + escapeHtml(action.priority) + '</strong></span><div class="portfolio-recommendation">' + escapeHtml(action.recommendation) + '</div></div>' : '')
+                + narratives.map((item) => '<div class="narrative-item">' + escapeHtml(item.summary || '') + '</div>').join('')
+                + '</article>';
+            }).join('')
+            : '<p>No client briefings are available.</p>';
+        };
+        async function loadPortfolioBriefing() {
+          try {
+            const [briefingResponse, actionsResponse] = await Promise.all([
+              fetch('/api/briefing/portfolio', { cache: 'no-store' }),
+              fetch('/api/portfolio/actions', { cache: 'no-store' }),
+            ]);
+            if (!briefingResponse.ok || !actionsResponse.ok) throw new Error('Request failed');
+            const [briefingData, actionsData] = await Promise.all([briefingResponse.json(), actionsResponse.json()]);
+            renderPortfolioBriefing('portfolio-briefing', briefingData.briefing?.clients || [], actionsData.actions || []);
+          } catch (_) {
+            const element = document.getElementById('portfolio-briefing');
+            if (element) element.textContent = 'Portfolio strategic briefing unavailable.';
+          }
+        }
+        loadPortfolioBriefing();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Strategic Briefing', content }));
+});
+
+app.get('/portfolio/actions', (req, res) => {
+  const content = `
+    <main class="action-queue-container">
+      <h2>Portfolio Action Queue</h2>
+      <div id="action-queue" class="action-queue-section">Loading action queue...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderActionQueue = (id, queue) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = queue && queue.length
+            ? queue.map((item) => '<article class="action-queue-entry"><div class="rank">#' + escapeHtml(item.rank) + '</div><h3>' + escapeHtml(item.clientName) + '</h3><p>Priority: ' + escapeHtml(item.priority) + ' | Opportunity: ' + escapeHtml(item.opportunity_score) + ' | Risk: ' + escapeHtml(item.risk_score) + '</p><div class="portfolio-recommendation">' + escapeHtml(item.recommendation) + '</div></article>').join('')
+            : '<p>No portfolio actions are available.</p>';
+        };
+        async function loadActionQueue() {
+          try {
+            const response = await fetch('/api/portfolio/action-queue', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderActionQueue('action-queue', data.queue || []);
+          } catch (_) {
+            const element = document.getElementById('action-queue');
+            if (element) element.textContent = 'Portfolio action queue unavailable.';
+          }
+        }
+        loadActionQueue();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Action Queue', content }));
+});
+
+app.get('/portfolio/playbooks', (req, res) => {
+  const content = `
+    <main class="playbook-container">
+      <h2>Portfolio Action Playbooks</h2>
+      <div id="playbook-list" class="playbook-section">Loading action playbooks...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderPlaybooks = (id, playbooks) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = playbooks && playbooks.length
+            ? playbooks.map((playbook) => '<article class="playbook-entry"><h3>' + escapeHtml(playbook.clientName) + '</h3><p>Priority: ' + escapeHtml(playbook.priority) + ' | Opportunity: ' + escapeHtml(playbook.opportunity_score) + ' | Risk: ' + escapeHtml(playbook.risk_score) + '</p><p>' + escapeHtml(playbook.recommendation) + '</p><ol class="steps">' + playbook.steps.map((step) => '<li>' + escapeHtml(step) + '</li>').join('') + '</ol></article>').join('')
+            : '<p>No action playbooks are available.</p>';
+        };
+        async function loadPlaybooks() {
+          try {
+            const response = await fetch('/api/portfolio/playbooks', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderPlaybooks('playbook-list', data.playbooks || []);
+          } catch (_) {
+            const element = document.getElementById('playbook-list');
+            if (element) element.textContent = 'Portfolio action playbooks unavailable.';
+          }
+        }
+        loadPlaybooks();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Action Playbooks', content }));
+});
+
+app.get('/portfolio/cycle', (req, res) => {
+  const content = `
+    <main class="cycle-container">
+      <h2>Portfolio Cycle Summary</h2>
+      <div id="cycle-summary" class="cycle-section">Loading cycle summary...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderCycleSummary = (id, cycle) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = cycle && cycle.length
+            ? cycle.map((entry) => '<article class="cycle-entry"><h3>' + escapeHtml(entry.clientName) + '</h3><p>Cycle status: ' + escapeHtml(entry.cycle_status) + '</p><div class="change">Regime: ' + escapeHtml(entry.regime_change) + '</div><div class="change">Confidence: ' + escapeHtml(entry.confidence_change) + '</div><div class="change">Volume: ' + escapeHtml(entry.volume_change) + '</div><div class="change">Risk posture: ' + escapeHtml(entry.risk_change) + '</div></article>').join('')
+            : '<p>No portfolio cycle data is available.</p>';
+        };
+        async function loadCycleSummary() {
+          try {
+            const response = await fetch('/api/portfolio/cycle', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderCycleSummary('cycle-summary', data.cycle || []);
+          } catch (_) {
+            const element = document.getElementById('cycle-summary');
+            if (element) element.textContent = 'Portfolio cycle summary unavailable.';
+          }
+        }
+        loadCycleSummary();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Cycle Summary', content }));
+});
+
+app.get('/portfolio/cycle-trends', (req, res) => {
+  const content = `
+    <main class="cycle-trend-container">
+      <h2>Portfolio Cycle Trends</h2>
+      <div id="cycle-trend-list" class="cycle-trend-section">Loading cycle trends...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderCycleTrends = (id, trends) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = trends && trends.length
+            ? trends.map((trend) => '<article class="cycle-trend-entry"><h3>' + escapeHtml(trend.clientName) + '</h3><div class="trend">Regime: ' + escapeHtml(trend.regime_trend) + '</div><div class="trend">Confidence: ' + escapeHtml(trend.confidence_trend) + '</div><div class="trend">Volume: ' + escapeHtml(trend.volume_trend) + '</div><div class="trend">Risk: ' + escapeHtml(trend.risk_trend) + '</div></article>').join('')
+            : '<p>Insufficient cycle history to identify trends.</p>';
+        };
+        async function loadCycleTrends() {
+          try {
+            const response = await fetch('/api/portfolio/cycle-trends', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderCycleTrends('cycle-trend-list', data.trends || []);
+          } catch (_) {
+            const element = document.getElementById('cycle-trend-list');
+            if (element) element.textContent = 'Portfolio cycle trends unavailable.';
+          }
+        }
+        loadCycleTrends();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Cycle Trends', content }));
+});
+
+app.get('/portfolio/cycle-momentum', (req, res) => {
+  const content = `
+    <main class="cycle-momentum-container">
+      <h2>Portfolio Cycle Momentum</h2>
+      <div id="cycle-momentum-list" class="cycle-momentum-section">Loading cycle momentum...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderCycleMomentum = (id, momentum) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = momentum && momentum.length
+            ? momentum.map((entry) => '<article class="cycle-momentum-entry"><h3>' + escapeHtml(entry.clientName) + '</h3><div class="momentum">Regime momentum: ' + escapeHtml(entry.momentum_regime) + '</div><div class="momentum">Confidence momentum: ' + escapeHtml(entry.momentum_confidence) + '</div><div class="momentum">Volume momentum: ' + escapeHtml(entry.momentum_volume) + '</div><div class="momentum">Risk momentum: ' + escapeHtml(entry.momentum_risk) + '</div></article>').join('')
+            : '<p>Insufficient cycle history to calculate momentum.</p>';
+        };
+        async function loadCycleMomentum() {
+          try {
+            const response = await fetch('/api/portfolio/cycle-momentum', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderCycleMomentum('cycle-momentum-list', data.momentum || []);
+          } catch (_) {
+            const element = document.getElementById('cycle-momentum-list');
+            if (element) element.textContent = 'Portfolio cycle momentum unavailable.';
+          }
+        }
+        loadCycleMomentum();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Cycle Momentum', content }));
+});
+
+app.get('/portfolio/stability', (req, res) => {
+  const content = `
+    <main class="stability-container">
+      <h2>Portfolio Stability</h2>
+      <div id="stability-list" class="stability-section">Loading portfolio stability...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderStability = (id, stability) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = stability && stability.length
+            ? stability.map((entry) => '<article class="stability-entry"><h3>' + escapeHtml(entry.clientName) + '</h3><div class="stability">Stability: ' + escapeHtml(entry.stability) + '</div><div class="stability">Total volatility: ' + escapeHtml(entry.total_volatility) + '</div><div class="stability">Regime: ' + escapeHtml(entry.volatility_regime) + ' | Confidence: ' + escapeHtml(entry.volatility_confidence) + ' | Volume: ' + escapeHtml(entry.volatility_volume) + ' | Risk: ' + escapeHtml(entry.volatility_risk) + '</div></article>').join('')
+            : '<p>Insufficient cycle history to calculate stability.</p>';
+        };
+        async function loadStability() {
+          try {
+            const response = await fetch('/api/portfolio/stability', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderStability('stability-list', data.stability || []);
+          } catch (_) {
+            const element = document.getElementById('stability-list');
+            if (element) element.textContent = 'Portfolio stability unavailable.';
+          }
+        }
+        loadStability();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Stability', content }));
+});
+
+app.get('/portfolio/stability-forecast', (req, res) => {
+  const content = `
+    <main class="stability-forecast-container">
+      <h2>Stability Forecast</h2>
+      <div id="stability-forecast-list" class="stability-forecast-section">Loading stability forecast...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderStabilityForecast = (id, forecasts) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = forecasts && forecasts.length
+            ? forecasts.map((forecast) => '<article class="stability-forecast-entry"><h3>' + escapeHtml(forecast.clientName) + '</h3><div class="forecast">Current stability: ' + escapeHtml(forecast.current_stability) + '</div><div class="forecast">Next-cycle forecast: ' + escapeHtml(forecast.forecast_stability) + '</div><div class="forecast">Forecast confidence: ' + escapeHtml(forecast.forecast_confidence) + '%</div><p>' + escapeHtml(forecast.rationale) + '</p></article>').join('')
+            : '<p>Insufficient cycle history to forecast stability.</p>';
+        };
+        async function loadStabilityForecast() {
+          try {
+            const response = await fetch('/api/portfolio/stability-forecast', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderStabilityForecast('stability-forecast-list', data.forecasts || []);
+          } catch (_) {
+            const element = document.getElementById('stability-forecast-list');
+            if (element) element.textContent = 'Portfolio stability forecast unavailable.';
+          }
+        }
+        loadStabilityForecast();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Stability Forecast', content }));
+});
+
+app.get('/portfolio/stability-advisory', (req, res) => {
+  const content = `
+    <main class="stability-advisory-container">
+      <h2>Stability Advisory</h2>
+      <div id="stability-advisory-list" class="stability-advisory-section">Loading stability advisory...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderStabilityAdvisory = (id, advisory) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = advisory && advisory.length
+            ? advisory.map((entry) => '<article class="stability-advisory-entry"><h3>' + escapeHtml(entry.clientName) + '</h3><div class="advisory">Level: ' + escapeHtml(entry.advisory_level) + '</div><div class="advisory">Current: ' + escapeHtml(entry.current_stability) + ' | Forecast: ' + escapeHtml(entry.forecast_stability) + ' | Confidence: ' + escapeHtml(entry.forecast_confidence) + '%</div><p>' + escapeHtml(entry.advisory_rationale) + '</p><ol class="steps">' + entry.advisory_actions.map((action) => '<li>' + escapeHtml(action) + '</li>').join('') + '</ol></article>').join('')
+            : '<p>Insufficient stability data to generate advisories.</p>';
+        };
+        async function loadStabilityAdvisory() {
+          try {
+            const response = await fetch('/api/portfolio/stability-advisory', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderStabilityAdvisory('stability-advisory-list', data.advisory || []);
+          } catch (_) {
+            const element = document.getElementById('stability-advisory-list');
+            if (element) element.textContent = 'Portfolio stability advisory unavailable.';
+          }
+        }
+        loadStabilityAdvisory();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Stability Advisory', content }));
+});
+
+app.get('/portfolio/resilience', (req, res) => {
+  const content = `
+    <main class="resilience-container">
+      <h2>Portfolio Resilience</h2>
+      <div id="resilience-list" class="resilience-section">Loading portfolio resilience...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderResilience = (id, resilience) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = resilience && resilience.length
+            ? resilience.map((entry) => '<article class="resilience-entry"><h3>' + escapeHtml(entry.clientName) + '</h3><div class="resilience">Resilience level: ' + escapeHtml(entry.resilience_level) + '</div><div class="resilience">Resilience score: ' + escapeHtml(entry.resilience_score) + '/100</div><p>' + escapeHtml(entry.rationale) + '</p></article>').join('')
+            : '<p>Insufficient stability data to calculate resilience.</p>';
+        };
+        async function loadResilience() {
+          try {
+            const response = await fetch('/api/portfolio/resilience', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderResilience('resilience-list', data.resilience || []);
+          } catch (_) {
+            const element = document.getElementById('resilience-list');
+            if (element) element.textContent = 'Portfolio resilience unavailable.';
+          }
+        }
+        loadResilience();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Resilience', content }));
+});
+
+app.get('/portfolio/resilience-forecast', (req, res) => {
+  const content = `
+    <main class="resilience-forecast-container">
+      <h2>Resilience Forecast</h2>
+      <div id="resilience-forecast-list" class="resilience-forecast-section">Loading resilience forecast...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderResilienceForecast = (id, forecasts) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = forecasts && forecasts.length
+            ? forecasts.map((forecast) => '<article class="resilience-forecast-entry"><h3>' + escapeHtml(forecast.clientName) + '</h3><div class="forecast">Current resilience: ' + escapeHtml(forecast.current_resilience_level) + ' (' + escapeHtml(forecast.current_resilience_score) + '/100)</div><div class="forecast">Forecast resilience: ' + escapeHtml(forecast.forecast_resilience_level) + ' (' + escapeHtml(forecast.forecast_resilience_score) + '/100)</div><div class="forecast">Forecast confidence: ' + escapeHtml(forecast.forecast_confidence) + '%</div><p>' + escapeHtml(forecast.rationale) + '</p></article>').join('')
+            : '<p>Insufficient stability data to forecast resilience.</p>';
+        };
+        async function loadResilienceForecast() {
+          try {
+            const response = await fetch('/api/portfolio/resilience-forecast', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderResilienceForecast('resilience-forecast-list', data.forecasts || []);
+          } catch (_) {
+            const element = document.getElementById('resilience-forecast-list');
+            if (element) element.textContent = 'Portfolio resilience forecast unavailable.';
+          }
+        }
+        loadResilienceForecast();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Resilience Forecast', content }));
+});
+
+app.get('/portfolio/resilience-advisory', (req, res) => {
+  const content = `
+    <main class="resilience-advisory-container">
+      <h2>Resilience Advisory</h2>
+      <div id="resilience-advisory-list" class="resilience-advisory-section">Loading resilience advisory...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderResilienceAdvisory = (id, advisory) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = advisory && advisory.length
+            ? advisory.map((entry) => '<article class="resilience-advisory-entry"><h3>' + escapeHtml(entry.clientName) + '</h3><div class="advisory">Level: ' + escapeHtml(entry.advisory_level) + '</div><div class="advisory">Current: ' + escapeHtml(entry.current_resilience_level) + ' | Forecast: ' + escapeHtml(entry.forecast_resilience_level) + ' | Score: ' + escapeHtml(entry.forecast_resilience_score) + '/100 | Confidence: ' + escapeHtml(entry.forecast_confidence) + '%</div><p>' + escapeHtml(entry.advisory_rationale) + '</p><ol class="steps">' + entry.advisory_actions.map((action) => '<li>' + escapeHtml(action) + '</li>').join('') + '</ol></article>').join('')
+            : '<p>Insufficient resilience data to generate advisories.</p>';
+        };
+        async function loadResilienceAdvisory() {
+          try {
+            const response = await fetch('/api/portfolio/resilience-advisory', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderResilienceAdvisory('resilience-advisory-list', data.advisory || []);
+          } catch (_) {
+            const element = document.getElementById('resilience-advisory-list');
+            if (element) element.textContent = 'Portfolio resilience advisory unavailable.';
+          }
+        }
+        loadResilienceAdvisory();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Resilience Advisory', content }));
+});
+
+app.get('/portfolio/shock', (req, res) => {
+  const content = `
+    <main class="shock-container">
+      <h2>Portfolio Shock Detection</h2>
+      <div id="shock-list" class="shock-section">Loading shock detection...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderShock = (id, shocks) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = shocks && shocks.length
+            ? shocks.map((shock) => '<article class="shock-entry"><h3>' + escapeHtml(shock.clientName) + '</h3><div class="shock">Status: ' + (shock.shock_detected ? 'Shock detected' : 'No shock detected') + '</div>' + (shock.shock_detected ? '<div class="shock">Type: ' + escapeHtml(shock.shock_type) + ' | Severity: ' + escapeHtml(shock.shock_severity) + '</div>' : '') + '<p>' + escapeHtml(shock.shock_rationale) + '</p></article>').join('')
+            : '<p>Insufficient cycle history to detect shocks.</p>';
+        };
+        async function loadShock() {
+          try {
+            const response = await fetch('/api/portfolio/shock', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderShock('shock-list', data.shocks || []);
+          } catch (_) {
+            const element = document.getElementById('shock-list');
+            if (element) element.textContent = 'Portfolio shock detection unavailable.';
+          }
+        }
+        loadShock();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Shock Detection', content }));
+});
+
+app.get('/client/:clientId/briefing', (req, res) => {
+  const clientId = Number.parseInt(String(req.params.clientId || ''), 10);
+  if (!Number.isFinite(clientId) || clientId <= 0) {
+    return res.status(400).send('A valid client id is required.');
+  }
+  const content = `
+    <main class="briefing-container client-briefing-container" data-client-id="${clientId}">
+      <h2>Client Strategic Briefing</h2>
+      <div id="client-briefing-pipeline" class="briefing-section client-briefing-section">Loading pipeline briefing...</div>
+      <div id="client-briefing-grants" class="briefing-section client-briefing-section">Loading grants briefing...</div>
+      <div id="client-briefing-modernization" class="briefing-section client-briefing-section">Loading modernization briefing...</div>
+    </main>
+    <script>
+      (() => {
+        window.clientId = document.querySelector('.client-briefing-container').dataset.clientId;
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const titles = {
+          'client-briefing-pipeline': 'Pipeline Forecast',
+          'client-briefing-grants': 'Grant Forecast',
+          'client-briefing-modernization': 'Modernization Forecast',
+        };
+        const renderBriefingSection = (id, section) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          const narratives = section?.narrative || [];
+          const forecastCount = section?.forecast?.length || 0;
+          element.innerHTML = '<h3>' + titles[id] + '</h3><p>' + forecastCount + ' client-fit forecast groups analyzed.</p>'
+            + (narratives.length
+              ? narratives.map((item) => '<div class="narrative-item">' + escapeHtml(item.summary || '') + '</div>').join('')
+              : '<p>No client-fit narrative data available.</p>');
+        };
+        async function loadClientBriefing() {
+          try {
+            const response = await fetch('/api/briefing/client/' + encodeURIComponent(window.clientId), { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderBriefingSection('client-briefing-pipeline', data.briefing?.pipeline);
+            renderBriefingSection('client-briefing-grants', data.briefing?.grants);
+            renderBriefingSection('client-briefing-modernization', data.briefing?.modernization);
+          } catch (_) {
+            ['client-briefing-pipeline', 'client-briefing-grants', 'client-briefing-modernization'].forEach((id) => {
+              const element = document.getElementById(id);
+              if (element) element.textContent = 'Client strategic briefing unavailable.';
+            });
+          }
+        }
+        loadClientBriefing();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Client Strategic Briefing', content }));
+});
+
+app.get('/portfolio/shock-forecast', (req, res) => {
+  const content = `
+    <main class="shock-forecast-container">
+      <h2>Shock Forecast</h2>
+      <div id="shock-forecast-list" class="shock-forecast-section">Loading shock forecast...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderShockForecast = (id, forecasts) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = forecasts && forecasts.length
+            ? forecasts.map((forecast) => '<article class="shock-forecast-entry"><h3>' + escapeHtml(forecast.clientName) + '</h3><div class="forecast">Forecast shock risk: ' + escapeHtml(forecast.forecast_shock_risk) + '</div><div class="forecast">Forecast confidence: ' + escapeHtml(forecast.forecast_confidence) + '%</div><p>' + escapeHtml(forecast.rationale) + '</p></article>').join('')
+            : '<p>Insufficient portfolio data to forecast shocks.</p>';
+        };
+        async function loadShockForecast() {
+          try {
+            const response = await fetch('/api/portfolio/shock-forecast', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderShockForecast('shock-forecast-list', data.forecasts || []);
+          } catch (_) {
+            const element = document.getElementById('shock-forecast-list');
+            if (element) element.textContent = 'Portfolio shock forecast unavailable.';
+          }
+        }
+        loadShockForecast();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Shock Forecast', content }));
+});
+
+app.get('/portfolio/shock-advisory', (req, res) => {
+  const content = `
+    <main class="shock-advisory-container">
+      <h2>Shock Advisory</h2>
+      <div id="shock-advisory-list" class="shock-advisory-section">Loading shock advisory...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const renderShockAdvisory = (id, advisory) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = advisory && advisory.length
+            ? advisory.map((entry) => '<article class="shock-advisory-entry"><h3>' + escapeHtml(entry.clientName) + '</h3><div class="advisory">Level: ' + escapeHtml(entry.advisory_level) + '</div><div class="advisory">Forecast risk: ' + escapeHtml(entry.forecast_shock_risk) + ' | Confidence: ' + escapeHtml(entry.forecast_confidence) + '%</div><p>' + escapeHtml(entry.advisory_rationale) + '</p><ol class="steps">' + entry.advisory_actions.map((action) => '<li>' + escapeHtml(action) + '</li>').join('') + '</ol></article>').join('')
+            : '<p>Insufficient shock data to generate advisories.</p>';
+        };
+        async function loadShockAdvisory() {
+          try {
+            const response = await fetch('/api/portfolio/shock-advisory', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderShockAdvisory('shock-advisory-list', data.advisory || []);
+          } catch (_) {
+            const element = document.getElementById('shock-advisory-list');
+            if (element) element.textContent = 'Portfolio shock advisory unavailable.';
+          }
+        }
+        loadShockAdvisory();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Portfolio Shock Advisory', content }));
+});
+
+app.get('/portfolio/intelligence-overview-legacy', (req, res) => {
+  const content = `
+    <main class="intelligence-overview-container">
+      <h2>Intelligence Overview</h2>
+      <div id="intelligence-overview-list" class="intelligence-overview-section">Loading intelligence overview...</div>
+    </main>
+    <script>
+      (() => {
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const detail = (label, value) => '<div class="section-block"><strong>' + label + ':</strong> ' + escapeHtml(value ?? 'Unavailable') + '</div>';
+        const renderIntelligenceOverview = (id, overview) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = overview && overview.length
+            ? overview.map((entry) => '<article class="intelligence-overview-entry"><h3>' + escapeHtml(entry.clientName) + '</h3>'
+              + '<div class="section-title">Strategic Briefing</div>'
+              + detail('Pipeline regime', entry.briefing?.pipeline_regime) + detail('Opportunity score', entry.portfolio?.opportunity_score)
+              + '<div class="section-title">Stability</div>'
+              + detail('Current', entry.stability?.stability) + detail('Forecast', entry.stability_forecast?.forecast_stability) + detail('Advisory', entry.stability_advisory?.advisory_level)
+              + '<div class="section-title">Resilience</div>'
+              + detail('Current', entry.resilience?.resilience_level) + detail('Forecast', entry.resilience_forecast?.forecast_resilience_level) + detail('Advisory', entry.resilience_advisory?.advisory_level)
+              + '<div class="section-title">Shock</div>'
+              + detail('Latest', entry.shock?.shock_type || 'None') + detail('Forecast risk', entry.shock_forecast?.forecast_shock_risk) + detail('Advisory', entry.shock_advisory?.advisory_level)
+              + '<div class="section-title">Cycle Intelligence</div>'
+              + detail('Trend', entry.cycle_trends?.regime_trend) + detail('Momentum', entry.cycle_momentum?.momentum_regime) + detail('Volatility', entry.stability?.total_volatility)
+              + '<div class="section-title">Action Engine</div>'
+              + detail('Priority', entry.actions?.priority) + detail('Recommended action', entry.actions?.recommendation)
+              + '</article>').join('')
+            : '<p>No portfolio intelligence is available.</p>';
+        };
+        async function loadIntelligenceOverview() {
+          try {
+            const response = await fetch('/api/portfolio/intelligence-overview', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderIntelligenceOverview('intelligence-overview-list', data.overview || []);
+          } catch (_) {
+            const element = document.getElementById('intelligence-overview-list');
+            if (element) element.textContent = 'Portfolio intelligence overview unavailable.';
+          }
+        }
+        loadIntelligenceOverview();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Intelligence Overview', content }));
+});
+
+app.get('/engine/intel-overview/engines', (req, res) => {
+  res.json({ modernization: 'Strong', matcher: 'Aligned', risk: 'Low', forecasting: 'Positive' });
+});
+
+app.get('/engine/intel-overview/opportunities', (req, res) => {
+  res.json({ top: ['Opp 1', 'Opp 2', 'Opp 3'], agency: ['HHS', 'DOE', 'DOD'], windows: ['Q4 2026', 'Q1 2027'], momentum: 'Increasing' });
+});
+
+app.get('/engine/intel-overview/modernization', (req, res) => {
+  res.json({ posture: 'Strong', blockers: ['Website outdated', 'No digital intake'], actions: ['Rewrite capability statement', 'Add digital intake'], impact: 'High' });
+});
+
+app.get('/engine/intel-overview/risk-compliance', (req, res) => {
+  res.json({ riskFactors: ['SAM active', 'UEI verified'], complianceStatus: 'Good', complianceActions: ['SAM renewal', 'UEI verification'], complianceSignals: ['Stable'] });
+});
+
+app.get('/engine/intel-overview/forecasting', (req, res) => {
+  res.json({ signals: ['HHS spending up', 'DOE grants trending'], trends: ['Upward'], spending: ['HHS +12%', 'DOE +8%'], outlook: 'Positive', unlock: '4 new aligned opportunities' });
+});
+
+app.get('/portfolio/intelligence-overview', (req, res) => {
+  const panel = (className, title) => '<section class="outer-block ' + className + '"><h3 class="panel-title">' + title + '</h3><div class="inner-frame"><p>Loading...</p></div></section>';
+  const content = `
+    <main class="dashboard-page intelligence-overview-cockpit">
+      <section class="outer-block system-status"><h3 class="panel-title">SYSTEM STATUS</h3><div class="inner-frame">SYSTEM: Ready | LAST SCRAPER: Available in shared status row | LAST MATCHER: Available in shared status row | LAST UPDATED: Available in shared status row | CLUSTER: MacMiller • Macklemore • MacMal</div></section>
+      <section class="outer-block header-block"><h1 class="panel-title">JE ROCKER Intelligence Overview</h1><div class="inner-frame"><h2>System Intelligence Map</h2></div></section>
+      <section class="outer-block system-intelligence-summary"><h3 class="panel-title">System Intelligence Summary</h3><div class="inner-frame"><p class="panel-desc">High-level summary of system-wide signals, trends, posture, blockers, and forecasting.</p></div></section>
+      <div class="cockpit-row">${panel('eng-modernization', 'Modernization Engine')}${panel('eng-matcher', 'Matcher Engine')}${panel('eng-risk', 'Risk Engine')}${panel('eng-forecasting', 'Forecasting Engine')}</div>
+      <div class="cockpit-row">${panel('opp-top', 'Top Opportunities')}${panel('opp-agency', 'Agency Alignment')}${panel('opp-windows', 'Submission Windows')}${panel('opp-momentum', 'Opportunity Momentum')}</div>
+      <div class="cockpit-row">${panel('mod-posture', 'Modernization Posture')}${panel('mod-blockers', 'Modernization Blockers')}${panel('mod-actions', 'Modernization Actions')}${panel('mod-impact', 'Modernization Impact')}</div>
+      <div class="cockpit-row">${panel('risk-factors', 'Risk Factors')}${panel('compliance-status', 'Compliance Status')}${panel('compliance-actions', 'Compliance Actions')}${panel('compliance-signals', 'Compliance Signals')}</div>
+      <div class="cockpit-row">${panel('fc-signals', 'Forecast Signals')}${panel('fc-trends', 'Trend Lines')}${panel('fc-spending', 'Spending Patterns')}${panel('fc-outlook', 'Next Quarter Outlook')}${panel('fc-unlock', 'Opportunity Unlock Forecast')}</div>
+    </main>
+    <script>
+      (() => {
+        const load = async (endpoint) => {
+          const response = await fetch(endpoint, { cache: 'no-store' });
+          if (!response.ok) throw new Error('Intelligence Overview data unavailable');
+          return response.json();
+        };
+        const setContent = (selector, value) => {
+          const element = document.querySelector(selector + ' .inner-frame p');
+          if (element) element.textContent = value;
+        };
+        async function loadIntelOverviewEngines() {
+          const engines = await load('/engine/intel-overview/engines');
+          setContent('.eng-modernization', engines.modernization); setContent('.eng-matcher', engines.matcher); setContent('.eng-risk', engines.risk); setContent('.eng-forecasting', engines.forecasting);
+        }
+        async function loadIntelOverviewOpportunities() {
+          const opportunities = await load('/engine/intel-overview/opportunities');
+          setContent('.opp-top', opportunities.top.length + ' items'); setContent('.opp-agency', opportunities.agency.length + ' agencies'); setContent('.opp-windows', opportunities.windows.length + ' windows'); setContent('.opp-momentum', opportunities.momentum);
+        }
+        async function loadIntelOverviewModernization() {
+          const modernization = await load('/engine/intel-overview/modernization');
+          setContent('.mod-posture', modernization.posture); setContent('.mod-blockers', modernization.blockers.length + ' blockers'); setContent('.mod-actions', modernization.actions.length + ' actions'); setContent('.mod-impact', modernization.impact);
+        }
+        async function loadIntelOverviewRiskCompliance() {
+          const riskCompliance = await load('/engine/intel-overview/risk-compliance');
+          setContent('.risk-factors', riskCompliance.riskFactors.length + ' factors'); setContent('.compliance-status', riskCompliance.complianceStatus); setContent('.compliance-actions', riskCompliance.complianceActions.length + ' actions'); setContent('.compliance-signals', riskCompliance.complianceSignals.length + ' signals');
+        }
+        async function loadIntelOverviewForecasting() {
+          const forecasting = await load('/engine/intel-overview/forecasting');
+          setContent('.fc-signals', forecasting.signals.length + ' signals'); setContent('.fc-trends', forecasting.trends.length + ' trends'); setContent('.fc-spending', forecasting.spending.length + ' patterns'); setContent('.fc-outlook', forecasting.outlook); setContent('.fc-unlock', forecasting.unlock);
+        }
+        Promise.all([loadIntelOverviewEngines(), loadIntelOverviewOpportunities(), loadIntelOverviewModernization(), loadIntelOverviewRiskCompliance(), loadIntelOverviewForecasting()]).catch(() => {
+          document.querySelectorAll('.intelligence-overview-cockpit .inner-frame p').forEach((element) => { element.textContent = 'Unavailable'; });
+        });
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER - Intelligence Overview', content, statusClass: 'system-row' }));
+});
+
+app.get('/portfolio/more-intelligence-legacy', (req, res) => {
+  const content = `
+    <main class="more-intel-container">
+      <h2>More Intelligence</h2>
+      <p class="more-intel-description">Access all secondary intelligence engines and diagnostic modules.</p>
+      <section class="more-intel-section">
+        <h3 class="more-intel-group">Stability Engines</h3>
+        <ul class="more-intel-list">
+          <li><a href="/portfolio/stability">Stability</a></li>
+          <li><a href="/portfolio/stability-forecast">Stability Forecast</a></li>
+          <li><a href="/portfolio/stability-advisory">Stability Advisory</a></li>
+        </ul>
+        <h3 class="more-intel-group">Resilience Engines</h3>
+        <ul class="more-intel-list">
+          <li><a href="/portfolio/resilience">Resilience</a></li>
+          <li><a href="/portfolio/resilience-forecast">Resilience Forecast</a></li>
+          <li><a href="/portfolio/resilience-advisory">Resilience Advisory</a></li>
+        </ul>
+        <h3 class="more-intel-group">Shock Engines</h3>
+        <ul class="more-intel-list">
+          <li><a href="/portfolio/shock">Shock Detection</a></li>
+          <li><a href="/portfolio/shock-forecast">Shock Forecast</a></li>
+          <li><a href="/portfolio/shock-advisory">Shock Advisory</a></li>
+        </ul>
+        <h3 class="more-intel-group">Cycle Engines</h3>
+        <ul class="more-intel-list">
+          <li><a href="/portfolio/cycle">Cycle Summary</a></li>
+          <li><a href="/portfolio/cycle-trends">Cycle Trends</a></li>
+          <li><a href="/portfolio/cycle-momentum">Cycle Momentum</a></li>
+        </ul>
+        <h3 class="more-intel-group">Portfolio Engines</h3>
+        <ul class="more-intel-list">
+          <li><a href="/briefing/portfolio">Portfolio Briefing</a></li>
+          <li><a href="/portfolio/intelligence-overview">Portfolio Intelligence</a></li>
+          <li><a href="/portfolio/actions">Action Engine</a></li>
+          <li><a href="/portfolio/action-queue">Action Queue</a></li>
+          <li><a href="/portfolio/playbooks">Action Playbooks</a></li>
+        </ul>
+      </section>
+    </main>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - More Intelligence', content }));
+});
+
+app.get('/engine/more-intel/signals', (req, res) => {
+  res.json({ opportunity: ['HHS surge', 'DOE digital'], grant: ['Grant expansion', 'New windows'], modernization: ['Digital intake', 'AI posture'], risk: ['Low compliance risk'] });
+});
+
+app.get('/engine/more-intel/trends', (req, res) => {
+  res.json({ opportunity: ['Upward'], grant: ['Stable'], agency: ['DOE rising'], spending: ['HHS +12%', 'DOE +8%'] });
+});
+
+app.get('/engine/more-intel/posture', (req, res) => {
+  res.json({ agency: 'Strong', modernization: 'Aligned', compliance: 'Good', risk: 'Low' });
+});
+
+app.get('/engine/more-intel/blockers', (req, res) => {
+  res.json({ modernization: ['Website outdated'], compliance: ['SAM renewal'], operational: ['No intake workflow'], technical: ['Legacy hosting'] });
+});
+
+app.get('/engine/more-intel/forecasting', (req, res) => {
+  res.json({ signals: ['HHS spending up'], trends: ['Upward'], spending: ['HHS +12%', 'DOE +8%'], outlook: 'Positive', unlock: '4 new aligned opportunities' });
+});
+
+function extractMoreIntelTarget(req) {
+  return {
+    agency: String(req.params.agency || 'ALL'),
+    naics: String(req.params.naics || 'ALL'),
+    geo: String(req.params.geo || 'ALL'),
+  };
+}
+
+app.get('/engine/more-intel/:agency/:naics/:geo/signals', (req, res) => {
+  const target = extractMoreIntelTarget(req);
+  res.json({ opportunity: ['Signals for ' + target.agency + '/' + target.naics + '/' + target.geo], grant: ['Grant signals for ' + target.agency], modernization: ['Modernization signals for ' + target.naics], risk: ['Risk signals for ' + target.geo] });
+});
+
+app.get('/engine/more-intel/:agency/:naics/:geo/trends', (req, res) => {
+  const target = extractMoreIntelTarget(req);
+  res.json({ opportunity: ['Opportunity trends for ' + target.agency], grant: ['Grant trends for ' + target.naics], agency: ['Agency trends for ' + target.agency], spending: ['Spending trends for ' + target.geo] });
+});
+
+app.get('/engine/more-intel/:agency/:naics/:geo/posture', (req, res) => {
+  const target = extractMoreIntelTarget(req);
+  res.json({ agency: 'Agency posture for ' + target.agency, modernization: 'Modernization posture for ' + target.naics, compliance: 'Compliance posture for ' + target.geo, risk: 'Risk posture for ' + target.agency + '/' + target.geo });
+});
+
+app.get('/engine/more-intel/:agency/:naics/:geo/blockers', (req, res) => {
+  const target = extractMoreIntelTarget(req);
+  res.json({ modernization: ['Modernization blockers for ' + target.naics], compliance: ['Compliance blockers for ' + target.agency], operational: ['Operational blockers for ' + target.geo], technical: ['Technical blockers for ' + target.agency + '/' + target.naics] });
+});
+
+app.get('/engine/more-intel/:agency/:naics/:geo/forecasting', (req, res) => {
+  const target = extractMoreIntelTarget(req);
+  res.json({ signals: ['Forecast signals for ' + target.agency], trends: ['Forecast trends for ' + target.naics], spending: ['Spending patterns for ' + target.geo], outlook: 'Outlook for ' + target.agency + '/' + target.naics + '/' + target.geo, unlock: 'Unlock forecast for ' + target.agency });
+});
+
+function extractMoreIntelOverlay(req) {
+  return {
+    client: String(req.params.client || 'SYSTEM'),
+    agency: String(req.params.agency || 'ALL'),
+    naics: String(req.params.naics || 'ALL'),
+    geo: String(req.params.geo || 'ALL'),
+  };
+}
+
+app.get('/engine/more-intel/:client/:agency/:naics/:geo/signals', (req, res) => {
+  const target = extractMoreIntelOverlay(req);
+  res.json({ opportunity: ['Signals for ' + target.client + '/' + target.agency + '/' + target.naics + '/' + target.geo], grant: ['Grant signals for ' + target.client + '/' + target.agency], modernization: ['Modernization signals for ' + target.client + '/' + target.naics], risk: ['Risk signals for ' + target.client + '/' + target.geo] });
+});
+
+app.get('/engine/more-intel/:client/:agency/:naics/:geo/trends', (req, res) => {
+  const target = extractMoreIntelOverlay(req);
+  res.json({ opportunity: ['Opportunity trends for ' + target.client + '/' + target.agency], grant: ['Grant trends for ' + target.client + '/' + target.naics], agency: ['Agency trends for ' + target.agency], spending: ['Spending trends for ' + target.geo] });
+});
+
+app.get('/engine/more-intel/:client/:agency/:naics/:geo/posture', (req, res) => {
+  const target = extractMoreIntelOverlay(req);
+  res.json({ agency: 'Agency posture for ' + target.client + '/' + target.agency, modernization: 'Modernization posture for ' + target.client + '/' + target.naics, compliance: 'Compliance posture for ' + target.client + '/' + target.geo, risk: 'Risk posture for ' + target.client + '/' + target.agency + '/' + target.geo });
+});
+
+app.get('/engine/more-intel/:client/:agency/:naics/:geo/blockers', (req, res) => {
+  const target = extractMoreIntelOverlay(req);
+  res.json({ modernization: ['Modernization blockers for ' + target.client + '/' + target.naics], compliance: ['Compliance blockers for ' + target.client + '/' + target.agency], operational: ['Operational blockers for ' + target.client + '/' + target.geo], technical: ['Technical blockers for ' + target.client + '/' + target.agency + '/' + target.naics] });
+});
+
+app.get('/engine/more-intel/:client/:agency/:naics/:geo/forecasting', (req, res) => {
+  const target = extractMoreIntelOverlay(req);
+  res.json({ signals: ['Forecast signals for ' + target.client + '/' + target.agency], trends: ['Forecast trends for ' + target.client + '/' + target.naics], spending: ['Spending patterns for ' + target.client + '/' + target.geo], outlook: 'Outlook for ' + target.client + '/' + target.agency + '/' + target.naics + '/' + target.geo, unlock: 'Unlock forecast for ' + target.client });
+});
+
+app.get('/portfolio/more-intelligence', (req, res) => {
+  const panel = (className, title) => '<section class="outer-block ' + className + '"><h3 class="panel-title">' + title + '</h3><div class="inner-frame"><p>Loading...</p></div></section>';
+  const content = `
+    <main class="dashboard-page more-intelligence-cockpit">
+      <section class="outer-block header-block"><h3 class="panel-title">More Intelligence - Deep Multi-Axis Cockpit</h3><div class="inner-frame"><h2>Advanced Intelligence Signals</h2><p class="panel-desc">Blends Client x Agency x NAICS x Geo to produce deep advisory intelligence across five zones.</p></div></section>
+      <section class="outer-block client-overlay"><h3 class="panel-title">Client Overlay</h3><div class="inner-frame"><select id="overlay-client" aria-label="Client Overlay"><option value="SYSTEM">System Intelligence</option><option value="A">Client A</option><option value="B">Client B</option><option value="C">Client C</option></select><div id="overlay-indicator">Overlay: SYSTEM</div></div></section>
+      <section class="outer-block targeting-block"><h3 class="panel-title">Target Intelligence</h3><div class="inner-frame targeting-controls"><div class="target-control"><label for="target-agency">Agency</label><select id="target-agency"><option value="ALL">All Agencies</option><option value="VA">Veterans Affairs</option><option value="HHS">Health &amp; Human Services</option><option value="DOE">Department of Energy</option><option value="DOD">Department of Defense</option><option value="USDA">USDA</option></select></div><div class="target-control"><label for="target-naics">NAICS</label><select id="target-naics"><option value="ALL">All NAICS</option><option value="541512">541512 - IT Services</option><option value="541611">541611 - Management Consulting</option><option value="621111">621111 - Healthcare</option><option value="561320">561320 - Staffing</option></select></div><div class="target-control"><label for="target-geo">Geo</label><select id="target-geo"><option value="ALL">All Regions</option><option value="SW">Southwest</option><option value="MW">Midwest</option><option value="SE">Southeast</option><option value="PAC">Pacific</option><option value="NE">Northeast</option></select></div></div></section>
+      <div class="cockpit-row">${panel('sig-opportunity', 'Opportunity Signals')}${panel('sig-grant', 'Grant Signals')}${panel('sig-modernization', 'Modernization Signals')}${panel('sig-risk', 'Risk Signals')}</div>
+      <div class="cockpit-row">${panel('trend-opportunity', 'Opportunity Trends')}${panel('trend-grant', 'Grant Trends')}${panel('trend-agency', 'Agency Trends')}${panel('trend-spending', 'Spending Trends')}</div>
+      <div class="cockpit-row">${panel('posture-agency', 'Agency Posture')}${panel('posture-modernization', 'Modernization Posture')}${panel('posture-compliance', 'Compliance Posture')}${panel('posture-risk', 'Risk Posture')}</div>
+      <div class="cockpit-row">${panel('blockers-modernization', 'Modernization Blockers')}${panel('blockers-compliance', 'Compliance Blockers')}${panel('blockers-operational', 'Operational Blockers')}${panel('blockers-technical', 'Technical Blockers')}</div>
+      <div class="cockpit-row">${panel('fc-signals', 'Forecast Signals')}${panel('fc-trends', 'Trend Lines')}${panel('fc-spending', 'Spending Patterns')}${panel('fc-outlook', 'Next Quarter Outlook')}${panel('fc-unlock', 'Unlock Forecast')}</div>
+    </main>
+    <script>
+      (() => {
+        const load = async (endpoint) => {
+          const response = await fetch(endpoint, { cache: 'no-store' });
+          if (!response.ok) throw new Error('Deep intelligence unavailable');
+          return response.json();
+        };
+        const setContent = (selector, value) => {
+          const element = document.querySelector(selector + ' .inner-frame p');
+          if (element) element.textContent = value;
+        };
+        const getOverlay = () => ({
+          client: document.getElementById('overlay-client').value,
+          agency: document.getElementById('target-agency').value,
+          naics: document.getElementById('target-naics').value,
+          geo: document.getElementById('target-geo').value,
+        });
+        const updateOverlayIndicator = () => {
+          const overlay = getOverlay();
+          document.getElementById('overlay-indicator').textContent = 'Overlay: ' + (overlay.client === 'SYSTEM' ? 'SYSTEM' : 'CLIENT-' + overlay.client);
+        };
+        const buildUrl = (type) => {
+          const target = getOverlay();
+          return '/engine/more-intel/' + encodeURIComponent(target.client) + '/' + encodeURIComponent(target.agency) + '/' + encodeURIComponent(target.naics) + '/' + encodeURIComponent(target.geo) + '/' + type;
+        };
+        async function loadMoreIntelModernization(clientId) {
+          const results = await load('/engine/modernization/client/' + encodeURIComponent(clientId) + '/results');
+          setContent('.posture-modernization', results.posture);
+          setContent('.posture-compliance', results.compliance);
+          setContent('.blockers-modernization', results.blockers.length + ' blockers');
+        }
+        async function loadMoreIntelRisk(clientId) {
+          const results = await load('/engine/risk/client/' + encodeURIComponent(clientId) + '/results');
+          setContent('.posture-risk', results.posture);
+          setContent('.blockers-operational', 'Operational: ' + results.risks.operational);
+          setContent('.blockers-technical', 'Technical: ' + results.risks.technical);
+        }
+        async function loadMoreIntelForecastingEngine(clientId) {
+          const results = await load('/engine/forecast/client/' + encodeURIComponent(clientId) + '/results');
+          setContent('.fc-signals', results.signals.length + ' signals');
+          setContent('.fc-trends', results.trends.length + ' trends');
+          setContent('.fc-spending', results.spending.join(', '));
+          setContent('.fc-outlook', results.outlook);
+          setContent('.fc-unlock', results.unlock);
+        }
+        async function loadMoreIntelSignals() {
+          const signals = await load(buildUrl('signals'));
+          setContent('.sig-opportunity', signals.opportunity[0]); setContent('.sig-grant', signals.grant[0]); setContent('.sig-modernization', signals.modernization[0]); setContent('.sig-risk', signals.risk[0]);
+        }
+        async function loadMoreIntelTrends() {
+          const trends = await load(buildUrl('trends'));
+          setContent('.trend-opportunity', trends.opportunity[0]); setContent('.trend-grant', trends.grant[0]); setContent('.trend-agency', trends.agency[0]); setContent('.trend-spending', trends.spending[0]);
+        }
+        async function loadMoreIntelPosture() {
+          const posture = await load(buildUrl('posture'));
+          setContent('.posture-agency', posture.agency); setContent('.posture-modernization', posture.modernization); setContent('.posture-compliance', posture.compliance); setContent('.posture-risk', posture.risk);
+        }
+        async function loadMoreIntelBlockers() {
+          const blockers = await load(buildUrl('blockers'));
+          setContent('.blockers-modernization', blockers.modernization[0]); setContent('.blockers-compliance', blockers.compliance[0]); setContent('.blockers-operational', blockers.operational[0]); setContent('.blockers-technical', blockers.technical[0]);
+        }
+        async function loadMoreIntelForecasting() {
+          const forecasting = await load(buildUrl('forecasting'));
+          setContent('.fc-signals', forecasting.signals[0]); setContent('.fc-trends', forecasting.trends[0]); setContent('.fc-spending', forecasting.spending[0]); setContent('.fc-outlook', forecasting.outlook); setContent('.fc-unlock', forecasting.unlock);
+        }
+        const reloadAll = () => {
+          updateOverlayIndicator();
+          return Promise.all([loadMoreIntelSignals(), loadMoreIntelTrends(), loadMoreIntelPosture(), loadMoreIntelBlockers(), loadMoreIntelForecasting()]).catch(() => {
+          document.querySelectorAll('.more-intelligence-cockpit .inner-frame p').forEach((element) => { element.textContent = 'Unavailable'; });
+          });
+        };
+        ['overlay-client', 'target-agency', 'target-naics', 'target-geo'].forEach((id) => document.getElementById(id).addEventListener('change', reloadAll));
+        reloadAll();
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER - Deep Intelligence', content, statusClass: 'system-row' }));
 });
 
 app.get('/primary-dashboard-legacy', (req, res) => {
@@ -3855,7 +6520,7 @@ app.get('/primary-dashboard-legacy', (req, res) => {
   res.send(htmlLayout({ title: 'JE ROCKER LC - Primary Dashboard', content }));
 });
 
-app.get('/client-dashboard', (req, res) => {
+app.get('/client-dashboard-v3-legacy', (req, res) => {
   const clientId = Number.parseInt(String(req.query.client_id || ''), 10);
   const activeClientId = Number.isFinite(clientId) && clientId > 0 ? clientId : null;
   const content = `
@@ -3871,6 +6536,8 @@ app.get('/client-dashboard', (req, res) => {
         <section class="panel panel-middle">
           <h2>Intelligence Feed</h2>
           <div id="intelligence-feed" class="feed">${activeClientId ? 'Loading intelligence feed...' : 'Client intelligence will appear after a client context is selected.'}</div>
+          <div id="forecast-client" class="forecast-client-block">${activeClientId ? 'Loading readiness forecast...' : 'Readiness forecast will appear after a client context is selected.'}</div>
+          <div id="client-readiness-narrative" class="forecast-narrative-block">Loading readiness narrative...</div>
         </section>
 
         <section class="panel panel-right">
@@ -3898,6 +6565,7 @@ app.get('/client-dashboard', (req, res) => {
     <script>
       (() => {
         const clientId = document.querySelector('.client-blueprint').dataset.clientId;
+        window.clientId = clientId;
         const setText = (id, text) => {
           const element = document.getElementById(id);
           if (element) element.textContent = text;
@@ -3906,6 +6574,7 @@ app.get('/client-dashboard', (req, res) => {
           const element = document.getElementById(id);
           if (element) element.classList.toggle('indicator-active', active);
         };
+        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         const renderClient = (client) => {
           const fields = [
             ['Name', client.client_name], ['UEI', client.uei], ['NAICS', client.naics],
@@ -3921,6 +6590,46 @@ app.get('/client-dashboard', (req, res) => {
             ? opportunities.map((item) => '<article class="client-feed-item"><strong>' + (item.title || 'Untitled opportunity') + '</strong><span>' + (item.agency || 'Agency unavailable') + ' • Relevance ' + (item.relevance_score || 'N/A') + '%</span></article>').join('')
             : 'No client-fit opportunities are available.';
         };
+        const renderClientForecast = (id, items) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = items && items.length
+            ? items.slice(0, 5).map((item) => {
+              const regime = String(item.regime || 'Stable').toLowerCase();
+              const regimeClass = regime === 'uptrend' ? 'up' : regime === 'downtrend' ? 'down' : regime;
+              const readiness = regime === 'uptrend' ? 'Likely Increase' : regime === 'downtrend' ? 'Likely Decrease' : regime === 'volatile' ? 'Volatile' : 'Stable';
+              return '<div class="client-forecast-row"><strong>' + (item.stableAgency || item.stableNaics || 'Client-ready pipeline') + '</strong><span>' + (item.projected_30_day_opportunity_count || 0) + ' projected opportunities</span><span class="forecast-regime-' + regimeClass + '">' + readiness + '</span><span class="forecast-confidence">' + (item.confidence || 'Low') + ' confidence</span></div>';
+            }).join('')
+            : 'No client-context forecast data is available.';
+        };
+        async function loadClientForecast() {
+          if (!window.clientId) return;
+          try {
+            const response = await fetch('/api/forecast/client/' + encodeURIComponent(window.clientId), { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderClientForecast('forecast-client', data.items || []);
+          } catch (_) {
+            setText('forecast-client', 'Readiness forecast unavailable.');
+          }
+        }
+        const renderNarrative = (id, items) => {
+          const element = document.getElementById(id);
+          if (!element) return;
+          element.innerHTML = items && items.length
+            ? items.slice(0, 3).map((item) => '<div class="narrative-item">' + escapeHtml(item.summary || '') + '</div>').join('')
+            : 'No readiness narrative data is available.';
+        };
+        async function loadClientReadinessNarrative() {
+          try {
+            const response = await fetch('/api/forecast/narrative/pipeline', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Request failed');
+            const data = await response.json();
+            renderNarrative('client-readiness-narrative', data.items || []);
+          } catch (_) {
+            setText('client-readiness-narrative', 'Readiness narrative unavailable.');
+          }
+        }
         const commandUnavailable = (name) => {
           setText('client-action-status', name + ' is not enabled on MacMiller. Macklemore remains the driver node.');
         };
@@ -3943,6 +6652,7 @@ app.get('/client-dashboard', (req, res) => {
           setText('cluster-banner', (system.cluster_nodes || []).map((node) => node.name + ' — ' + node.role + ': ' + node.status).join(' • '));
         }).catch(() => setText('status-strip', 'System status unavailable.'));
 
+        loadClientReadinessNarrative();
         if (!clientId) return;
         fetch('/api/client/' + encodeURIComponent(clientId), { cache: 'no-store' })
           .then((response) => response.ok ? response.json() : Promise.reject())
@@ -3952,6 +6662,7 @@ app.get('/client-dashboard', (req, res) => {
           .then((response) => response.ok ? response.json() : Promise.reject())
           .then(renderFeed)
           .catch(() => setText('intelligence-feed', 'Client intelligence feed unavailable.'));
+        loadClientForecast();
       })();
     </script>
   `;
@@ -3960,6 +6671,155 @@ app.get('/client-dashboard', (req, res) => {
     content,
     extraHead: '<link rel="stylesheet" href="/src/styles/client.css" />',
   }));
+});
+
+app.get('/client-dashboard', (req, res) => {
+  const content = `
+    <main class="dashboard-page client-dashboard-page">
+      <div class="outer-block header-block"><h1 class="panel-title">CLIENT DASHBOARD</h1><div class="inner-frame"><h2>Client Intelligence Cockpit</h2></div></div>
+
+      <div class="client-selector">
+        <label for="clientDropdown">Select Client:</label>
+        <select id="clientDropdown" onchange="loadClientData(this.value)">
+          <option value="">Select Client</option>
+          <option value="ClientA">Client A</option>
+          <option value="ClientB">Client B</option>
+          <option value="ClientC">Client C</option>
+        </select>
+      </div>
+      <section class="outer-block client-profile"><h3 class="panel-title">Client Profile</h3><div class="inner-frame"><button type="button" id="view-client-profile">View Profile</button><button type="button" id="view-client-intake">View Intake</button></div></section>
+
+      <div class="cockpit-row snapshot-row">
+        <section class="outer-block client-identity"><h3 class="panel-title">Client Identity</h3><div class="inner-frame"><p>Name: <span id="clientName">--</span></p><p>Tier: <span id="clientTier">--</span></p><p>Industry: <span id="clientIndustry">--</span></p><p>Region: <span id="clientRegion">--</span></p><p>Agency Alignment: <span id="clientAgency">--</span></p></div></section><section class="outer-block modernization-score"><h3 class="panel-title">Modernization Score</h3><div class="inner-frame"><p id="modernizationScore">--</p></div></section><section class="outer-block match-score"><h3 class="panel-title">Match Score</h3><div class="inner-frame"><p id="matchScore">--</p></div></section><section class="outer-block risk-score"><h3 class="panel-title">Risk Score</h3><div class="inner-frame"><p id="riskScore">--</p></div></section>
+      </div>
+
+      <div class="cockpit-row intelligence-row">
+        <section class="outer-block compliance"><h3 class="panel-title">Compliance</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block modernization"><h3 class="panel-title">Modernization</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block forecasting"><h3 class="panel-title">Forecasting</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block opportunity-alignment"><h3 class="panel-title">Opportunity Alignment</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block readiness"><h3 class="panel-title">Readiness</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block momentum"><h3 class="panel-title">Momentum</h3><div class="inner-frame"><p>Placeholder</p></div></section>
+      </div>
+
+      <div class="cockpit-row opportunity-row">
+        <section class="outer-block top-opportunities"><h3 class="panel-title">Top 10 Opportunities</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block full-feed"><h3 class="panel-title">Full Opportunity Feed</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block agency-breakdown"><h3 class="panel-title">Agency Breakdown</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block submission-windows"><h3 class="panel-title">Submission Windows</h3><div class="inner-frame"><p>Placeholder</p></div></section>
+      </div>
+
+      <div class="cockpit-row action-row">
+        <section class="outer-block modernization-actions"><h3 class="panel-title">Modernization Actions</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block compliance-actions"><h3 class="panel-title">Compliance Actions</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block outreach-actions"><h3 class="panel-title">Outreach Actions</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block checklist-notes"><h3 class="panel-title">Checklist / Notes</h3><div class="inner-frame"><p>Placeholder</p></div></section><section class="outer-block submission-actions"><h3 class="panel-title">Submission Actions</h3><div class="inner-frame"><p>Placeholder</p></div></section>
+      </div>
+      <section class="outer-block client-matches"><h3 class="panel-title">Matched Opportunities</h3><div class="inner-frame" id="client-matches-content"><p>Select a client to load matches.</p></div></section>
+      <div class="cockpit-row client-modernization-row"><section class="outer-block client-modernization"><h3 class="panel-title">Modernization Posture</h3><div class="inner-frame" id="client-modernization-content"><p>Select a client to load modernization.</p></div></section><section class="outer-block client-compliance"><h3 class="panel-title">Compliance Posture</h3><div class="inner-frame" id="client-compliance-content"><p>Select a client to load compliance.</p></div></section><section class="outer-block client-blockers"><h3 class="panel-title">Modernization Blockers</h3><div class="inner-frame" id="client-blockers-content"><p>Select a client to load blockers.</p></div></section></div>
+      <div class="cockpit-row client-risk-row"><section class="outer-block client-risk"><h3 class="panel-title">Risk Posture</h3><div class="inner-frame" id="client-risk-content"><p>Select a client to load risk.</p></div></section><section class="outer-block client-risk-breakdown"><h3 class="panel-title">Risk Breakdown</h3><div class="inner-frame" id="client-risk-breakdown-content"><p>Select a client to load risk.</p></div></section></div>
+      <section class="outer-block client-forecast"><h3 class="panel-title">Forecast</h3><div class="inner-frame" id="client-forecast-content"><p>Select a client to load forecast.</p></div></section>
+      <section class="outer-block client-priority-opps"><h3 class="panel-title">Top Opportunities</h3><div class="inner-frame" id="client-priority-opps-content"><p>Select a client to load priorities.</p></div></section>
+    </main>
+    <script>
+      (() => {
+        const loadEngineOutput = async (clientId, engine) => {
+          const response = await fetch('/engine/client/' + encodeURIComponent(clientId) + '/' + engine, { cache: 'no-store' });
+          if (!response.ok) throw new Error(engine + ' output unavailable');
+          return response.json();
+        };
+        async function loadModernizationEngine(clientId) {
+          const mod = await loadEngineOutput(clientId, 'modernization');
+          document.querySelector('.modernization .inner-frame p').textContent = mod.posture + ' - Score ' + mod.score;
+        }
+        async function loadMatcherEngine(clientId) {
+          const match = await loadEngineOutput(clientId, 'matcher');
+          document.querySelector('.opportunity-alignment .inner-frame p').textContent = match.alignmentScore + ' - ' + match.alignedAgencies.length + ' agencies';
+        }
+        async function loadRiskEngine(clientId) {
+          const risk = await loadEngineOutput(clientId, 'risk');
+          document.querySelector('.risk-score .inner-frame p').textContent = risk.score + ' - ' + risk.level;
+        }
+        async function loadForecastingEngine(clientId) {
+          const forecast = await loadEngineOutput(clientId, 'forecasting');
+          document.querySelector('.momentum .inner-frame p').textContent = forecast.momentum + ' - ' + forecast.nextQuarter;
+          document.querySelector('.readiness .inner-frame p').textContent = forecast.readiness;
+        }
+        async function loadEngineOpportunities(clientId) {
+          const opportunities = await loadEngineOutput(clientId, 'opportunities');
+          document.querySelector('.top-opportunities .inner-frame p').textContent = opportunities.top10.length + ' items';
+          document.querySelector('.full-feed .inner-frame p').textContent = opportunities.fullFeed.length + ' items';
+          document.querySelector('.agency-breakdown .inner-frame p').textContent = opportunities.agencies.length + ' agencies';
+          document.querySelector('.submission-windows .inner-frame p').textContent = opportunities.windows.length + ' windows';
+        }
+        async function loadEngineActions(clientId) {
+          const actions = await loadEngineOutput(clientId, 'actions');
+          document.querySelector('.modernization-actions .inner-frame p').textContent = actions.modernization.length + ' items';
+          document.querySelector('.compliance-actions .inner-frame p').textContent = actions.compliance.length + ' items';
+          document.querySelector('.outreach-actions .inner-frame p').textContent = actions.outreach.length + ' items';
+          document.querySelector('.submission-actions .inner-frame p').textContent = actions.submission.length + ' items';
+          document.querySelector('.checklist-notes .inner-frame p').textContent = actions.notes.length + ' notes';
+        }
+        async function loadClientMatches(clientId) {
+          const response = await fetch('/engine/matcher/client/' + encodeURIComponent(clientId) + '/results', { cache: 'no-store' });
+          if (!response.ok) return;
+          const data = await response.json();
+          document.getElementById('client-matches-content').innerHTML = data.matches.length
+            ? data.matches.map((match) => '<div class="client-match-item">' + match + '</div>').join('')
+            : '<p>No matches available.</p>';
+        }
+        async function loadClientModernization(clientId) {
+          const response = await fetch('/engine/modernization/client/' + encodeURIComponent(clientId) + '/results', { cache: 'no-store' });
+          if (!response.ok) return;
+          const data = await response.json();
+          document.getElementById('client-modernization-content').textContent = data.posture;
+          document.getElementById('client-compliance-content').textContent = data.compliance;
+          document.getElementById('client-blockers-content').innerHTML = data.blockers.map((blocker) => '<div class="client-modernization-item">' + blocker + '</div>').join('');
+        }
+        async function loadClientRisk(clientId) {
+          const response = await fetch('/engine/risk/client/' + encodeURIComponent(clientId) + '/results', { cache: 'no-store' });
+          if (!response.ok) return;
+          const data = await response.json();
+          document.getElementById('client-risk-content').textContent = data.posture;
+          document.getElementById('client-risk-breakdown-content').innerHTML = 'Compliance Risk: ' + data.risks.compliance + '<br>Operational Risk: ' + data.risks.operational + '<br>Technical Risk: ' + data.risks.technical;
+        }
+        async function loadClientForecast(clientId) {
+          const response = await fetch('/engine/forecast/client/' + encodeURIComponent(clientId) + '/results', { cache: 'no-store' });
+          if (!response.ok) return;
+          const data = await response.json();
+          document.getElementById('client-forecast-content').innerHTML = 'Outlook: ' + data.outlook + '<br>Signals: ' + data.signals.join(', ') + '<br>Trends: ' + data.trends.join(', ') + '<br>Spending: ' + data.spending.join(', ') + '<br>Unlock: ' + data.unlock;
+        }
+        async function loadClientPrioritization(clientId) {
+          const response = await fetch('/engine/prioritize/client/' + encodeURIComponent(clientId) + '/results', { cache: 'no-store' });
+          if (!response.ok) return;
+          const data = await response.json();
+          document.getElementById('client-priority-opps-content').innerHTML = data.opportunities.map((opportunity) => '<div class="client-priority-item">' + opportunity.title + ' - Score ' + opportunity.score + '</div>').join('');
+        }
+        const selectedClientId = () => document.getElementById('clientDropdown').value;
+        document.getElementById('view-client-profile').addEventListener('click', () => { const clientId = selectedClientId(); if (clientId) window.location.href = '/client/' + encodeURIComponent(clientId) + '/profile'; });
+        document.getElementById('view-client-intake').addEventListener('click', () => { const clientId = selectedClientId(); if (clientId) window.location.href = '/client/' + encodeURIComponent(clientId) + '/intake'; });
+        window.loadClientData = async (clientId) => {
+          if (!clientId) return;
+          const response = await fetch('/api/client/' + encodeURIComponent(clientId), { cache: 'no-store' });
+          if (!response.ok) return;
+          const data = await response.json();
+          document.getElementById('clientName').textContent = data.name;
+          document.getElementById('clientTier').textContent = data.tier;
+          document.getElementById('clientIndustry').textContent = data.industry;
+          document.getElementById('clientRegion').textContent = data.region;
+          document.getElementById('clientAgency').textContent = data.agency;
+          document.getElementById('modernizationScore').textContent = data.scores.modernization;
+          document.getElementById('matchScore').textContent = data.scores.match;
+          document.getElementById('riskScore').textContent = data.scores.risk;
+          document.querySelector('.compliance .inner-frame p').textContent = data.intelligence.compliance;
+          document.querySelector('.forecasting .inner-frame p').textContent = data.intelligence.forecasting;
+          await Promise.all([
+            loadModernizationEngine(clientId),
+            loadMatcherEngine(clientId),
+            loadRiskEngine(clientId),
+            loadForecastingEngine(clientId),
+            loadEngineOpportunities(clientId),
+            loadEngineActions(clientId),
+            loadClientMatches(clientId),
+            loadClientModernization(clientId),
+            loadClientRisk(clientId),
+            loadClientForecast(clientId),
+            loadClientPrioritization(clientId),
+          ]);
+        };
+      })();
+    </script>
+  `;
+  res.send(htmlLayout({ title: 'JE ROCKER LC - Client Dashboard', content, statusClass: 'system-row' }));
 });
 
 app.get('/client-dashboard-legacy', (req, res) => {
