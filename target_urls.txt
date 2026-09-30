@@ -1,0 +1,69 @@
+# Target Corporate Job Portals - National AI Headhunter Ingestion
+
+# 1. Honeywell - United States National Pipeline
+https://icfcjb.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/Aerospace/jobs?location=United+States&locationLevel=country
+
+# 2. Lockheed Martin - US National Eightfold Production Link
+https://lockheedmartin.eightfold.ai/careers
+
+# 3. Northrop Grumman - US National Eightfold Production Link
+https://jobs.northropgrumman.com/careers
+
+# 4. RTX Corporation - Phenom Career Pipeline
+# Base domains: raytheon.com, rtx.com
+https://careers.rtx.com/global/en
+https://globalhr.wd5.myworkdayjobs.com/en-US/REC_RTX_Ext_Gateway
+
+# 5. General Dynamics - Corporate and GDIT Career Pipelines
+# Base domains: generaldynamics.com, gdit.com
+https://www.gd.com/careers
+https://gdit.wd5.myworkdayjobs.com/External_Career_Site
+
+# 6. The Boeing Company - TalentBrew Career Pipeline
+# Base domain: boeing.com
+https://jobs.boeing.com/
+
+# 7. BAE Systems - Phenom Career Pipeline
+# Base domain: baesystems.com
+https://baesystems.com
+
+# 8. Booz Allen Hamilton - Corporate Career Pipeline
+# Base domain: boozallen.com
+https://careers.boozallen.com/
+
+# 9. Leidos - Corporate Career Pipeline
+# Base domain: leidos.com
+https://careers.leidos.com/
+
+# 10. Anduril - Production Career Pipeline
+https://www.anduril.com/careers/
+
+# 11. Palantir - Production Career Pipeline
+https://www.palantir.com/careers/
+
+# 12. FedEx Corporation - Production Career Pipeline
+https://careers.fedex.com/
+
+# 13. United Parcel Service (UPS) - Production Career Pipeline
+https://www.jobs-ups.com/
+
+# 14. J.B. Hunt Transport - Production Career Pipeline
+https://jobs.jbhunt.com/
+
+# 15. HCA Healthcare - Production Career Pipeline
+https://careers.hcahealthcare.com/
+
+# 16. UnitedHealth Group - Production Career Pipeline
+https://careers.unitedhealthgroup.com/
+
+# 17. CVS Health - Production Career Pipeline
+https://cvshealth.wd1.myworkdayjobs.com/CVS_Health_Careers
+
+# 18. NextEra Energy / FPL - Production Career Pipeline
+https://jobs.nexteraenergy.com/
+
+# 19. Verizon Communications - Production Career Pipeline
+https://mycareer.verizon.com/
+
+# 20. Union Pacific Railroad - Production Career Pipeline
+https://up.jobs/

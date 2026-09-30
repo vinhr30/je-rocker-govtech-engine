@@ -1,0 +1,68 @@
+# Production Corporate Career Search Endpoints
+
+# Existing national pipelines
+https://icfcjb.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/Aerospace/jobs?location=United+States&locationLevel=country
+https://lockheedmartin.eightfold.ai/careers
+https://jobs.northropgrumman.com/careers
+
+# RTX / Raytheon
+https://careers.rtx.com/global/en
+https://globalhr.wd5.myworkdayjobs.com/en-US/REC_RTX_Ext_Gateway
+
+# General Dynamics / GDIT
+https://www.gd.com/careers
+https://gdit.wd5.myworkdayjobs.com/External_Career_Site
+
+# The Boeing Company
+https://jobs.boeing.com/
+
+# BAE Systems
+https://baesystems.com
+
+# Booz Allen Hamilton
+https://careers.boozallen.com/
+
+# Leidos
+https://careers.leidos.com/
+
+# Anduril
+https://www.anduril.com/careers/
+
+# Palantir
+https://www.palantir.com/careers/
+
+# FedEx Corporation - Production Career Pipeline
+# Architecture: Radancy
+https://careers.fedex.com/
+
+# United Parcel Service (UPS) - Production Career Pipeline
+# Architecture: Radancy
+https://www.jobs-ups.com/
+
+# J.B. Hunt Transport - Production Career Pipeline
+# Architecture: Workday
+https://jobs.jbhunt.com/
+
+# HCA Healthcare - Production Career Pipeline
+# Architecture: Radancy
+https://careers.hcahealthcare.com/
+
+# UnitedHealth Group - Production Career Pipeline
+# Architecture: Radancy
+https://careers.unitedhealthgroup.com/
+
+# CVS Health - Production Career Pipeline
+# Architecture: Workday
+https://cvshealth.wd1.myworkdayjobs.com/CVS_Health_Careers
+
+# NextEra Energy / FPL - Production Career Pipeline
+# Architecture: SuccessFactors
+https://jobs.nexteraenergy.com/
+
+# Verizon Communications - Production Career Pipeline
+# Architecture: Workday
+https://mycareer.verizon.com/
+
+# Union Pacific Railroad - Production Career Pipeline
+# Architecture: SuccessFactors
+https://up.jobs/
