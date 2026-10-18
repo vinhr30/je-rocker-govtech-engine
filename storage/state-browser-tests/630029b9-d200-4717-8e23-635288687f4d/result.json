@@ -1,0 +1,26 @@
+{
+  "state": "NY",
+  "extraction_method": "state_workflow",
+  "transport": "persistent_chrome_dom_snapshot",
+  "structured_data": [],
+  "discovered_records": 0,
+  "selected_records": 0,
+  "hydrated_records": 0,
+  "evidence": [
+    {
+      "snapshot_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-browser-tests/630029b9-d200-4717-8e23-635288687f4d/listing_1.png",
+      "dom_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-browser-tests/630029b9-d200-4717-8e23-635288687f4d/listing_1.json",
+      "snapshot_sha256": "4a8df04fa4287c0b3b5b1180e2aae7a7e8dd2e5b2171b0a2260837e6d2aa4502",
+      "dom_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "url": "https://www.nyscr.ny.gov/"
+    }
+  ],
+  "quality_issues": [
+    "listing_controls_not_ready_requires_manual_review"
+  ],
+  "review_required": true,
+  "status": "requires_manual_review",
+  "requested_max_pages": 1,
+  "max_details": 1,
+  "browser_tab_left_open": true
+}

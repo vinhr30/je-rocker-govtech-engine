@@ -1,0 +1,672 @@
+<!DOCTYPE html><html lang="en"><head runat="server">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-K963M0PKTT&amp;cx=c&amp;gtm=4e6ae1"></script><script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=UA-3419582-2&amp;cx=c&amp;gtm=4e6ae1"></script><script async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-WTBNSTN"></script><script src="/config/InFlight.NLX.Customer.config.js?rev=acc20f021e"></script>
+
+  
+  <meta name="google-site-verification" content="h79ijDsYoMKM_C0YPqjnLz4ijsgBZvtGAsHdu7bkOSo">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Not Authorized</title>
+  <meta name="description" content="Cal eProcure.">
+  <meta name="keywords" content="information, system, finance, department">
+  <meta name="author" content="Cal eProcure">
+  <meta name="web_author" content="InFlight Corporation">
+
+  <!-- Bootstrap -->
+  <link href="/assets/css/vendor.min.css?rev=5ea72739fb" rel="stylesheet">
+  <link href="/assets/css/app.min.css?rev=3a72ffdb76" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet" type="text/css">
+
+  <link rel="apple-touch-icon" sizes="57x57" href="/images/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/images/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/images/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/images/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/images/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/images/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/images/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-180x180.png">
+  <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/images/favicon-194x194.png" sizes="194x194">
+  <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+  <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="apple-mobile-web-app-title" content="California eProcurement Portal">
+  <meta name="application-name" content="California eProcurement Portal">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-TileImage" content="/images/mstile-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-WTBNSTN');</script>
+  <!-- End Google Tag Manager -->
+
+  <!-- Google Tag Manager - Statewide Analytics -->
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      //statewide GA property
+          gtag('config', 'UA-3419582-2');
+      //please update state department UA code in line below before deployment
+          gtag('config', InFlight.NLX.Cfg.Customer.getGTMUACode());
+
+      var getOutboundLink = function(url) {
+      gtag('event', 'click', {
+          'event_category': 'navigation',
+          'event_label': 'outbound link: ' + url,
+          'transport_type': 'beacon',
+          'event_callback': function(){document.location = url;}
+      });
+      }
+
+      var trackDownload = function(filename) {
+      gtag('event', 'click', {
+          'event_category': 'download',
+          'event_label': 'file: ' + filename,
+          'transport_type': 'beacon',
+          'event_callback': function(){document.location = url;}
+      });
+      }
+  </script>
+  <!-- End Google Tag Manager - Statewide Analytics -->
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
+  <script src="/assets/js/vendor.min.js?rev=ba9459d675"></script>
+
+  <style>
+    .if-hide {
+      display: none !important;
+    }
+
+    .psaccesshidden {
+      display: none !important;
+    }
+
+    .form-horizontal .has-feedback .form-control-feedback {
+      top: 10px;
+    }
+
+    .fv-form-bootstrap .fv-icon-no-label {
+      top: 10px;
+      right: 15px;
+    }
+
+    .bs-callout {
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #a94442;
+      border-left-width: 5px;
+      border-radius: 3px;
+    }
+
+      .bs-callout h4 {
+        margin-top: 0;
+        margin-bottom: 5px;
+      }
+
+      .bs-callout p:last-child {
+        margin-bottom: 0;
+      }
+
+      .bs-callout code {
+        border-radius: 3px;
+      }
+
+      .bs-callout + .bs-callout {
+        margin-top: -5px;
+      }
+
+    .bs-callout-default {
+      border-left-color: #777;
+    }
+
+      .bs-callout-default h4 {
+        color: #777;
+      }
+
+    .bs-callout-primary {
+      border-left-color: #428bca;
+    }
+
+      .bs-callout-primary h4 {
+        color: #428bca;
+      }
+
+    .bs-callout-success {
+      border-left-color: #5cb85c;
+    }
+
+      .bs-callout-success h4 {
+        color: #5cb85c;
+      }
+
+    .bs-callout-danger {
+      border-left-color: #a94442;
+    }
+
+      .bs-callout-danger h4 {
+        color: #d9534f;
+      }
+
+    .bs-callout-warning {
+      border-left-color: #f0ad4e;
+    }
+
+      .bs-callout-warning h4 {
+        color: #f0ad4e;
+      }
+
+    .bs-callout-info {
+      border-left-color: #5bc0de;
+    }
+
+      .bs-callout-info h4 {
+        color: #5bc0de;
+      }
+
+    .btn-danger {
+      position: relative;
+    }
+  </style>
+
+</head>
+
+<body id="home">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WTBNSTN"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <!-- Powered by InFlight NLX.  http://www.inflightintegration.com    Copyright (c) 2013-2017 InFlight Corporation.  All Rights Reserved -->
+
+
+  <div id="global_header">
+    <header>
+    <div class="alert alert-warning alert-dismissible mb-0" id="maintenanceHeader" role="alert" style="border-radius:0; ">
+        <div class="container">
+            <button type="button" id="maintenanceHeaderDismissBtn" class="close" aria-label="Close"><span aria-hidden="true">x</span></button>
+            <p id="customAlertHeaderMsg" class="bold"><p> All businesses are encouraged to provide voluntary diversity data information in their CaleProcure profiles. The data will help us shape policies and develop strategies to improve opportunities for all businesses to contract with the state.</p><p>Click&nbsp;<a href="https://fiscal.cdn.prismic.io/fiscal/394445b2-9d0e-40a3-b940-9315c3783793_Diversity+Data+Procedures+%28Registered%29+%281%29.pdf">HERE</a> for instructions. More information is available on the&nbsp;<a target="_blank" rel="noopener" href="https://www.dgs.ca.gov/PD/About/Page-Content/PD-Branch-Intro-Accordion-List/Statewide-Supplier-Diversity-Program/Statewide-Supplier-Diversity-Program">Statewide Supplier Diversity Program</a> page.</p><p>&nbsp;</p><p></p><p></p></p>
+        </div>
+    </div>
+    <nav class="navbar">
+        <div class="container">
+            <div class="grid-logo">
+                <div class="logo">
+                    <h1 class="m-0 p-0">
+                        <a href="/pages/index.aspx">
+                            <img src="/images/cal-eprocure_header.png" alt="Cal eProcure" class="img-responsive">
+                        </a>
+                    </h1>
+                </div>
+            </div>
+            <div class="grid-nav">
+                <button id="btn-nav-user" type="button" class="navbar-toggle user collapsed" data-toggle="collapse" data-target="#user-nav" aria-expanded="false">
+                    <span class="sr-only">Toggle User Menu</span>
+                    <i class="user-icon ifc-icon ifc-circle-10 2x x2" aria-hidden="true"></i>
+                </button>
+                <button id="btn-nav-main" type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-nav" aria-expanded="false">
+                    <div class="center-icon">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </div>
+                </button>
+                <div class="collapse navbar-collapse pull-left" id="main-nav">
+                    <ul class="nav navbar-nav">
+                        <li id="navhome">
+                            <a id="navhome_default" style="" href="/pages/index.aspx" data-i18n="header_home">Home</a>
+                            <a id="navhome_loggedin" style="display:none;" href="/pages/index.aspx" data-i18n="header_home_logged_in">My WorkCenter</a>
+                        </li>
+
+                        <li id="navresources" class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span data-i18n="header_resources">Resources</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="/pages/bidder-vendor.aspx" data-i18n="header_selling_to_the_state">Selling to the State</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/sbdvbe-index.aspx" data-i18n="header_certification_program">Certification Program (SB/DVBE)</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/public-search.aspx" data-i18n="header_public_procurement">Public Procurement Information</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/events.aspx" data-i18n="header_outreach_calendar">Training and Resources</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li id="navsearch" class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span data-i18n="header_search">Quick Links</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="/pages/Events-BS3/event-search.aspx" data-i18n="header_bid_opportunities">Find Bid Opportunities (CSCR)</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/PublicSearch/supplier-search.aspx?psNewWin=true" data-i18n="header_certified_firms">Find Certified Firms (SB/DVBE)</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/LPASearch/lpa-search.aspx" data-i18n="header_state_contracts">Find State Contracts (LPA)</a>
+                                </li>
+                                <li>
+                                    <a id="scprsSearchLink" href="https://suppliers.fiscal.ca.gov/psc/psfpd1/SUPPLIER/ERP/c/ZZ_PO.ZZ_SCPRS1_CMP.GBL?FolderPath=PORTAL_ROOT_OBJECT.ZZ_FISCAL_SCPRS.ZZ_SCPRS1_CMP_GBL&amp;IsFolder=false&amp;IgnoreParamTempl=FolderPath%2cIsFolder" data-i18n="header_past_purchases" target="_blank">Find Past Purchases (SCPRS)</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li id="navhelp" class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span data-i18n="_help">Help</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="/pages/contact.aspx" data-i18n="header_contact_us">Contact Us</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/faq.aspx" data-i18n="header_faq">FAQ</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="collapse navbar-collapse sign-in" id="user-nav">
+                    <ul id="login_tpl" style="" class="nav navbar-nav navbar-right">
+                        <li id="navlogin">
+                            <a href="/pages/BS3/login.aspx" id="sign-in-link">
+                                <i class="sign-in ifc-icon ifc-log-in"></i>
+                                <span data-i18n="header_sign_in">Login/Register</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul id="logout_tpl" style="display:none;" class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" id="user-block" class="dropdown-toggle hidden-xs" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <i class="sign-in fa fa-user"></i>
+                                <span id="user-name">[username]</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" style="min-width:210px">
+                                <li id="myWorkCenterItem"><a href="/pages/index.aspx" data-i18n="header_home_logged_in">My WorkCenter</a></li>
+                                <li id="editAccountHeaderItem" style="display:none"><a href="/pages/EditAccount-BS3/edit-account-main.aspx" data-i18n="header_edit_bidder_account">Edit Bidder Account</a></li>
+                                <li id="updateNotificationsHeaderItem"><a href="/pages/EditAccount-BS3/edit-account-notifications.aspx" data-i18n="header_manage_notifications">Manage Notification Profile</a></li>
+                                <li id="viewProfileHeaderItem" style="display:none"><a href="/pages/SupplierProfile/supplier-profile.aspx" data-i18n="header_view_certification_profile">View Certification Profile</a></li>
+                                <li id="changePasswordHeaderItem" style="display:none"><a href="/pages/BS3/change-password.aspx" data-i18n="header_account_change_password">Change Password</a></li>
+                                <li><a href="javascript:InFlight.User.doLogout()" id="logout" data-i18n="header_sign_out">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<script type="text/javascript">
+
+    $(function () {
+        InFlight.i18n.localize();
+        var isError = commonCleanup();
+        $('#scprsSearchLink').attr('href', InFlight.NLX.Cfg.Customer.classicPastPurchasesUrl);
+        $('#scprsSearchLink').attr('target', '_blank');
+
+        $("#maintenanceHeaderDismissBtn").on("click", function () {
+            sessionStorage.hasDismissedMaintenanceHeader = "true";
+            $("#maintenanceHeader").hide();
+        });
+
+        var $userNav = $('#user-nav');
+        var $mainNav = $('#main-nav');
+        var $gridLogo = $('.grid-logo');
+
+        $('#btn-nav-main').off().on('click', function () {
+            setupMenus($mainNav, $userNav);
+        });
+
+        $('#btn-nav-user').off().on('click', function (e) {
+            if (InFlight.User.isLoggedIn()) {
+                setupMenus($userNav, $mainNav);
+            } else {
+                window.location.href = $('#sign-in-link').attr("href");
+                e.stopPropagation();
+            }
+        });
+
+        function setupMenus($selfNav, $otherNav) {
+            $otherNav.collapse('hide');
+            setTimeout(function () {
+                $selfNav.find('li.dropdown').addClass('open');
+                var count = $('nav .navbar-toggle:not(.collapsed)').length;
+                if (count) {
+                    $gridLogo.addClass('menu-open');
+                } else {
+                    $gridLogo.removeClass('menu-open');
+                }
+            }, 150);
+        }
+
+        // If the user's trying to preview the site banner, then always show the maintenance header
+        if (window.location.href.indexOf('index.aspx?preview=') !== -1 || sessionStorage.hasDismissedMaintenanceHeader !== "true") {
+            InFlight.CMS.getSiteBanner().then(function (resp) {
+                if (!(resp && resp.banner_text)) {
+                    return;
+                }
+
+                var newStyle = $("#maintenanceHeader").attr("style").replace("display: none;", "");
+                $("#maintenanceHeader").attr("style", newStyle);
+                $('#customAlertHeaderMsg').html(resp.banner_text);
+            });
+        }
+    });
+
+    window.addEventListener("hashchange", function (event) {
+
+        var element = document.getElementById(location.hash.substring(1));
+
+        if (element) {
+
+            if (!/^(?:a|select|input|button|textarea)$/i.test(element.tagName)) {
+                element.tabIndex = -1;
+            }
+
+            element.focus();
+        }
+
+    }, false);
+
+
+</script>
+  </div>
+
+  <!-- Page loader -->
+  <div id="loadingContainer" style="display: none;">
+    <div class="overlay">
+    </div>
+    <div id="loading">
+        <div class="spinner">
+            <div class="center">
+                <i class="fa fa-spinner fa-spin fa-5x "></i>
+                <br>
+                <h3 id="nlxLoadingMsg">Loading...</h3>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- this is a button for downloading attachments -->
+  <div data-if-context-wrapper="UNIVERSAL">
+    <div class="modal fade" id="attachmentWrapperModal" tabindex="-1" role="dialog" aria-labelledby="downloadModalAriaLabel" aria-zhidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="if-hide px-15" data-if-label="attachmentWrapper" data-if-source="div.InFlightAttachment:first" data-if-content="null" data-if-hide-when-absent=".">
+              <div class="row " id="attchmentMessage">
+                <span>
+                  Your file is ready.
+                </span>
+              </div>
+              <div class="row" id="attachmentBox">
+                <div class="pull-right">
+                  <a id="downloadButton" target="_blank" href="#" onclick="clearAttachmentWrapper();" class="btn btn-primary" data-if-container-label="attachmentWrapper" data-if-label="attachmentLink" data-if-source="." data-if-content="text:href">
+                    Download Attachment
+                  </a>
+                  <button type="button" class="btn btn-outline-primary" data-dismiss="modal">
+                      Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <span id="downloadModalAriaLabel" style="display:none">Download Attachment Dialog</span>
+  </div>
+
+<script type="text/javascript">
+
+if(localStorage.outageBannerDismissed!="true"){
+    $("#outageBanner").show();
+}
+
+function getInternetExplorerVersion() {
+  var rv = -1; // Return value assumes failure.
+  if (navigator.appName == 'Microsoft Internet Explorer')
+  {
+    var ua = navigator.userAgent;
+    var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+    if (re.exec(ua) != null)
+      rv = parseFloat( RegExp.$1 );
+  } else if (navigator.appName == 'Netscape') {
+    var ua = navigator.userAgent;
+    var re  = new RegExp("Trident/.*rv:([0-9]{1,}[\.0-9]{0,})");
+    if (re.exec(ua) != null)
+      rv = parseFloat( RegExp.$1 );
+  }
+  return rv;
+}
+
+var ver = getInternetExplorerVersion();
+if (ver == 10 || ver == 9 || ver == 8 || ver == 7 || ver == 6 || ver == 5) {
+  window.location.href="/pages/upgrade_browser.html";
+}
+
+function fixSBVDETabs()
+{
+  var tabLinks = document.querySelectorAll("a[data-if-sbvde-special=yes]");
+  if (tabLinks != null)
+  {
+    //console.log("found tab links that need fixing...");
+    for (var i = 0; i < tabLinks.length; i++)
+    {
+      try
+      {
+        var rawJavascript = tabLinks[i].getAttribute("data-if-sbvde-panel-js");
+        var cutStart = rawJavascript.indexOf(",'")+2;
+        var cutEnd = rawJavascript.indexOf("'", cutStart);
+        var panelName = rawJavascript.substring(cutStart, cutEnd);
+        tabLinks[i].setAttribute("name", panelName);
+      }
+      catch(e)
+      {
+        console.log("Error in fixing SBVDE tab links: " + e);
+      }
+    }
+  }
+}
+
+</script>
+
+  <!-- form action -->
+  <div class="hidden" id="formAction" data-if-label="formAction" data-if-source="form" data-if-content="action:ifaction" data-if-hide-when-absent="."></div>
+
+  <!-- Error Modal -->
+  <div data-if-context-wrapper="UNIVERSAL">
+    <div class="modal fade" id="popupMessageModal" tabindex="-1" role="dialog" aria-labelledby="popupMessageTitle" aria-zhidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="popupMessageTitle">Notice</h4>
+          </div>
+          <div class="modal-body">
+            <p id="popupMessageContent" data-if-source="span.InFlightPopup" data-if-content="html" data-if-label="popupMessageContent"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i>Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaving Site Modal -->
+  <div class="modal fade" id="leaveSiteModal" tabindex="-1" role="dialog" aria-labelledby="popupMessageTitleSite" aria-zhidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">×</span>
+            <span class="sr-only">Close</span>
+          </button>
+          <h4 class="modal-title" id="popupMessageTitleSite"><span>Notice - Leaving Site</span></h4>
+        </div>
+        <div class="modal-body">
+          <p>This link will open in a new browser tab and is best viewed in a desktop browser. Close the tab when finished to return to Cal eProcure. <br><br> Do you want to proceed?</p>
+          <br><small style="display:none" id="leaveSiteModal_location"></small>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" onclick="clearLeaveSiteModal();">No</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="openNewTab();">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeout Warning Modal -->
+  <div class="modal fade" id="timeoutWarningModal" tabindex="-1" role="dialog" aria-labelledby="timeoutWarningTitle" aria-zhidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">×</span>
+            <span class="sr-only">Close</span>
+          </button>
+          <h4 class="modal-title" id="timeoutWarningTitle"><span>Timeout Warning</span></h4>
+        </div>
+        <div class="modal-body">
+          <p>Your session is about to expire. Click OK to extend your session.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="reInitSessionExtension();">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nlxContainerMaster">
+    
+  <div class="nlxContainer" style="height: 100%;">
+            
+
+
+  <meta name="robots" content="noindex">
+
+
+
+
+  <div id="hero-image" class="full">
+  </div>
+  <div id="main">
+    <div class="container">
+      <form>
+        <section class="block">
+          <div class="row">
+            <div class="col-xs-12">
+              <h1 class="text-center h3 bold">Please Sign in or Create an Account</h1>
+              <p class="text-center padding-vertical-lg">Please click the button below to sign in or register an account
+                to be able to view this page.</p>
+              <div class="row padding-vertical">
+                <div class="col-sm-6 col-md-4 col-md-offset-2 mb-10">
+                  <a class="btn btn-block btn-primary btn-lg" href="javascript:void(0)" onclick="window.location.href='/pages/BS3/login.aspx'"><i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp;Login</a>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                  <a class="btn btn-block btn-outline-primary btn-lg" href="/pages/BidderRegistration-BS3/bidder-registration-1.aspx"><i class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;New Bidder Registration</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </form>
+    </div>
+  </div>
+
+  <!-- /#main -->
+
+  <script>
+    $(function () {
+      // Clear the logged-in username from the header
+      var $userfield = $("#usermsg");
+      if ($userfield.length > 0) {
+        $userfield.html('');
+        $("#logout_tpl").hide();
+        $("#login_tpl").show();
+      }
+
+      var isError = commonCleanup(null, null, "Not Authorized");
+      
+      sessionStorage.setItem('no-auth-referrer', document.referrer);
+      $('.thumbnail').matchHeight();
+      $('#main').show();
+    });
+  </script>
+
+
+
+            <form>
+                <!-- note - we need to implement a replacement in any page that has context wrappers -->
+                <input type="hidden" data-if-label="hiddenInput" data-if-source="input[type=hidden]" data-if-content="id name value">
+            </form>
+        </div></div>
+  <div id="global_footer" style="visibility: visible;">
+    <footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 text-center logos">
+        <a href="http://www.fiscal.ca.gov/" target="_blank"><img src="/images/logos/fiscal-dark.png" alt="fiscal.ca.gov"></a>
+        <a href="http://www.dgs.ca.gov/" target="_blank"><img src="/images/logos/dgs-dark.png" alt="dgs.ca.gov"></a>
+        <a href="http://www.ca.gov/" target="_blank"><img src="/images/logos/cagov-dark.png" alt="ca.gov"></a>        
+      </div>
+      <div class="col-xs-12 text-center my-20">
+          Copyright 
+          © 2015-<span id="footerYear">2026</span><script>$("#footerYear").html(new Date().getFullYear());</script> 
+          State of California
+      </div>
+      <div class="col-xs-12 text-center">
+        <a href="https://fiscal.ca.gov/privacy-policy">Privacy Policy</a>
+      </div>
+      <div class="col-xs-12">
+        <p class="sr-only" tabindex="0">For further information, help or simply to give feedback on the site reach out to vendors@fiscal.ca.gov</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  </div>
+
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="/assets/js/templates.js?rev=a461821906"></script>
+  <script src="/assets/js/app.min.js?rev=f26d8fff5f"></script>
+  <script src="/assets/js/siteMaintenance.min.js?rev=078bbab472"></script>
+  <script src="/assets/js/sessionExtension.min.js?rev=c4b370a2a8"></script>
+
+
+
+<iframe style="display:none" src="about:blank" id="pastFrame"></iframe><script type="text/javascript" id="" charset="">var pageTimer=function(){var eventName="timerEventVPV";var vTitle=google_tag_manager["rm"]["10906062"](8);var vPath=google_tag_manager["rm"]["10906062"](9);var uId=google_tag_manager["rm"]["10906062"](10);var uLoc=google_tag_manager["rm"]["10906062"](11);var bidderStep=google_tag_manager["rm"]["10906062"](12);var certStep=google_tag_manager["rm"]["10906062"](13);var rVTitle;var rVPath;var rUId;var rULoc;var rBidderStep;var rCertStep;var startTime=0;var endTime=0;var totalTime;var instance;function Singleton(){if(instance)return instance;instance=this;this.elapsedTime=function(){endTime=performance.now();totalTime=
+endTime-startTime;rVTitle=window.google_tag_manager[google_tag_manager["rm"]["10906062"](14)].dataLayer.get("virtualPageTitle");rVPath=window.google_tag_manager[google_tag_manager["rm"]["10906062"](15)].dataLayer.get("virtualPageURL");rBidderStep=window.google_tag_manager[google_tag_manager["rm"]["10906062"](16)].dataLayer.get("bidderRegistrationStep");rCertStep=window.google_tag_manager[google_tag_manager["rm"]["10906062"](17)].dataLayer.get("certificationStep");uLoc=window.google_tag_manager[google_tag_manager["rm"]["10906062"](18)].dataLayer.get("originalLocation");rUId=window.google_tag_manager[google_tag_manager["rm"]["10906062"](19)].dataLayer.get("userId");
+window.dataLayer.push({"event":eventName,"custom.timerElapsedTime":totalTime,"virtualPageURL":vPath,"virtualPageTitle":vTitle,"bidderRegistrationStep":bidderStep,"certificationStep":certStep,"originalLocation":uLoc,"userId":google_tag_manager["rm"]["10906062"](20),"path":vPath,"current path":rVPath});window.dataLayer.push({"event":"resetDataLayer","virtualPageURL":rVPath,"virtualPageTitle":rVTitle,"bidderRegistrationStep":rBidderStep,"certificationStep":rCertStep,"originalLocation":rULoc,"userId":rUId});vTitle=window.google_tag_manager[google_tag_manager["rm"]["10906062"](21)].dataLayer.get("virtualPageTitle");
+vPath=window.google_tag_manager[google_tag_manager["rm"]["10906062"](22)].dataLayer.get("virtualPageURL");rBidderStep=window.google_tag_manager[google_tag_manager["rm"]["10906062"](23)].dataLayer.get("bidderRegistrationStep");rCertStep=window.google_tag_manager[google_tag_manager["rm"]["10906062"](24)].dataLayer.get("certificationStep");uLoc=window.google_tag_manager[google_tag_manager["rm"]["10906062"](25)].dataLayer.get("originalLocation");rUId=window.google_tag_manager[google_tag_manager["rm"]["10906062"](26)].dataLayer.get("userId")};this.clearTime=function(){startTime=endTime;endTime=
+0;totalTime=0}}Singleton.getInstance=function(){return instance||new Singleton};return Singleton}();var t=new pageTimer;</script><script type="text/javascript" id="" charset="">window.dataLayer=window.dataLayer||[];window.dataLayer.push({originalLocation:document.location.protocol+"//"+document.location.hostname+document.location.pathname+document.location.search});</script><script type="text/javascript" id="" charset="">t.elapsedTime();t.clearTime();</script></body></html>

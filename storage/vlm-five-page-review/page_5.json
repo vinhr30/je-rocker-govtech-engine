@@ -1,0 +1,549 @@
+{
+  "id": "five-page-vlm-benchmark",
+  "page": 5,
+  "total_pages": 446,
+  "url": "https://sam.gov/search/?index=opp",
+  "snapshot_sha256": "41a8a5b7f42cb8e2f85d76be4a2c73061415126314a478080837209f551a6b33",
+  "processed_by": "Mac-Mal.local",
+  "model": "Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf",
+  "execution_time": 240.657,
+  "structured_data": [
+    {
+      "solicitation_number": "28321327RI000002",
+      "title": "RFI for Social Security Television (SSTV) Network",
+      "closing_date": "October 22, 2026 at 10:00 AM MST",
+      "primary_agency": "SOCIAL SECURITY ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "FY27HUMEnd2End",
+      "title": "End 2 End (E2E)",
+      "closing_date": "October 23, 2026 at 11:00 AM MST",
+      "primary_agency": "U. S. SECRET SERVICE"
+    },
+    {
+      "solicitation_number": "1282A727Q0004",
+      "title": "Boxelder JCC Medical Services",
+      "closing_date": "November 05, 2026 at 03:00 PM MST",
+      "primary_agency": "USDA FOREST SERVICE"
+    },
+    {
+      "solicitation_number": "W9128F26XICGB",
+      "title": "Cooling Water System Repair and Reliability Project",
+      "closing_date": "October 26, 2026 at 02:00 PM MST",
+      "primary_agency": "W071 ENDIST OMAHA"
+    },
+    {
+      "solicitation_number": "70ZU0327Q60310",
+      "title": "VALVE, 4\", 3-WAY BALL",
+      "closing_date": "October 21, 2026 at",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "70ZU0327Q60310",
+      "title": "VALVE, 4\", 3-WAY BALL",
+      "closing_date": "October 21, 2026 at 07:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "36C25027Q0037",
+      "title": "6130--Uninterruptible Power Supply (UPS) for Pharmaceutical Refrigerators",
+      "closing_date": "October 22, 2026 at 01:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "SPE7MX27D5000",
+      "title": "1 NSN SK FILTER",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "FA800326SS004",
+      "title": "Operational Medicine Test and Evaluation Cell Salvage Supplemental - (AFMEDCOM)",
+      "closing_date": "November 16, 2026 at 04:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W912ER26QA005",
+      "title": "Various Maintenance Parts",
+      "closing_date": "November 03, 2026 at 11:30 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "28321326R00000022",
+      "title": "IT Support Services Contract (ITSSC) Recompete",
+      "closing_date": "October 22, 2026 at 07:00 AM MST",
+      "primary_agency": "SOCIAL SECURITY ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "140L4326Q0124",
+      "title": "R--AREMP AND WATER SAMPLE ANALYSIS",
+      "closing_date": "October 22, 2026 at 07:00 AM MST",
+      "primary_agency": "SOCIAL SECURITY ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "W911S227U0047",
+      "title": "Ballistic Glass Panels",
+      "closing_date": "October 19, 2026 at 11:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "1240LT26Q0035",
+      "title": "GAOA Remove and Replace Roofing on Island Park Admin Site Housing Units",
+      "closing_date": "October 30, 2026 at 04:00 PM MST",
+      "primary_agency": "AGRICULTURE, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "W912P626BA029",
+      "title": "CSSC Site-Wide Handrail Replacement",
+      "closing_date": "October 14, 2026 at 11:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "70Z04026P60011Y00",
+      "title": "ENGINE GRADE OIL",
+      "closing_date": "October 21, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "NSN 3110-01-495-487, BEARING, BALL, AIRFRAME",
+      "title": "SPE4A6-26-R-X302",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "SOCIAL SECURITY ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "SPE4A6-26-R-X302",
+      "title": "NSN 3110-01-495-4847, BEARING, BALL, AIRFRAME",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "70ZU0327Q60311Y00",
+      "title": "CIRCUIT BREAKER, J-FRAME, TYPE JD, 3-POLE, 125A",
+      "closing_date": "Oct 26, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "6TN0194",
+      "title": "General Services Administration (GSA) seeks to lease the following space in Nashville, TN: Solicitation No. 6TN0194",
+      "closing_date": "Oct 30, 2026 at 02:00 PM MST",
+      "primary_agency": "U.S. GOVERNMENT"
+    },
+    {
+      "solicitation_number": "70ZU0327Q60307Y00",
+      "title": "ROD, BRAZING, 0.050\" THK X 0.125\" X 20\" LONG",
+      "closing_date": "Oct 26, 2026 at 07:00 AM MST",
+      "primary_agency": "U.S. GOVERNMENT"
+    },
+    {
+      "solicitation_number": "W911S227U0046",
+      "title": "Television and Mounts",
+      "closing_date": "Oct 22, 2026 at 10:55 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N6134027Q1002",
+      "title": "Zeks Air Refrigerated Dryer System",
+      "closing_date": "Oct 28, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N6134027Q1002",
+      "title": "Zeks Air Refrigerated Dryer System",
+      "closing_date": "October 28, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "70ZU0327Q60306Y00",
+      "title": "MTU ENGINE OVERHAUL PARTS",
+      "closing_date": "October 31, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A727R0054-1680-011589685 - BELL CRANK/ 40A/HELICOPTER, UH-60A,UH-60L, UH-60V",
+      "title": "SPE4A727R0054",
+      "closing_date": "December 02, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C25027AP1139",
+      "title": "6515--SUPPLIES-PROSTHETIC LIMB- DETROIT",
+      "closing_date": "October 27, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "RFI468",
+      "title": "Operational Loads Monitoring System (OLMS)",
+      "closing_date": "October 27, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF AGRICULTURE, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "36C26326B0038",
+      "title": "Y1DZ--Copy of 656-22-342, Preserve Building 10 Windows",
+      "closing_date": "October 27, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "N6883627Q0007",
+      "title": "Washer/Dryer Lease and Maintenance, Naval Submarine Base (NSB), Kings Bay, GA",
+      "closing_date": "November 06, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "47Q5MD20R0001",
+      "title": "Multiple Award Schedule",
+      "closing_date": "October 16, 2026 at 09:12 AM MST",
+      "primary_agency": "FEDERAL ACQUISITION SERVICE"
+    },
+    {
+      "solicitation_number": "36C24927B0001",
+      "title": "R602--Medical Courier Services",
+      "closing_date": "November 30, 2026 at 10:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "FD20302700279",
+      "title": "COMPUTER,SPECIAL PU_End_Item_KC-46_NSN_1680016548736KT_PN_3R2201B",
+      "closing_date": "October 23, 2026 at 09:59 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N6175027R0000",
+      "title": "Modernizing the Naval Enterprise Digital Environment",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "FA446027Q0003",
+      "title": "Little Rock AFB Mortuary Services",
+      "closing_date": "October 19, 2026 at 08:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M427Q0060",
+      "title": "48--VALVE,REGULATING,FLUID",
+      "closing_date": "October 21, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "6973GH-26-R-00177",
+      "title": "6973GH-26-R-00177 - MINIATURE UPS KITS - SIR",
+      "closing_date": "November 04, 2026 at 03:00 PM MST",
+      "primary_agency": "TRANSPORTATION, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "IHS1532024",
+      "title": "Laboratory Proficiency Testing for the Red Lake Service Unit",
+      "closing_date": "October 25, 2026 at 11:00 AM MST",
+      "primary_agency": "HEALTH AND HUMAN SERVICES, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "SPE2D127R0001",
+      "title": "Digital Imaging Network - Picture Archiving and Communication Systems (DIN-PACS) - Generation V",
+      "closing_date": "October 14, 2031 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "80HQTR27R0006",
+      "title": "NASA Postdoctoral Program-3 (NPP-3) - Draft Request for Proposal (DRFP)",
+      "closing_date": "October 30, 2026 at 12:00 PM MST",
+      "primary_agency": "NATIONAL AERONAUTICS AND SPACE ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "NPP-3",
+      "title": "NPP-3 acquisition support",
+      "closing_date": "12:00 PM MST",
+      "primary_agency": "NATIONAL AERONAUTICS AND SPACE ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "70Z03827IH0000003",
+      "title": "Overhaul of ECM Radomes",
+      "closing_date": "October 30, 2026 at 09:00 AM MST",
+      "primary_agency": "HOMELAND SECURITY, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "36C2627Q0030",
+      "title": "J041--PMI ICE Machine Service Contract - w/wd, B+4, POP 1/1/2027 - 12/31/2027",
+      "closing_date": "November 10, 2026 at 04:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "SPE4A727R0053-1680-014732355 - PANEL,CONTROL,ELECTRICAL-ELECTRONIC EQ/ 05F/AIRCRAFT,STRATOLIFTER C/KC",
+      "title": "Panel, Control, Electrical-Electronic EQ",
+      "closing_date": "December 02, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N6117727R5001",
+      "title": "Indefinite Delivery Indefinite Quantity-Multiple Award Contracts (IDIQ-MACs) at Mid-Atlantic Regional Maintenance Center (MARMC) for Next Generation Homeport CNO Availabilities",
+      "closing_date": "November 15, 2026 at 03:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "140P2026R0106",
+      "title": "Z--GOGA 336173 - Repair Conzelman Road",
+      "closing_date": "October 29, 2026 at 01:00 PM MST",
+      "primary_agency": "INTERIOR, DEPARTMENT OF THE"
+    },
+    {
+      "solicitation_number": "SPRDL1-25-R-0153",
+      "title": "Redacted Justification & Approval (J&A)",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPRDL1-25-R-0153",
+      "title": "Redacted J&A",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8E627Q0022",
+      "title": "42--LIFE PRESERVER,VEST",
+      "closing_date": "October 21, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE3SE27Q0039",
+      "title": "73--OVEN,ROASTING AND HOLD",
+      "closing_date": "October 21, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C25526R0167",
+      "title": "71DA--657-24-111JC FCA-Renovate Ambassador Suite & Main Lobby B1",
+      "closing_date": "November 04, 2026 at 01:00 AM MST",
+      "primary_agency": "DEPT OF VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "36C26327Q0066",
+      "title": "5515--PROS V23 618 UNU BILL & REPLACE 88108 TAVR (DOS: 10/15/2026) (VA-27-00015446)",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "SPE4A626RXC53",
+      "title": "53--RIVET,BLIND",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "THAADMS-26-0001",
+      "title": "Terminal High Altitude Area Defense (THAAD) Modeling & Simulation Support",
+      "closing_date": "November 15, 2026 at 03:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "THAAD-26-0001",
+      "title": "Terminal High Altitude Area Defense (THAAD) Modeling & Simulation Support",
+      "closing_date": "November 15, 2026 at 03:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W9127826RA063",
+      "title": "Operation and Maintenance of Government-Owned Facilities and Equipment, Jim Woodruff Lock and Dam and Lake Seminole Project, Florida and Georgia",
+      "closing_date": "November 02, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF THE ARMY"
+    },
+    {
+      "solicitation_number": "FA2377-26-R-B011",
+      "title": "Aircraft Defensive Electro-optical Protection Technologies (ADEPT)",
+      "closing_date": "November 09, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N6660427P0028",
+      "title": "Exterior Sign Removal",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SP8000-27-Q-0002",
+      "title": "S&P Subscription Products",
+      "closing_date": "October 26, 2026 at 09:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N3220527R6008",
+      "title": "90-Day Tanker Time Charter",
+      "closing_date": "October 16, 2026 at 10:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "FY27HUMEnd2End",
+      "title": "End 2 End (E2E)",
+      "closing_date": "October 23, 2026 at 11:00 AM MST",
+      "primary_agency": "U.S. SECRET SERVICE"
+    },
+    {
+      "solicitation_number": "W9128F26XICGB",
+      "title": "Cooling Water System Repair and Reliability Project",
+      "closing_date": "October 26, 2026 at 02:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "70ZU0327Q60310",
+      "title": "VALVE, 4\", 3-WAY BALL",
+      "closing_date": "October 21, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W912ER26QA005",
+      "title": "Various Maintenance Parts",
+      "closing_date": "November 03, 2026 at 03:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "140L4326Q0124",
+      "title": "R--AREMP AND WATER SAMPLE ANALYSIS",
+      "closing_date": "October 21, 2026 at 02:00 PM MST",
+      "primary_agency": "INTERIOR, DEPARTMENT OF THE"
+    },
+    {
+      "solicitation_number": "W912P626BA029",
+      "title": "CSCC Site-Wide Handrailing Replacement",
+      "closing_date": "October 14, 2026 at 11:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "70Z04026P60011Y00",
+      "title": "ENGINE GRADE OIL",
+      "closing_date": "October 14, 2026 at 11:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A6-26-R-X302, NSN 3110-01-495-4847, BEARING, BALL, AIRFRAME",
+      "title": "CIRCUIT BREAKER, J-FRAME, TYPE JD, 3-POLE, 125A",
+      "closing_date": "October 26, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "6TN0194",
+      "title": "General Services Administration (GSA) seeks to lease the following space in Nashville, TN: Solicitation No. 6TN0194",
+      "closing_date": "October 30, 2026 at 02:00 PM MST",
+      "primary_agency": "U.S. GOVERNMENT"
+    },
+    {
+      "solicitation_number": "70ZU0327Q60307Y00",
+      "title": "ROD, BRAZING, 0.050\" THK X 0.125\" X 20\" LONG",
+      "closing_date": "October 26, 2026 at 07:00 AM MST",
+      "primary_agency": "U.S. GOVERNMENT"
+    },
+    {
+      "solicitation_number": "W911S227U0046",
+      "title": "Television and Mounts",
+      "closing_date": "October 22, 2026 at 10:55 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A727R0054",
+      "title": "BELL CRANK/ 40A/HELICOPTER, UH-60A,UH-60L, UH-60V",
+      "closing_date": "December 02, 2026 at 01:00 PM MST",
+      "primary_agency": "DEFENSE LOGISTICS AGENCY"
+    },
+    {
+      "solicitation_number": "36C25027AP1139",
+      "title": "SUPPLIES-PROSTHETIC LIMB- DETROIT",
+      "closing_date": "October 27, 2026 at 12:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "RFI468",
+      "title": "Operational Loads Monitoring System (OLMS)",
+      "closing_date": "October 27, 2026 at 12:00 PM MST",
+      "primary_agency": "AGRICULTURE, FOREST SERVICE"
+    },
+    {
+      "solicitation_number": "N6883627Q0007",
+      "title": "Washer/Dryer Lease and Maintenance, Naval Submarine Base (NSB), Kings Bay, GA",
+      "closing_date": "November 06, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF THE NAVY"
+    },
+    {
+      "solicitation_number": "47QSMD20R0001",
+      "title": "Multiple Award Schedule",
+      "closing_date": "October 16, 2026 at 09:12 AM MST",
+      "primary_agency": "FEDERAL ACQUISITION SERVICE"
+    },
+    {
+      "solicitation_number": "36C24927B0001",
+      "title": "R602--Medical Courier Services",
+      "closing_date": "November 30, 2026 at 10:00 AM MST",
+      "primary_agency": "DEPARTMENT OF VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "FD20302700279",
+      "title": "COMPUTER,SPECIAL PU_End_Item_KC-46_NSN_1680016548736KT _PN_3R2201B",
+      "closing_date": "October 23, 2026 at 09:59 PM MST",
+      "primary_agency": "DEPARTMENT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N6175027R0000",
+      "title": "Modernizing the Naval Enterprise Digital Environment",
+      "closing_date": "October 19, 2026 at 08:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "6973GH-26-R-00177 - MINIATURE UPS KITS - SIR",
+      "title": "SOLICITATION FOR THE ACQUISITION OF 6973GH-26-R-00177 MINIATURE UPS KITS MULTI-YEAR CONTRACT, IN SUPPORT OF CBP DETAILLED IN THIS ANNOUNCEMENT FOR T",
+      "closing_date": "November 04, 2026 at 03:00 PM MST",
+      "primary_agency": "TRANSPORTATION, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "SPE2D127R0001",
+      "title": "Notice ID: SPE2D127R0001",
+      "closing_date": "October 14, 2031 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C26227Q0030",
+      "title": "J041--PMI Ice Machine Service Contract -w/ww, B+4, POP 1/1/2027 - 12/31/2027",
+      "closing_date": "November 10, 2026 at 04:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "SPE4A727R0053-1680-014732355 - PANEL, CONTROL, ELECTRICAL-ELECTRONIC EQ/05F/AIRCRAFT, STRATOLIFTER C/KC",
+      "title": "Notice ID: SPE4A727R0053",
+      "closing_date": "December 02, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "Z--GOGA 336173 - Repair Conzelman Road",
+      "title": "Z--GOGA 336173 - Repair Conzelman Road",
+      "closing_date": "October 29, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "Notice ID: 140P2026R0106",
+      "title": "Notice ID: 140P2026R0106",
+      "closing_date": "October 29, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "Notice ID: SPRLD1-25-R-0153",
+      "title": "Redacted Justification & Approval (J&A)",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "42--LIFE PRESERVER,VEST",
+      "title": "42--LIFE PRESERVER,VEST",
+      "closing_date": "October 21, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "73--OVEN,ROASTING AND HOLD",
+      "title": "73--OVEN,ROASTING AND HOLD",
+      "closing_date": "October 21, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "Z1DA--657-24-111JC FCA-Renovate Ambassador Suite & Main Lobby B1",
+      "title": "Z1DA--657-24-111JC FCA-Renovate Ambassador Suite & Main Lobby B1",
+      "closing_date": "November 04, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    }
+  ],
+  "image_sections": 19,
+  "review_required": true,
+  "timestamp": 1792264423.3201332
+}

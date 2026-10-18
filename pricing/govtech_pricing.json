@@ -1,0 +1,43 @@
+{
+  "namespace": "govtech",
+  "business_line": "GovTech Contracts & Procurement Intelligence",
+  "currency": "USD",
+  "pricing_model": {
+    "readiness": {
+      "product_id": "govtech_readiness_499",
+      "name": "GovTech Readiness Package",
+      "price": 499.00,
+      "billing_type": "one-time",
+      "description": "Comprehensive SAM.gov, UEI, and capability statement readiness review and registration audit.",
+      "checkout_route": "/govtech-checkout/readiness",
+      "stripe_checkout_url": "https://buy.stripe.com/00w7sL3oM9Ko5oYdAtbII02"
+    },
+    "intel": {
+      "product_id": "govtech_intel_149_monthly",
+      "name": "GovTech Intelligence Subscription",
+      "price": 149.00,
+      "billing_type": "monthly",
+      "description": "Continuous automated access to state and federal procurement scraping and opportunity pipeline scoring.",
+      "checkout_route": "/govtech-checkout/intel",
+      "stripe_checkout_url": "https://buy.stripe.com/14A14n0cA6yc3gQdAtbII03"
+    },
+    "proposal": {
+      "product_id": "govtech_proposal_399",
+      "name": "GovTech Proposal Support",
+      "price": 399.00,
+      "billing_type": "per-proposal",
+      "description": "Targeted compliance matrix, technical alignment, and proposal packaging support per contract vehicle.",
+      "checkout_route": "/govtech-checkout/proposal",
+      "stripe_checkout_url": "https://buy.stripe.com/fZu14n2kI8Gk5oYgMFbII04"
+    },
+    "retainer": {
+      "product_id": "govtech_retainer_999_monthly",
+      "name": "GovTech Retainer",
+      "price": 999.00,
+      "billing_type": "monthly",
+      "description": "Dedicated full-cycle federal & state contract capture, agency intelligence briefing, and proposal defense.",
+      "checkout_route": "/govtech-checkout/retainer",
+      "stripe_checkout_url": "https://buy.stripe.com/8x200j0cA2hWg3CdAtbII05"
+    }
+  }
+}

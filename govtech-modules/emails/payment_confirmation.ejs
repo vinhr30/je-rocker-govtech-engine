@@ -1,0 +1,28 @@
+Subject: Payment Confirmed: <%= package_name %> | J.E. Rocker GovTech Advisory
+
+Dear <%= owner_name %>,
+
+Thank you for your payment. We have successfully verified and activated your transaction for <%= business_name %>.
+
+TRANSACTION DETAILS:
+==================================================
+Package:        <%= package_name %>
+Amount Paid:    <%= amount %> USD
+Billing Status: PAID IN FULL (Verified via Stripe Gateway)
+Client ID:      <%= client_id %>
+Timestamp:      <%= new Date().toISOString() %>
+==================================================
+
+WHAT HAPPENS NEXT:
+1. Ingestion Initialization: Your company profile and target NAICS codes (<%= (naics_codes || []).join(', ') %>) are now loaded into our active opportunity surveillance engine.
+2. Compliance Verification: Our local team is reviewing your SAM.gov registration status and UEI.
+3. Deliverable Schedule: Your customized readiness audit and initial opportunity feed will be compiled within 72 hours.
+
+If you need immediate assistance or have upcoming procurement deadlines, reply directly to this email.
+
+Best regards,
+
+Vinh L. Rocker
+Founder & CEO | J.E. Rocker
+📱 480-414-9915
+📧 JEROCKER@outlook.com

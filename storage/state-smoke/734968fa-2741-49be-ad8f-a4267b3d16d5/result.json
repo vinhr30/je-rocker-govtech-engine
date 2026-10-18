@@ -1,0 +1,14 @@
+{
+  "state": "VA",
+  "extraction_method": "state_workflow",
+  "database_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-smoke/734968fa-2741-49be-ad8f-a4267b3d16d5/opportunities_VA.db",
+  "discovered_records": 0,
+  "selected_records": 0,
+  "hydrated_records": 0,
+  "structured_data": [],
+  "review_required": true,
+  "requested_max_pages": 1,
+  "max_details": 1,
+  "discovery_page_limit_supported": true,
+  "status": "no_records_requires_review"
+}

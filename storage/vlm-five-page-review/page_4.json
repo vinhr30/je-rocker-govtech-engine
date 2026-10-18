@@ -1,0 +1,615 @@
+{
+  "id": "five-page-vlm-benchmark",
+  "page": 4,
+  "total_pages": 446,
+  "url": "https://sam.gov/search/?index=opp",
+  "snapshot_sha256": "1d0dd2b9040f0e48e4b901d17ba774d6abf19fb317101384b750cc7f09cae1da",
+  "processed_by": "Mac-Mal.local",
+  "model": "Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf",
+  "execution_time": 233.949,
+  "structured_data": [
+    {
+      "solicitation_number": "6515--PROS V23 618 UNU BILL & REPLACE 6182943978 (MI) TAVR",
+      "title": "6515--PROS V23 618 UNU BILL & REPLACE 6182943978 (MI) TAVR (NEED BY 10/20/2026) (VA-27-00015154)",
+      "closing_date": "10/20/2026",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "Zoller Power Shrink 600",
+      "title": "Zoller Power Shrink 600",
+      "closing_date": "10/28/2026",
+      "primary_agency": "ENERGY, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "U008--Notice of Intent to Sole Source Implementation Science Training",
+      "title": "U008--Notice of Intent to Sole Source Implementation Science Training",
+      "closing_date": "10/22/2026",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "HQ DAF Services Industry Day",
+      "title": "HQ DAF Services Industry Day",
+      "closing_date": "10/08/2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "80-DAY DRY CARGO TIME CHARTER",
+      "title": "80-DAY DRY CARGO TIME CHARTER",
+      "closing_date": "10/23/2026",
+      "primary_agency": "DEPT OF THE AIR FORCE"
+    },
+    {
+      "solicitation_number": "N32205-SS-N321-27-004",
+      "title": "80-DAY DRY CARGO TIME CHARTER",
+      "closing_date": "October 23, 2026 at 08:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "70Z02326R93250001",
+      "title": "USCG Response Boat Small Third Generation (RB-S III)",
+      "closing_date": "November 13, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF THE NAVY"
+    },
+    {
+      "solicitation_number": "W912DW27QA001",
+      "title": "CJD National Pollutant Discharge Elimination System (NPDES) Laboratory Services - Base plus 4 Option Years",
+      "closing_date": "October 21, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "RLP36C24W26R0045",
+      "title": "X1GZ--REQUEST FOR LEASE PROPOSAL: Warehouse - Las Vegas, Nevada",
+      "closing_date": "November 30, 2026 at 05:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "36C25027AP1141",
+      "title": "6515--SUPPLIES-PROSTHETIC LIMB - DETROIT",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "36C25027C0008",
+      "title": "1IDA--RENOVATE OPERATING ROOMS 541-19-101",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "L.C Fluharty Construction LLC"
+    },
+    {
+      "solicitation_number": "FA665627A0001",
+      "title": "Laundry Services",
+      "closing_date": null,
+      "primary_agency": "DEPT OF THE AIR FORCE"
+    },
+    {
+      "solicitation_number": "36C26026Q0472",
+      "title": "Q511--OFL CSS/IOT Lab Management Software and Digital Lens Calculations",
+      "closing_date": null,
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "36C24427Q0025",
+      "title": "Sources Sought- Pathology and Laboratory Microscope",
+      "closing_date": null,
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "SPE4A727R0060-Sources_Sought",
+      "title": "Sources Sought for NSN 1630-00-918-0339",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W50S7U-27-Q-0001",
+      "title": "183 SVF FY27 RSD Meals",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "22DA-FY27 NRM - 36C26126Q1261",
+      "title": "Re-slurry and Re-stripe Bldg. 88 and 98 Parking Lots",
+      "closing_date": "October 22, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE300-27-DP455",
+      "title": "Award for solicitation # SPE300-25-R0062-Fresh Fruit & Vegetable support for (DoD) Troops and Non-DoD USDA School customers located in the Southern Nevada Zone",
+      "closing_date": "October 21, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W51AA13MSealant",
+      "title": "Sources Sought: Brand Name 3M Sealants",
+      "closing_date": "October 21, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C26327Q0067",
+      "title": "6515--PROS V23 618 6182970547 NSC VAN CONVERSION (VA-27-00013895)",
+      "closing_date": "October 28, 2026 at 12:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "36C25727Q0019",
+      "title": "NTX Fisher House Housekeeping Service",
+      "closing_date": "October 26, 2026 at 04:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "140DWF27Q0001",
+      "title": "BLM-ID Wood-Strand Erosion Control Mulch NOTICE OF INTENT",
+      "closing_date": "October 26, 2026 at 04:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "140DWF27Q0001",
+      "title": "BLM-ID Wood-Strand Erosion Control Mulch",
+      "closing_date": "October 26, 2026 at 04:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "47Q5MD20R0001",
+      "title": "Multiple Award Schedule",
+      "closing_date": "October 16, 2026 at 09:12 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W911WN27BA001",
+      "title": "JP Murtha Float Mooring Bitts Retrofit",
+      "closing_date": "November 05, 2026 at 09:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPMYM327Q1100",
+      "title": "Assorted Hardware",
+      "closing_date": "October 20, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A727Q0052",
+      "title": "28--SEAL,METALLIC,AIRCRAFT",
+      "closing_date": "October 16, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "DACA4552700011500",
+      "title": "Lease for Office Space -- 1,578 Sq Ft Required",
+      "closing_date": "October 22, 2026 at 09:59 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W912P827CA001",
+      "title": "Soils & Testing Laboratory Debris Removal",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N6852026Q1069",
+      "title": "Preventive Maintenance Gas Detection System (Re-Bid)",
+      "closing_date": "October 26, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W912WJ27QA003",
+      "title": "Guardrail Installation, Mansfield Hollow Lake, Mansfield, CT",
+      "closing_date": "October 30, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W911WN26QA062",
+      "title": "Mosquito Lake Control Tower Structural Standing Seam Metal Roof Replacement",
+      "closing_date": "October 26, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "140P8326R0006",
+      "title": "Y--OLYM - FAIRHOLME CG ABAAS IMPROVEMENTS",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF THE INTERIOR, DEPARTMENT OF THE NATIONAL PARK SERVICE"
+    },
+    {
+      "solicitation_number": "N6833526Q1183",
+      "title": "MATS Functional Test Set (FMS)",
+      "closing_date": "October 30, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N6833526Q1183",
+      "title": "AMENDMENT 0001",
+      "closing_date": "October 30, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "1AK2099",
+      "title": "General Services Administration (GSA) seeks to lease office space in Palmer and Wasilla, AK",
+      "closing_date": "November 20, 2026 at 06:00 PM MST",
+      "primary_agency": "GENERAL SERVICES ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "52800PR27APPOL13",
+      "title": "NOTICE OF PROPOSED CONTRACT ACTION- NLETS",
+      "closing_date": "November 02, 2026 at 09:00 AM MST",
+      "primary_agency": "HOMELAND SECURITY, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "W912HZ27Z1CRT",
+      "title": "Explosive Characterization and Technical Service Support",
+      "closing_date": "October 22, 2026 at 11:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W912PP25RA009",
+      "title": "Combined Synopsis/Solicitation for; W912PP25RA009 INDEFINITE-DELIVERY, INDEFINITE-QUANTITY (IDIQ), MULTIPLE AWARD TASK ORDER CONTRACT (MATOC) FOR CIVIL WORKS PLANNING STUDIES AND ASSOCIATED DESIGN ARCHITECT-ENGINEER (A-E) SERVICES, ALBUQUERQUE DISTRICT, NE",
+      "closing_date": "November 13, 2026 at 02:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "PANDHA27P0000050968",
+      "title": "INSTRUMENT STERILIZATION SERVICES FOR GUTHRIE ARMY HEALTH CLINIC, FORT DRAUM, NV",
+      "closing_date": "October 23, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "J065--Sonosite X-Porte Repair",
+      "title": "THIS IS NOT A SOLICITATION ANNOUNCEMENT. THIS IS A REQUEST FOR INFORMATION ONLY. This Request for Information (RFI) is intended for information and...",
+      "closing_date": "October 21, 2026 at 08:00 AM MST",
+      "primary_agency": "DEFENSE HEALTH AGENCY"
+    },
+    {
+      "solicitation_number": "47QSMD20R0001",
+      "title": "Multiple Award Schedule",
+      "closing_date": "October 16, 2026 at 09:12 AM MST",
+      "primary_agency": "GENERAL SERVICES ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "CDC-NCHS-2027-10162026",
+      "title": "NCHS/Division of Vital Statistics Coding of the Vital Statistics Data",
+      "closing_date": "October 22, 2026 at 11:00 AM MST",
+      "primary_agency": "HEALTH AND HUMAN SERVICES, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "70US0926R70093666",
+      "title": "National Recruitment Advertising Campaign Services (NRAC)",
+      "closing_date": "May 08, 2026 at 01:00 PM MST",
+      "primary_agency": "HOMELAND SECURITY, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "W912BU26TDSTR",
+      "title": "Detection Sciences Testing and Applied Research (DSTAR)",
+      "closing_date": "October 21, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF THE ARMY"
+    },
+    {
+      "solicitation_number": "36C10B26R0031",
+      "title": "DA01--Identity Credential Access Management (ICAM)",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DELOITTE CONSULTING LLP"
+    },
+    {
+      "solicitation_number": "DA01--Identity Credential Access Management (ICAM)",
+      "title": "DA01--Identity Credential Access Management (ICAM)",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPARTMENT OF VETERANS AFFAIRS"
+    },
+    {
+      "solicitation_number": "ACC-DTA Ground Maneuver Commercial Solutions Opening (CSO)",
+      "title": "ACC-DTA Ground Maneuver Commercial Solutions Opening (CSO)",
+      "closing_date": "Jan 08, 2029",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "MQ-4C Triton Engineering and Sustainment IDIQ",
+      "title": "MQ-4C Triton Engineering and Sustainment IDIQ",
+      "closing_date": "Nov 02, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "PROVIDE TWO TUGS AND ONE PILOT NOAA SHIP PISCES",
+      "title": "PROVIDE TWO TUGS AND ONE PILOT NOAA SHIP PISCES",
+      "closing_date": "Oct 19, 2026",
+      "primary_agency": "DEPT OF COMMERCE"
+    },
+    {
+      "solicitation_number": "41--IMPELLER,FAN,AXIAL",
+      "title": "41--IMPELLER,FAN,AXIAL",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "95--PLATE,FLOOR,METAL",
+      "title": "95--PLATE,FLOOR,METAL",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "BBG ENTERPRISES INC"
+    },
+    {
+      "solicitation_number": "95--PLATE,FLOOR,METAL",
+      "title": "95--PLATE,FLOOR,METAL",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "62--TAILLIGHT,VEHICULAR",
+      "title": "62--TAILLIGHT,VEHICULAR",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "Multiple NSNs - Collins Aerospace (multiple CAGEs) / Multiple Weapons Systems: Sole Source Long Term Contract",
+      "title": "Multiple NSNs - Collins Aerospace (multiple CAGEs) / Multiple Weapons Systems: Sole Source Long Term Contract",
+      "closing_date": "November 02, 2026 at 03:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "Law Enforcement equipment: Binoculars, Monocular, and Helmets.",
+      "title": "Law Enforcement equipment: Binoculars, Monocular, and Helmets.",
+      "closing_date": "November 16, 2026 at 09:00 AM MST",
+      "primary_agency": "STATE, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "SEAL, PLAIN 6649",
+      "title": "SEAL, PLAIN 6649",
+      "closing_date": "November 04, 2026 at 09:59 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "NOAA Ships - Oil Containment Boom Services",
+      "title": "NOAA Ships - Oil Containment Boom Services",
+      "closing_date": "October 27, 2026 at 04:00 AM MST",
+      "primary_agency": "DEPT OF COMMERCE"
+    },
+    {
+      "solicitation_number": "USDA Forest Service Cultural Resource Evaluation and Documentation",
+      "title": "USDA Forest Service Cultural Resource Evaluation and Documentation",
+      "closing_date": "October 27, 2026 at 04:00 AM MST",
+      "primary_agency": "DEPT OF COMMERCE"
+    },
+    {
+      "solicitation_number": "6515--PROS V23 618 UNU BILL & REPLACE 6182943978 (MI) TAVR",
+      "title": "6515--PROS V23 618 UNU BILL & REPLACE 6182943978 (MI) TAVR",
+      "closing_date": "10/20/2026",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "Zoller Power Shrink 600",
+      "title": "Zoller Power Shrink 600",
+      "closing_date": null,
+      "primary_agency": "ENERGY, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "U008--Notice of Intent to Sole Source Implementation Science Training",
+      "title": "U008--Notice of Intent to Sole Source Implementation Science Training",
+      "closing_date": null,
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "HQ DAF Services Industry Day",
+      "title": "HQ DAF Services Industry Day",
+      "closing_date": "October 08, 2026 at 02:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "80-DAY DRY CARGO TIME CHARTER",
+      "title": "80-DAY DRY CARGO TIME CHARTER",
+      "closing_date": "October 23, 2026 at 08:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "USCG Response Boat Small Third Generation (RB-S III)",
+      "title": "USCG Response Boat Small Third Generation (RB-S III)",
+      "closing_date": "November 13, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF THE NAVY"
+    },
+    {
+      "solicitation_number": "CJD National Pollutant Discharge Elimination System (NPDES) Laboratory Services - Base plus 4 Option Years",
+      "title": "CJD National Pollutant Discharge Elimination System (NPDES) Laboratory Services - Base plus 4 Option Years",
+      "closing_date": "October 21, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "X1GZ--REQUEST FOR LEASE PROPOSAL: Warehouse - Las Vegas, Nevada",
+      "title": "X1GZ--REQUEST FOR LEASE PROPOSAL: Warehouse - Las Vegas, Nevada",
+      "closing_date": "November 30, 2026 at 05:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "6515--SUPPLIES-PROSTHETIC LIMB - DETROIT",
+      "title": "6515--SUPPLIES-PROSTHETIC LIMB - DETROIT",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "HANGER PROSTHETICS & ORTHOTICS EAST"
+    },
+    {
+      "solicitation_number": "36C25027AP1141",
+      "title": "6515--SUPPLIES-PROSTHETIC LIMB- DETROIT",
+      "closing_date": null,
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "36C25027C0008",
+      "title": "1IDA--RENOVATE OPERATING ROOMS 541-19-101",
+      "closing_date": null,
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "FA665627A0001",
+      "title": "Laundry Services",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A727R0060",
+      "title": "Defense Logistics Agency (DLA) Weapons Support",
+      "closing_date": "October 21, 2026 at 11:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W50S7U-27-Q-0001",
+      "title": "183 SVF FY27 RSD Meals",
+      "closing_date": "October 22, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C26126Q1261",
+      "title": "Z2DA--FY27 NRM - 36C26126Q1261 | Re-slurry and Re-stripe Bldg. 88 and 98 Parking Lots",
+      "closing_date": "November 03, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE300-27-DP455",
+      "title": "Award for solicitation# SPE300-25-R0062-Fresh Fruit & Vegetable support for (DoD) Troops and Non-DoD USDA School customers located in the Southern Nevada Zone",
+      "closing_date": "October 21, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W51AA13MSealant",
+      "title": "Sources sought for 2 different 3M products. See attached documents for full understanding of requirement.",
+      "closing_date": "October 21, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C26327Q0067",
+      "title": "NTX Fisher House Housekeeping Service",
+      "closing_date": "October 21, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C25727Q0019",
+      "title": "NTX Fisher House Housekeeping Service",
+      "closing_date": "October 28, 2026 at 12:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "140DWF27Q0001",
+      "title": "BLM-ID Wood-Strand Erosion Control Mulch",
+      "closing_date": "October 26, 2026 at 04:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "SPE4A727Q0052",
+      "title": "28--SEAL, METALLIC, AIRCRAFT",
+      "closing_date": "October 16, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "28--SEAL,METALLIC, AIRCRAFT",
+      "title": "Proposed procurement for NSN 2840016162295 SEAL,METALLIC, AIRCRAFT: Line 0001 Qty 160 UI EA Deliver To: W1A8 DLA DISTRIBUTION By: 0344 DAYS ADO App...",
+      "closing_date": "October 16, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N6852026Q1069",
+      "title": "Preventative Maintenance Gas Detection System (Re-Bid)",
+      "closing_date": "October 26, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W912WJ27QA003",
+      "title": "Guardrail Installation, Mansfield Hollow Lake, Mansfield, CT",
+      "closing_date": "October 30, 2026 at 11:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W911WN26QA062",
+      "title": "Mosquito Lake Control Tower Structural Standing Seam Metal Roof Replacement",
+      "closing_date": "October 26, 2026 at 09:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "140P8326R0006",
+      "title": "Y--OLYM - FAIRHOLME CG ABAAS IMPROVEMENTS",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "140P8326R0006",
+      "title": "EO 14398 Make ABAAS improvements and construct family restroom foundations at Fairholme Campground - OLYM...",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N6833526Q1183",
+      "title": "MATS Functional Test Set (FMS)",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "1AK2099",
+      "title": "General Services Administration (GSA) seeks to lease office space in Palmer and Wasilla, AK",
+      "closing_date": "Nov 20, 2026",
+      "primary_agency": "GENERAL SERVICES ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "52800PR27APPOL13",
+      "title": "NOTICE OF PROPOSED CONTRACT ACTION- NLETS",
+      "closing_date": "Nov 02, 2026",
+      "primary_agency": "HOMELAND SECURITY, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "W912HZ27Z1CRT",
+      "title": "Explosive Characterization and Technical Service Support",
+      "closing_date": "Oct 22, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W912PP25RA009",
+      "title": "Combined Synopsis/Solicitation for; W912PP25RA009 INDEFINITE-DELIVERY, INDEFINITE-QUANTITY (IDIQ), MULTIPLE AWARD TASK ORDER CONTRACT (MATOC) FOR CIVIL WORKS PLANNING STUDIES AND ASSOCIATED DESIGN ARCHITECT-ENGINEER (A-E) SERVICES, ALBUQUERQUE DISTRICT, NE",
+      "closing_date": "Nov 13, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W912PP25RA009",
+      "title": "Notice ID: W912PP25RA009",
+      "closing_date": "November 13, 2026 at 02:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "PANDHA27P000050968",
+      "title": "Notice ID: PANDHA27P000050968",
+      "closing_date": "October 23, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C24827Q0060",
+      "title": "J065--Sonosite X-Porte Repair",
+      "closing_date": "October 21, 2026 at 08:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "47QSMD20R0001",
+      "title": "Notice ID: 47QSMD20R0001",
+      "closing_date": "October 16, 2026 at 09:12 AM MST",
+      "primary_agency": "GENERAL SERVICES ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "W912BU26TDSTR",
+      "title": "Detection Sciences Testing and Applied Research (DSTAR)",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C10B26R0031",
+      "title": "DA01--Identity Credential Access Management (ICAM)",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DELOITTE CONSULTING LLP"
+    },
+    {
+      "solicitation_number": "36C10B26R0031",
+      "title": "DA01--Identity Credential Access Management (ICAM)",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "W912CH-26-S-0001",
+      "title": "ACC-DA Ground Maneuver Commercial Solutions (CSO)",
+      "closing_date": "Jan 08, 2029",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "N00019-26-RFPRREQ-WPM262-0179",
+      "title": "MQ-4C Triton Engineering and Sustainment IDIQ",
+      "closing_date": "Nov 02, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    }
+  ],
+  "image_sections": 19,
+  "review_required": true,
+  "timestamp": 1792264182.649665
+}

@@ -1,0 +1,33 @@
+{
+  "state": "NY",
+  "extraction_method": "state_workflow",
+  "database_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-smoke/ac27c72f-ee18-4bb2-a91b-1055be9226b8/opportunities_NY.db",
+  "discovered_records": 25,
+  "selected_records": 1,
+  "hydrated_records": 1,
+  "structured_data": [
+    {
+      "id": 1,
+      "cr_number": "2139566",
+      "title": "Community Forest Conservation Round 4",
+      "agency": "Environmental Conservation, NYS Department of",
+      "category": "Environmental",
+      "ad_type": "Grant or notice of funds availability",
+      "issue_date": "2026-10-16",
+      "due_date": "2026-12-16",
+      "location": "",
+      "full_description": "Community Forest Conservation Round 4",
+      "contact_name": null,
+      "contact_email": null,
+      "contact_phone": null,
+      "attachments": "[]",
+      "state": "NY",
+      "normalized_at": "2026-10-17T20:01:47.202721+00:00"
+    }
+  ],
+  "review_required": true,
+  "requested_max_pages": 1,
+  "max_details": 1,
+  "discovery_page_limit_supported": true,
+  "status": "completed_for_review"
+}

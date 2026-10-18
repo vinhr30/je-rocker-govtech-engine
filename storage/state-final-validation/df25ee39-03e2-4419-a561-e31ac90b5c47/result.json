@@ -1,0 +1,44 @@
+{
+  "state": "NY",
+  "extraction_method": "state_workflow",
+  "workflow": "original_state_pipeline_with_targeted_browser_fallback",
+  "browser_evidence": [
+    {
+      "url": "https://www.nyscr.ny.gov/#cr-2139566",
+      "snapshot_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-final-validation/df25ee39-03e2-4419-a561-e31ac90b5c47/b1966708c9fd628094242a02ad6d396c9f4ca1537f78e40956d1bcec6b3cefc3.png",
+      "snapshot_sha256": "5d831eec7ab6c86427f40d0d77c35404581754782826647f6f7b5b11a8bfdb5d",
+      "purpose": "supplementary_browser_evidence",
+      "browser_tab_left_open": false
+    }
+  ],
+  "quality_issues": [],
+  "database_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-final-validation/df25ee39-03e2-4419-a561-e31ac90b5c47/opportunities_NY.db",
+  "discovered_records": 25,
+  "selected_records": 1,
+  "hydrated_records": 1,
+  "structured_data": [
+    {
+      "id": 1,
+      "cr_number": "2139566",
+      "title": "Community Forest Conservation Round 4",
+      "agency": "Environmental Conservation, NYS Department of",
+      "category": "Environmental",
+      "ad_type": "Grant or notice of funds availability",
+      "issue_date": "2026-10-16",
+      "due_date": "2026-12-16",
+      "location": "",
+      "full_description": "Community Forest Conservation Round 4",
+      "contact_name": null,
+      "contact_email": null,
+      "contact_phone": null,
+      "attachments": "[]",
+      "state": "NY",
+      "normalized_at": "2026-10-17T22:05:30.873010+00:00"
+    }
+  ],
+  "review_required": true,
+  "requested_max_pages": 1,
+  "max_details": 1,
+  "discovery_page_limit_supported": true,
+  "status": "completed_for_review"
+}

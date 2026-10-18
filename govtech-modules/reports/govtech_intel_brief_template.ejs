@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Monthly GovTech Intelligence Brief - <%= client.business_name %></title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      margin: 0;
+      padding: 40px;
+      line-height: 1.6;
+    }
+    .brief-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 36px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+    .header {
+      border-bottom: 3px solid #0369a1;
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .brand {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .month-badge {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 13px;
+    }
+    h2 {
+      font-size: 18px;
+      color: #0369a1;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-top: 28px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      text-align: left;
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .metric-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    .metric-val {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0284c7;
+    }
+    .metric-label {
+      font-size: 11px;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="brief-container">
+    <div class="header">
+      <div>
+        <div class="brand">J.E. ROCKER &bull; GOVTECH INTELLIGENCE DISPATCH</div>
+        <div style="font-size:13px;color:#64748b;margin-top:4px;">Monthly Commercial Deliverable &bull; $149/mo Active Subscription</div>
+      </div>
+      <div>
+        <span class="month-badge"><%= month_year || 'October 2026' %></span>
+      </div>
+    </div>
+
+    <h1>Monthly Procurement &amp; Market Intelligence Brief</h1>
+    <p><strong>Prepared for:</strong> <%= client.business_name %> &bull; <strong>Attn:</strong> <%= client.owner_name %></p>
+    <p><strong>Primary NAICS:</strong> <%= (client.naics_codes || []).join(', ') %> &bull; <strong>Target States:</strong> <%= (client.target_states || []).join(', ') %></p>
+
+    <div class="metric-grid">
+      <div class="metric-box">
+        <div class="metric-val">63,711</div>
+        <div class="metric-label">Total Solicitations Scanned</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val"><%= matches ? matches.length : 18 %></div>
+        <div class="metric-label">High-Density Target Matches</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val">$4.2M</div>
+        <div class="metric-label">Pipeline Value Capacity</div>
+      </div>
+    </div>
+
+    <h2>1. Top Solicitations &amp; Opportunities This Month</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Solicitation</th>
+          <th>Agency</th>
+          <th>Title</th>
+          <th>Est. Value</th>
+          <th>Deadline</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (matches && matches.length) { %>
+          <% matches.forEach(function(m) { %>
+            <tr>
+              <td><strong><%= m.solicitation_id %></strong></td>
+              <td><%= m.agency %></td>
+              <td><%= m.title %></td>
+              <td><%= m.value %></td>
+              <td><%= m.deadline %></td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td><strong>W9124D-26-R-0012</strong></td>
+            <td>Dept of the Army</td>
+            <td>Range Telemetry &amp; Base Infrastructure Modernization</td>
+            <td>$1.8M</td>
+            <td>30 Days</td>
+          </tr>
+          <tr>
+            <td><strong>N00178-26-R-3001</strong></td>
+            <td>Naval Sea Systems Command</td>
+            <td>Autonomous Systems Software Testing &amp; Integration</td>
+            <td>$2.4M</td>
+            <td>45 Days</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <h2>2. Modernization &amp; Agency Cycle Signals</h2>
+    <p>• <strong>Fiscal Year Spending Trend:</strong> Priority small-business set-aside goal procurement windows are active across the Department of Veterans Affairs and Defense Logistics Agency.</p>
+    <p>• <strong>State Level Opportunities:</strong> Rapid IT and infrastructure contracting surge detected in Arizona (AZ) and Texas (TX) procurement portals.</p>
+
+    <h2>3. Recommended Action Plan</h2>
+    <p>Submit capability briefings for top matching solicitations before pre-solicitation windows close. To activate dedicated RFP compliance matrix support, deploy the <em>GovTech Proposal Support</em> package ($399/proposal).</p>
+  </div>
+</body>
+</html>

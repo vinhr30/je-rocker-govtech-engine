@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/src/styles/dashboard.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0b0f17;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .govtech-dash-wrap {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 16px;
+    }
+    .dash-header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #38bdf8;
+    }
+    .dash-actions a {
+      margin-left: 10px;
+      padding: 8px 16px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .dash-actions a:hover {
+      background: #0284c7;
+      border-color: #0284c7;
+    }
+  </style>
+</head>
+<body>
+  <div class="govtech-dash-wrap">
+    <div class="dash-header">
+      <div>
+        <span style="background:#1e3a8a;color:#93c5fd;padding:2px 8px;border-radius:9999px;font-size:10px;font-weight:700;text-transform:uppercase;">Business 1 &bull; Cockpit Control</span>
+        <h1 style="margin-top:6px;">GovTech Client Operations Dashboard</h1>
+      </div>
+      <div class="dash-actions">
+        <a href="/cover">&larr; Return to GovTech Cover</a>
+        <a href="/govtech-intake">+ Add New Client</a>
+        <a href="/govtech-pipeline">CRM Pipeline</a>
+        <a href="/business-driver">Business Driver Cockpit</a>
+      </div>
+    </div>
+
+    <%- include('tiles/govtech_tile', { summary: summary, clients: clients }) %>
+  </div>
+</body>
+</html>

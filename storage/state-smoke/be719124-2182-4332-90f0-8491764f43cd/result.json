@@ -1,0 +1,35 @@
+{
+  "state": "FL",
+  "extraction_method": "state_workflow",
+  "database_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-smoke/be719124-2182-4332-90f0-8491764f43cd/opportunities_FL.db",
+  "discovered_records": 1,
+  "selected_records": 1,
+  "hydrated_records": 1,
+  "structured_data": [
+    {
+      "id": 1,
+      "event_id": "current_bid_opportunities",
+      "title": "current_bid_opportunities",
+      "department": "Florida Department of Management Services",
+      "event_type": "",
+      "start_date": null,
+      "end_date": null,
+      "description": "Skip to Main Content Menu Search: Search this site Home / Florida_department_of_management_services/business_operations/state_purchasing/office_of_supplier_development_osd/vendor_resources/current_bid_opportunities \u2191 Back to top Copyright \u00a9 2026 Department of Management Services - State of Florida",
+      "contact_name": null,
+      "contact_email": null,
+      "contact_phone": null,
+      "bid_type": "",
+      "location": "of Management Services Skip to Main Content Menu Search: Search this site Home / Florida_department_of_management_services/business_operations/state_purchasing/office_of_supplier_development_osd/vendor_resources/current_bid_opportunities \u2191 Back to top Copyright \u00a9 2026 Department of Management Services - State of Florida",
+      "commodity_codes": "[]",
+      "attachments": "[]",
+      "url": "https://www.dms.myflorida.com/business_operations/state_purchasing/office_of_supplier_development_osd/vendor_resources/current_bid_opportunities#main-content",
+      "state": "Florida",
+      "normalized_at": "2026-10-17T20:01:45.294460+00:00"
+    }
+  ],
+  "review_required": true,
+  "requested_max_pages": 1,
+  "max_details": 1,
+  "discovery_page_limit_supported": true,
+  "status": "completed_for_review"
+}

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GovTech Client Intake | J.E. Rocker</title>
+  <link rel="stylesheet" href="/src/styles/dashboard.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0b0f14;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .govtech-intake-container {
+      max-width: 860px;
+      margin: 40px auto;
+      padding: 32px;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+    }
+    .govtech-header {
+      border-bottom: 1px solid #374151;
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+    }
+    .govtech-header h1 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      color: #60a5fa;
+      letter-spacing: -0.02em;
+    }
+    .govtech-header p {
+      margin: 0;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+    .badge-namespace {
+      display: inline-block;
+      padding: 3px 10px;
+      background: #1e3a8a;
+      color: #93c5fd;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .form-group-full {
+      grid-column: span 2;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #cbd5e1;
+    }
+    label .required {
+      color: #f87171;
+    }
+    input[type="text"],
+    input[type="url"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 12px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 6px;
+      color: #f8fafc;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="file"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      background: #1f2937;
+      border: 1px dashed #4b5563;
+      border-radius: 6px;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    .helper-text {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    .plan-selector {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .plan-card {
+      border: 2px solid #374151;
+      background: #1e293b;
+      padding: 14px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .plan-card:hover {
+      border-color: #60a5fa;
+      background: #24344d;
+    }
+    .plan-card input[type="radio"] {
+      display: none;
+    }
+    .plan-card.selected {
+      border-color: #3b82f6;
+      background: #1e3a8a;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+    }
+    .plan-name {
+      font-weight: 700;
+      font-size: 13px;
+      color: #f8fafc;
+      margin-bottom: 4px;
+    }
+    .plan-price {
+      font-size: 18px;
+      font-weight: 800;
+      color: #34d399;
+      margin-bottom: 4px;
+    }
+    .plan-desc {
+      font-size: 11px;
+      color: #94a3b8;
+      line-height: 1.3;
+    }
+    .actions {
+      margin-top: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #374151;
+      padding-top: 20px;
+    }
+    .btn-submit {
+      padding: 12px 28px;
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-submit:hover {
+      background: #1d4ed8;
+    }
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+    .cancel-link {
+      color: #9ca3af;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .cancel-link:hover {
+      color: #e2e8f0;
+      text-decoration: underline;
+    }
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-group-full {
+        grid-column: span 1;
+      }
+      .plan-selector {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="govtech-intake-container">
+    <div class="govtech-header">
+      <span class="badge-namespace">Business 1 &bull; GovTech Namespace</span>
+      <h1>GovTech Client Onboarding &amp; Intake</h1>
+      <p>Configure contractor profile parameters for automated SAM.gov &amp; State opportunity capture scoring.</p>
+    </div>
+
+    <form id="govtech-intake-form" action="/govtech-intake" method="POST" enctype="multipart/form-data">
+      <div class="form-grid">
+        <div>
+          <label for="business_name">Business Name <span class="required">*</span></label>
+          <input type="text" id="business_name" name="business_name" required placeholder="e.g. Apex Defense Solutions LLC">
+        </div>
+
+        <div>
+          <label for="owner_name">Owner Name <span class="required">*</span></label>
+          <input type="text" id="owner_name" name="owner_name" required placeholder="e.g. Marcus Vance">
+        </div>
+
+        <div>
+          <label for="veteran_owned">Veteran-Owned Business <span class="required">*</span></label>
+          <select id="veteran_owned" name="veteran_owned" required>
+            <option value="yes">Yes (SDVOSB / VOSB Qualified)</option>
+            <option value="no">No (Standard Commercial / 8(a) / WOSB / HUBZone)</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="sam_status">SAM.gov Registration Status <span class="required">*</span></label>
+          <select id="sam_status" name="sam_status" required>
+            <option value="active">Active Registration</option>
+            <option value="in_progress">In Progress / Pending CAGE</option>
+            <option value="expired">Expired / Needs Renewal</option>
+            <option value="not_registered">Not Yet Registered</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="uei">Unique Entity Identifier (UEI)</label>
+          <input type="text" id="uei" name="uei" maxlength="12" placeholder="12-character SAM.gov UEI">
+          <div class="helper-text">Leave blank if pending registration</div>
+        </div>
+
+        <div>
+          <label for="website">Company Website</label>
+          <input type="url" id="website" name="website" placeholder="https://apexdefense.com">
+        </div>
+
+        <div class="form-group-full">
+          <label for="naics_codes">Primary NAICS Codes <span class="required">*</span></label>
+          <input type="text" id="naics_codes" name="naics_codes" required placeholder="e.g. 541512, 541519, 541330, 236220">
+          <div class="helper-text">Comma-separated 6-digit NAICS codes for target clustering</div>
+        </div>
+
+        <div>
+          <label for="target_states">Target States <span class="required">*</span></label>
+          <input type="text" id="target_states" name="target_states" required value="AZ, CA, TX, FL, VA, NY">
+          <div class="helper-text">Comma-separated (AZ, CA, TX, FL, VA, NY supported)</div>
+        </div>
+
+        <div>
+          <label for="target_agencies">Target Federal Agencies</label>
+          <input type="text" id="target_agencies" name="target_agencies" placeholder="e.g. DOD, DLA, VA, DHS, GSA, DOE">
+          <div class="helper-text">Target procurement departments</div>
+        </div>
+
+        <div class="form-group-full">
+          <label for="proposal_budget">Annual Proposal Pursuit Budget</label>
+          <select id="proposal_budget" name="proposal_budget">
+            <option value="under_25k">Under $25,000</option>
+            <option value="25k_100k">$25,000 - $100,000</option>
+            <option value="100k_250k">$100,000 - $250,000</option>
+            <option value="250k_plus">$250,000+</option>
+          </select>
+        </div>
+
+        <div class="form-group-full">
+          <label for="capability_statement">Capability Statement Upload (PDF / Word / Text)</label>
+          <input type="file" id="capability_statement" name="capability_statement" accept=".pdf,.doc,.docx,.txt,.md">
+          <div class="helper-text">Upload your current one-pager or capabilities overview for vector ingestion</div>
+        </div>
+
+        <div class="form-group-full">
+          <label>Preferred Plan <span class="required">*</span></label>
+          <div class="plan-selector">
+            <label class="plan-card" data-plan="readiness">
+              <input type="radio" name="preferred_plan" value="readiness" checked>
+              <div class="plan-name">Readiness Package</div>
+              <div class="plan-price">$499</div>
+              <div class="plan-desc">One-time registration &amp; capability statement audit</div>
+            </label>
+
+            <label class="plan-card" data-plan="intel">
+              <input type="radio" name="preferred_plan" value="intel">
+              <div class="plan-name">Intelligence Sub</div>
+              <div class="plan-price">$149<span style="font-size:11px;font-weight:normal">/mo</span></div>
+              <div class="plan-desc">Live state &amp; federal opportunity alerts &amp; match scoring</div>
+            </label>
+
+            <label class="plan-card" data-plan="proposal">
+              <input type="radio" name="preferred_plan" value="proposal">
+              <div class="plan-name">Proposal Support</div>
+              <div class="plan-price">$399</div>
+              <div class="plan-desc">Per-proposal compliance matrix &amp; response review</div>
+            </label>
+
+            <label class="plan-card" data-plan="retainer">
+              <input type="radio" name="preferred_plan" value="retainer">
+              <div class="plan-name">GovTech Retainer</div>
+              <div class="plan-price">$999<span style="font-size:11px;font-weight:normal">/mo</span></div>
+              <div class="plan-desc">Full-cycle contract capture, agency intelligence &amp; defense</div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a href="/business-driver" class="cancel-link">&larr; Return to Business Driver</a>
+        <button type="submit" class="btn-submit">Proceed to Secure Checkout &rarr;</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.querySelectorAll('.plan-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+      });
+      if (card.querySelector('input[type="radio"]:checked')) {
+        card.classList.add('selected');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GovTech Readiness Report - <%= client.business_name %></title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #ffffff;
+      color: #1e293b;
+      margin: 0;
+      padding: 40px;
+      line-height: 1.6;
+    }
+    .report-header {
+      border-bottom: 3px solid #0284c7;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .brand {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .badge-report {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .score-banner {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+    }
+    .score-val {
+      font-size: 36px;
+      font-weight: 800;
+      color: #0284c7;
+    }
+    .score-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      color: #64748b;
+      font-weight: 600;
+    }
+    h2 {
+      color: #0f172a;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 8px;
+      margin-top: 32px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      text-align: left;
+      font-size: 14px;
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+    }
+    .action-item {
+      background: #fefce8;
+      border-left: 4px solid #eab308;
+      padding: 12px 16px;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="report-header">
+    <div>
+      <div class="brand">J.E. ROCKER &bull; GOVTECH ADVISORY</div>
+      <div style="font-size: 13px; color: #64748b; margin-top: 4px;">Delivered under GovTech Readiness Package ($499)</div>
+    </div>
+    <div>
+      <span class="badge-report">Official Audit Deliverable</span>
+    </div>
+  </div>
+
+  <h1>Federal Contracting Readiness Report</h1>
+  <p><strong>Client Entity:</strong> <%= client.business_name %> &bull; <strong>Owner:</strong> <%= client.owner_name %></p>
+  <p><strong>Audit Date:</strong> <%= new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></p>
+
+  <div class="score-banner">
+    <div>
+      <div class="score-val"><%= readiness_score || 85 %>/100</div>
+      <div class="score-label">Readiness Index</div>
+    </div>
+    <div>
+      <div class="score-val"><%= client.sam_status === 'active' ? 'VERIFIED' : 'PENDING' %></div>
+      <div class="score-label">SAM.gov Registration</div>
+    </div>
+    <div>
+      <div class="score-val"><%= client.veteran_owned ? 'SDVOSB' : 'COMMERCIAL' %></div>
+      <div class="score-label">Set-Aside Classification</div>
+    </div>
+  </div>
+
+  <h2>1. Entity Registration &amp; Identification Audit</h2>
+  <table>
+    <tr><th>Parameter</th><th>Verified State</th><th>Status</th></tr>
+    <tr><td>SAM.gov Unique Entity Identifier (UEI)</td><td><%= client.uei || 'Pending Issuance' %></td><td><%= client.uei ? '✓ Compliant' : '⚠️ Action Required' %></td></tr>
+    <tr><td>SAM.gov Registration Status</td><td><%= client.sam_status %></td><td><%= client.sam_status === 'active' ? '✓ Active' : '⚠️ Renewal/Submission Needed' %></td></tr>
+    <tr><td>Primary NAICS Taxonomy</td><td><%= (client.naics_codes || []).join(', ') %></td><td>✓ Mapped to Federal Categories</td></tr>
+    <tr><td>Target Operating States</td><td><%= (client.target_states || []).join(', ') %></td><td>✓ Synchronized to Scraper Feeds</td></tr>
+  </table>
+
+  <h2>2. Gap Analysis &amp; Action Plan</h2>
+  <div class="action-item"><strong>Priority 1:</strong> Formalize capability statement with explicit core competencies mapped to primary NAICS <%= (client.naics_codes || [])[0] || '541512' %>.</div>
+  <div class="action-item"><strong>Priority 2:</strong> Register in state vendor portals (<%= (client.target_states || ['AZ', 'CA']).slice(0, 3).join(', ') %>) for localized small-business set-aside preference.</div>
+  <div class="action-item"><strong>Priority 3:</strong> Configure automated keyword monitors across target federal departments: <%= (client.target_agencies || ['DOD', 'DLA']).join(', ') %>.</div>
+
+  <h2>3. Next Steps</h2>
+  <p>Your firm has been onboarded into the J.E. Rocker opportunity surveillance database. To activate continuous daily proposal match alerts, upgrade to the <em>GovTech Intelligence Subscription</em> ($149/mo).</p>
+
+  <p style="margin-top: 40px; font-size: 13px; color: #64748b; border-top: 1px solid #cbd5e1; padding-top: 16px;">
+    J.E. Rocker &bull; Commercial Procurement Advisory &bull; 480-414-9915 &bull; JEROCKER@outlook.com
+  </p>
+</body>
+</html>

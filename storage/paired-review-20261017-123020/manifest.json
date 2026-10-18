@@ -1,0 +1,40 @@
+[
+  {
+    "id": "paired-review-20261017-123020",
+    "url": "https://sam.gov/search/?index=opp&page=1&pageSize=100&sort=-modifiedDate&sfm%5BsimpleSearch%5D%5BkeywordRadio%5D=ALL&sfm%5BsimpleSearch%5D%5BkeywordTags%5D%5B0%5D%5Bkey%5D=*&sfm%5BsimpleSearch%5D%5BkeywordTags%5D%5B0%5D%5Bvalue%5D=*&sfm%5BsimpleSearch%5D%5BkeywordEditorTextarea%5D=&sfm%5Bstatus%5D%5Bis_active%5D=true",
+    "source": "sam",
+    "page_number": 1,
+    "total_pages": 446,
+    "requested_max_pages": 2,
+    "snapshot_path": "/Users/vinhrocker/Desktop/Dashboard/storage/snapshots/paired-review-20261017-123020/opp_288a5ecd4c2287de531db1ead41e7716fcf632271641b169cc4d5dd7388607eb_page_1.png",
+    "snapshot_host": "Mac-Miller.local",
+    "snapshot_sha256": "70aded6a7c6a330f28cc1eb975d849195e572abe7bf3725737920873afb74759",
+    "dom_path": "/Users/vinhrocker/Desktop/Dashboard/storage/snapshots/paired-review-20261017-123020/opp_288a5ecd4c2287de531db1ead41e7716fcf632271641b169cc4d5dd7388607eb_page_1.json",
+    "dom_sha256": "c53921b5eb17318e0dab9d3b4a7dfdd439e95aed63ce6ae444ba26bc4a6904a1",
+    "dom_record_count": 100,
+    "details": {},
+    "elapsed_seconds": 3.028,
+    "timestamp": 1792265424.0413508,
+    "asset_transport": "worker_local_file",
+    "captured_pages": 2
+  },
+  {
+    "id": "paired-review-20261017-123020",
+    "url": "https://sam.gov/search/?index=opp&page=2&pageSize=100&sort=-modifiedDate&sfm%5BsimpleSearch%5D%5BkeywordRadio%5D=ALL&sfm%5BsimpleSearch%5D%5BkeywordTags%5D%5B0%5D%5Bkey%5D=*&sfm%5BsimpleSearch%5D%5BkeywordTags%5D%5B0%5D%5Bvalue%5D=*&sfm%5BsimpleSearch%5D%5BkeywordEditorTextarea%5D=&sfm%5Bstatus%5D%5Bis_active%5D=true",
+    "source": "sam",
+    "page_number": 2,
+    "total_pages": 446,
+    "requested_max_pages": 2,
+    "snapshot_path": "/Users/vinhrocker/Desktop/Dashboard/storage/snapshots/paired-review-20261017-123020/opp_288a5ecd4c2287de531db1ead41e7716fcf632271641b169cc4d5dd7388607eb_page_2.png",
+    "snapshot_host": "Mac-Miller.local",
+    "snapshot_sha256": "04e2c1f63310baee855fc7f0e56f02942ec4420e0059cb4484697cf33ff57b6e",
+    "dom_path": "/Users/vinhrocker/Desktop/Dashboard/storage/snapshots/paired-review-20261017-123020/opp_288a5ecd4c2287de531db1ead41e7716fcf632271641b169cc4d5dd7388607eb_page_2.json",
+    "dom_sha256": "fa6996c49b4562692446c4b3fea835b9736405907cc91ec072c256812519738f",
+    "dom_record_count": 100,
+    "details": {},
+    "elapsed_seconds": 4.143,
+    "timestamp": 1792265425.1563962,
+    "asset_transport": "worker_local_file",
+    "captured_pages": 2
+  }
+]

@@ -1,0 +1,46 @@
+{
+  "state": "TX",
+  "extraction_method": "state_workflow",
+  "workflow": "original_state_pipeline_with_targeted_browser_fallback",
+  "browser_evidence": [
+    {
+      "url": "https://www.txsmartbuy.gov/esbd/IW244388",
+      "snapshot_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-runs/live-browser-process-tx-01898f61-9b69-42e3-910a-4e7cb0c91987/4c3b8b12e033017d4ea1a42179d2e8adc2e3f14610d7373072cdafcc8b1bebeb.png",
+      "snapshot_sha256": "91888de3a124d4b289517de36a8a940f257a20b2c7576a24fd32ceaffbf18b7f",
+      "purpose": "supplementary_browser_evidence",
+      "browser_tab_left_open": false
+    }
+  ],
+  "quality_issues": [],
+  "database_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-runs/live-browser-process-tx-01898f61-9b69-42e3-910a-4e7cb0c91987/opportunities_TX.db",
+  "discovered_records": 24,
+  "selected_records": 1,
+  "hydrated_records": 1,
+  "structured_data": [
+    {
+      "id": 1,
+      "event_id": "IW244388",
+      "title": "TDCJ - Gurney Unit - Procurement of HVAC Package",
+      "department": "696",
+      "event_type": "",
+      "start_date": "2026-03-12",
+      "end_date": "2026-04-16",
+      "description": "Home ESBD Solicitations IW244388 Electronic State Business Daily Download PDF TDCJ - Gurney Unit - Procurement of HVAC Package Solicitation ID: IW244388 Status: No Award Contact Name: Teria Godwin-Pierce Contact Number: (936) 437-3847 Contact Email: teria.godwin-pierce@tdcj.texas.gov Bid Response Email: Bids@TDCJ.Texas.gov Response Due Date: 4/16/2026 Response Due Time: 3:00 PM Agency/Texas SmartBuy Member Number: 696 Posting Requirement: 14+ Days for Entire Solicitation Package State Agency Procurement Certification: CTCD Solicitation Posting Date: 3/12/2026 Last Modified: 10/16/2026 2:40 pm Class/Item Code: 91036-Heating, Air Conditioning, And Ventilation Maintenance And Repair Services (Including Installation); Highway Districts: District 10, View Highway Districts Planned Repost: Yes No Award Note: TDCJ plans to resolicit. Solicitation Description: THE TEXAS DEPARTMENT OF CRIMINAL JUSTICE (TDCJ) IS CURRENTLY REQUESTING BIDS TO ESTABLISH A PURCHASE ORDER FOR THE PROCUREMENT OF A HVAC UNIT PACKAGE TO REPLACE AN OBSOLETE 135 TON HVAC UNIT WITH A SEMI-CUSTOM 140 TON UNIT THAT INCLUDES INSTALL, START-UP AND TRAINING. Attachments Attachments # Name Description 1 ESBD_495397_1773171175915_IW244388.pdf Invitation For Bids X 2 ESBD_495397_1773171198270_T&C Standard.pdf Terms and Conditions X 3 ESBD_495397_1773171218180_Disclaimer.pdf Disclaimer X 4 ESBD_495397_1773171278414_R6220883 - IW244388 SOW.pdf Statement of Work - IW244388 X 5 ESBD_495397_1773171301647_R6220883 - IW244388 Drawings.pdf Drawings X 6 ESBD_495397_1775675380318_IW244388 - Amendment No. 1.pdf Amendment No.1 X 7 ESBD_495397_1775675472119_R6220883 - IW244388 SOW-A.pdf Statement of Work - A - IW244388 X 8 ESBD_495397_1775675572339_R6220883 - IW244388 SOW-B.pdf Statement of Work - B - IW244388 X 9 ESBD_495397_1775675631146_R6220883 - IW244388 Drawings-A.pdf Drawings - A X 10 ESBD_495397_1775675670709_R6220883 - IW244388 Drawings-B.pdf Drawings - B X",
+      "contact_name": "Outreach Spd Staff Directory Login Home Esbd Solicitations Iw",
+      "contact_email": "teria.godwin-pierce@tdcj.texas.gov",
+      "contact_phone": "(936) 437-3847",
+      "bid_type": "",
+      "location": "OF CRIMINAL JUSTICE (TDCJ) IS CURRENTLY REQUESTING BIDS TO ESTABLISH A PURCHASE ORDER FOR THE PROCUREMENT OF A HVAC UNIT PACKAGE TO REPLACE AN OBSOLETE 135 TON HVAC UNIT WITH A SEMI-CUSTOM 140 TON UNIT THAT INCLUDES INSTALL, START-UP AND TRAINING. Attachments Attachments # Name Description 1 ESBD_495397_1773171175915_IW244388.pdf Invitation For Bids X 2 ESBD_495397_1773171198270_T&C Standard.pdf Terms and Conditions X 3 ESBD_495397_1773171218180_Disclaimer.pdf Disclaimer X 4 ESBD_495397_1773171278414_R6220883 - IW244388 SOW.pdf Statement of Work - IW244388 X 5 ESBD_495397_1773171301647_R6220883 - IW244388 Drawings.pdf Drawings X 6 ESBD_495397_1775675380318_IW244388 - Amendment No. 1.pdf Amendment No.1 X 7 ESBD_495397_1775675472119_R6220883 - IW244388 SOW-A.pdf Statement of Work - A - IW244388 X 8 ESBD_495397_1775675572339_R6220883 - IW244388 SOW-B.pdf Statement of Work - B - IW244388 X 9 ESBD_495397_1775675631146_R6220883 - IW244388 Drawings-A.pdf Drawings - A X 10 ESBD_495397_1775675670709_R6220883 - IW244388 Drawings-B.pdf Drawings - B X Home Contact Us Policies Privacy and Security Policy Accessibility Policy Link Policy Search from the Texas State Library Texas Homeland Security Public Information Act Texas Secretary of State HB 855 Other State Sites Texas.gov Texas Records and Information Locator(TRAIL) State Link Policy Texas Veterans Portal",
+      "commodity_codes": "[]",
+      "attachments": "[]",
+      "url": "https://www.txsmartbuy.gov/esbd/IW244388",
+      "state": "Texas",
+      "normalized_at": "2026-10-17T23:02:47.827051+00:00"
+    }
+  ],
+  "review_required": true,
+  "requested_max_pages": 1,
+  "max_details": 1,
+  "discovery_page_limit_supported": true,
+  "status": "completed_for_review"
+}

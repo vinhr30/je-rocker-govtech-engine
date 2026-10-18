@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SAM.gov Five-Page Capture Review</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #edf2f5; color: #172b36; font-family: Georgia, serif; }
+    header { padding: 24px; border-bottom: 1px solid #b9cad3; }
+    h1 { margin: 0 0 8px; font-size: 26px; }
+    p { margin: 0; }
+    main { padding: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 24px; }
+    article { min-width: 0; }
+    h2 { font-size: 20px; margin: 0 0 12px; }
+    a { color: #075d82; }
+    .preview { height: 640px; overflow: auto; border: 1px solid #b9cad3; background: white; margin-top: 12px; }
+    img { display: block; width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <header><h1>SAM.gov Capture Review</h1><p>Five captured pages | 100 results per page selected | 446 total pages reported</p></header>
+  <main id="captures"></main>
+  <script>
+    const prefix = 'opp_e64adec294ca07ecb710af8d9802ce129dec9463d9e6f6ed4d3384dfcd6f2a44_page_';
+    for (let pageNumber = 1; pageNumber <= 5; pageNumber += 1) {
+      const article = document.createElement('article');
+      const filename = prefix + pageNumber + '.png';
+      article.innerHTML = '<h2>Page ' + pageNumber + '</h2><a href="' + filename + '" target="_blank" rel="noopener">Open full-resolution image</a><div class="preview"><img src="' + filename + '" alt="SAM.gov search results page ' + pageNumber + '"></div>';
+      document.getElementById('captures').appendChild(article);
+    }
+  </script>
+</body>
+</html>

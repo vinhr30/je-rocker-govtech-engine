@@ -1,0 +1,522 @@
+[
+  {
+    "solicitation_number": "Bid Solicitation #",
+    "title": "Bid Solicitation #",
+    "primary_agency": null,
+    "closing_date": null,
+    "opportunity_url": null,
+    "portal_status": null,
+    "raw_fields": [
+      "Bid Solicitation #",
+      "Organization Name",
+      "Blanket #",
+      "Buyer",
+      "Description",
+      "Bid Opening Date",
+      "Awarded Vendor(s)",
+      "Status",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-44300-00018213",
+    "title": "S-44300-00018213",
+    "primary_agency": null,
+    "closing_date": "11/06/2026 3:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-44300-00018213&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-44300-00018213",
+      "Oregon Health Authority",
+      "Blanket #",
+      "Suzanne Christman",
+      "Request for Grant Application Hospital Based Violence Intervention HB4045",
+      "11/06/2026 3:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-580501-00018208",
+    "title": "S-580501-00018208",
+    "primary_agency": null,
+    "closing_date": "11/03/2026 5:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-580501-00018208&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-580501-00018208",
+      "University of Oregon",
+      "Blanket #",
+      "Holly Stutz",
+      "RFP for Furniture for University of Oregon Friendly Hall Project (PCS# 450000-02106-RFP)",
+      "11/03/2026 5:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-C01010-00018206",
+    "title": "S-C01010-00018206",
+    "primary_agency": null,
+    "closing_date": "11/12/2026 2:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-C01010-00018206&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-C01010-00018206",
+      "Clackamas County",
+      "Blanket #",
+      "Stephanie Ebner",
+      "RFP 2026-76-SCHOOL-BASED SBIRT",
+      "11/12/2026 2:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-580100-00018205",
+    "title": "S-580100-00018205",
+    "primary_agency": null,
+    "closing_date": "11/22/2026 12:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-580100-00018205&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-580100-00018205",
+      "Eastern Oregon University",
+      "Blanket #",
+      "Kimberly Zollman",
+      "RFP 2026-27-03 Digital Marketing Services",
+      "11/22/2026 12:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-73000-00018201",
+    "title": "S-73000-00018201",
+    "primary_agency": null,
+    "closing_date": "10/28/2026 2:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-73000-00018201&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-73000-00018201",
+      "Department of Transportation",
+      "Blanket #",
+      "Ashley Kallberg",
+      "3 - 18' Flex Wing Rotary Mowers",
+      "10/28/2026 2:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-P18001-00018197",
+    "title": "S-P18001-00018197",
+    "primary_agency": null,
+    "closing_date": "10/21/2026 12:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-P18001-00018197&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-P18001-00018197",
+      "Klamath Falls City School District",
+      "Blanket #",
+      "Carly Lynch",
+      "Simulation and Training Equipment",
+      "10/21/2026 12:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-R34142-00018196",
+    "title": "S-R34142-00018196",
+    "primary_agency": null,
+    "closing_date": "11/02/2026 8:00 AM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-R34142-00018196&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-R34142-00018196",
+      "Tualatin Valley Fire & Rescue",
+      "Blanket #",
+      "Trisha Schultz",
+      "HVAC Services for Fire Department & Fire Stations",
+      "11/02/2026 8:00 AM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-KN0040-00018195",
+    "title": "S-KN0040-00018195",
+    "primary_agency": null,
+    "closing_date": "11/10/2026 2:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-KN0040-00018195&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-KN0040-00018195",
+      "City of Pendleton",
+      "Blanket #",
+      "Keri Standley",
+      "Professional Services for Energy Savings Performance Contracting",
+      "11/10/2026 2:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-10000-00018193",
+    "title": "S-10000-00018193",
+    "primary_agency": null,
+    "closing_date": "10/20/2026 5:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-10000-00018193&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-10000-00018193",
+      "Oregon Department of Human Services",
+      "Blanket #",
+      "Kirsten Udani",
+      "Sole Source Posting for LexisNexis",
+      "10/20/2026 5:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-C01010-00018192",
+    "title": "S-C01010-00018192",
+    "primary_agency": null,
+    "closing_date": "11/13/2026 2:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-C01010-00018192&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-C01010-00018192",
+      "Clackamas County",
+      "Blanket #",
+      "Jaymi Stark",
+      "RFI 2026-81",
+      "11/13/2026 2:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-KA0010-00018191",
+    "title": "S-KA0010-00018191",
+    "primary_agency": null,
+    "closing_date": "11/24/2026 2:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-KA0010-00018191&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-KA0010-00018191",
+      "City of Ashland",
+      "Blanket #",
+      "Keanna Khlafallah",
+      "RFP for Use of 2200 Ashland Street Facility",
+      "11/24/2026 2:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-C01010-00018188",
+    "title": "S-C01010-00018188",
+    "primary_agency": null,
+    "closing_date": "11/17/2026 2:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-C01010-00018188&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-C01010-00018188",
+      "Clackamas County",
+      "Blanket #",
+      "Thomas Candelario",
+      "Fitness evaluations conducted for the Clackamas County Rapid Forensic Assessment Program.",
+      "11/17/2026 2:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "2026-34"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-17000-00018186",
+    "title": "S-17000-00018186",
+    "primary_agency": null,
+    "closing_date": "10/19/2026 12:00 AM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-17000-00018186&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-17000-00018186",
+      "Oregon State Treasury",
+      "Blanket #",
+      "Michael Sztenderowicz",
+      "Special Procurement Notice - Notice Only, No Proposals Accepted",
+      "10/19/2026 12:00 AM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-44000-00018185",
+    "title": "S-44000-00018185",
+    "primary_agency": null,
+    "closing_date": "10/20/2026 7:30 AM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-44000-00018185&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-44000-00018185",
+      "Department of Consumer and Business Services",
+      "Blanket #",
+      "Daniel Robinson",
+      "Notice of Special Procurement # S-44000-00002796 Amd 1",
+      "10/20/2026 7:30 AM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-P00140-00018184",
+    "title": "S-P00140-00018184",
+    "primary_agency": null,
+    "closing_date": "11/10/2026 2:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-P00140-00018184&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-P00140-00018184",
+      "EWEB",
+      "Blanket #",
+      "Sandra Hahn",
+      "EWEB RFP #26-173-Q Part 12D Report Consulting",
+      "11/10/2026 2:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-P03035-00018183",
+    "title": "S-P03035-00018183",
+    "primary_agency": null,
+    "closing_date": "10/19/2026 3:30 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-P03035-00018183&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-P03035-00018183",
+      "Molalla River School District",
+      "Blanket #",
+      "Katie Piatkoff",
+      "Notice of Intent to Award - Meteor Education",
+      "10/19/2026 3:30 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-P00400-00018181",
+    "title": "S-P00400-00018181",
+    "primary_agency": null,
+    "closing_date": "10/23/2026 5:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-P00400-00018181&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-P00400-00018181",
+      "Mt Hood Community College",
+      "Blanket #",
+      "Mejdi Mahjoub",
+      "Refrigerated Truck",
+      "10/23/2026 5:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-DASOBO-00018179",
+    "title": "S-DASOBO-00018179",
+    "primary_agency": null,
+    "closing_date": "11/17/2026 1:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-DASOBO-00018179&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-DASOBO-00018179",
+      "DAS On-Behalf Of",
+      "Blanket #",
+      "Jordan Sim",
+      "DEQ AQ LEAD Nephelometers",
+      "11/17/2026 1:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-KS2410-00018177",
+    "title": "S-KS2410-00018177",
+    "primary_agency": null,
+    "closing_date": "10/23/2026 3:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-KS2410-00018177&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-KS2410-00018177",
+      "Salem Area Mass Transit District-Cherriots",
+      "Blanket #",
+      "Oscar Amador",
+      "PUBLIC NOTICE OF INTENT TO AWARD A SOLE SOURCE CONTRACT",
+      "10/23/2026 3:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-Q10026-00018175",
+    "title": "S-Q10026-00018175",
+    "primary_agency": null,
+    "closing_date": "11/09/2026 4:30 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-Q10026-00018175&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-Q10026-00018175",
+      "Medford Irrigation District",
+      "Blanket #",
+      "Jack Friend",
+      "RFP_MID_ODOT_Uility_Relocation",
+      "11/09/2026 4:30 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-29100-00018169",
+    "title": "S-29100-00018169",
+    "primary_agency": null,
+    "closing_date": "10/23/2026 9:00 AM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-29100-00018169&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-29100-00018169",
+      "Department of Corrections",
+      "Blanket #",
+      "Ben Hittle",
+      "Pork, Ham Ends & Pieces",
+      "10/23/2026 9:00 AM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-34000-00018168",
+    "title": "S-34000-00018168",
+    "primary_agency": null,
+    "closing_date": "10/21/2026 4:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-34000-00018168&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-34000-00018168",
+      "Department of Environmental Quality",
+      "Blanket #",
+      "Christina Dell",
+      "BUILT ENVIRONMENT MATERIAL SUPPLY CHAIN AND LIFE CYCLE TRACING",
+      "10/21/2026 4:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-KE0010-00018167",
+    "title": "S-KE0010-00018167",
+    "primary_agency": null,
+    "closing_date": "10/29/2026 2:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-KE0010-00018167&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-KE0010-00018167",
+      "City of Eugene",
+      "Blanket #",
+      "Milissa Bateman",
+      "2026 ITB 18 Lincoln St: 5th Ave - 13th Ave (Eugene)",
+      "10/29/2026 2:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-10700-00018166",
+    "title": "S-10700-00018166",
+    "primary_agency": null,
+    "closing_date": "10/29/2026 4:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-10700-00018166&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-10700-00018166",
+      "Department of Administrative Services",
+      "Blanket #",
+      "Kaliska King",
+      "Request for Information Only for Parks and Recreation Equipment and Installation",
+      "10/29/2026 4:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  },
+  {
+    "solicitation_number": "S-P00590-00018163",
+    "title": "S-P00590-00018163",
+    "primary_agency": null,
+    "closing_date": "11/10/2026 2:00 PM",
+    "opportunity_url": "https://oregonbuys.gov/bso/external/bidDetail.sda?docId=S-P00590-00018163&external=true&parentUrl=close",
+    "portal_status": null,
+    "raw_fields": [
+      "S-P00590-00018163",
+      "Umpqua Community College",
+      "Blanket #",
+      "Joy Yori",
+      "Campus Vending Services",
+      "11/10/2026 2:00 PM",
+      "Awarded Vendor(s)",
+      "Sent",
+      "Alternate Id"
+    ],
+    "record_kind": "procurement_listing"
+  }
+]

@@ -1,0 +1,46 @@
+{
+  "state": "FL",
+  "extraction_method": "state_workflow",
+  "workflow": "original_state_pipeline_with_targeted_browser_fallback",
+  "browser_evidence": [
+    {
+      "url": "https://www.dms.myflorida.com/business_operations/state_purchasing/office_of_supplier_development_osd/vendor_resources/current_bid_opportunities/charlotte_county_fl_-_gasparilla_road_intersections_signalization_-_bid_no._20260658",
+      "snapshot_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-runs/live-browser-process-fl-c62c0d0f-36f6-4f51-8874-42dbaa4314fd/00779b156da176f4505554548e57f52f0bdb9c03da85c40cc77b6a3f4190c67c.png",
+      "snapshot_sha256": "079d320fca8ab881ce5cf715ea2a64d053d86976cbc4807436d651340bdd9cba",
+      "purpose": "supplementary_browser_evidence",
+      "browser_tab_left_open": false
+    }
+  ],
+  "quality_issues": [],
+  "database_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-runs/live-browser-process-fl-c62c0d0f-36f6-4f51-8874-42dbaa4314fd/opportunities_FL.db",
+  "discovered_records": 21,
+  "selected_records": 1,
+  "hydrated_records": 1,
+  "structured_data": [
+    {
+      "id": 1,
+      "event_id": "charlotte_county_fl_-_gasparilla_road_intersections_signalization_-_bid_no._20260658",
+      "title": "charlotte county fl - gasparilla road intersections signalization - bid no. 20260658",
+      "department": "Florida Department of Management Services",
+      "event_type": "",
+      "start_date": null,
+      "end_date": null,
+      "description": "File No: 26-658 Description: Gasparilla Road Intersections Signalization Contact: Chastity.Williams@CharlotteCountyFL.gov File number: 20260658 Due Date: 10/28/2026 2:00:00 PM",
+      "contact_name": null,
+      "contact_email": null,
+      "contact_phone": null,
+      "bid_type": "",
+      "location": "of Management Services Skip to Main Content Menu Search: Search this site Home / Florida_department_of_management_services/business_operations/state_purchasing/office_of_supplier_development_osd/vendor_resources/current_bid_opportunities/charlotte_county_fl_-_gasparilla_road_intersections_signalization_-_bid_no._20260658 \u2191 Back to top Copyright \u00a9 2026 Department of Management Services - State of Florida",
+      "commodity_codes": "[]",
+      "attachments": "[{\"url\": \"https://www.dms.myflorida.com/content/download/604157/14022166?version=1\", \"filename\": \"266582.pdf\"}]",
+      "url": "https://www.dms.myflorida.com/business_operations/state_purchasing/office_of_supplier_development_osd/vendor_resources/current_bid_opportunities/charlotte_county_fl_-_gasparilla_road_intersections_signalization_-_bid_no._20260658",
+      "state": "Florida",
+      "normalized_at": "2026-10-17T23:03:13.116437+00:00"
+    }
+  ],
+  "review_required": true,
+  "requested_max_pages": 1,
+  "max_details": 1,
+  "discovery_page_limit_supported": true,
+  "status": "completed_for_review"
+}

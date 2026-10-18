@@ -1,0 +1,746 @@
+[
+  {
+    "solicitation_number": null,
+    "title": "Agriculture Tractors",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/agriculture-tractors/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Airline Travel",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/airline-travel/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Ammunition",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/ammunition/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Apparel/Uniforms",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/appareluniforms/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Auction Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/auction-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Audio/Video Equipment",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/audiovideoequipment/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Background Check Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/background-check-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Bat Gate Construction and Abandoned Mine Lands",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/bat-gate-construction-in-abandoned-mine-lands/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Body Armor",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/body-armor/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Building & Industrial Maintenance Supplies (MRO)",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/building-industrial-maintenance-supplies-mro/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Building and Maintenance Supplies (walk-in)",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/building-and-maintenance-supplies-walk-in/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Bulk Fuels",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/bulk-fuels/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Citizen Engagement Platform",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/citizen-engagement-platform/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Cloud Solutions",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/cloud-solutions/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Commercial Kitchen Solutions",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/commercial-kitchen-solutions/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Computer Equipment Peripherals",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/computer-equipment-peripherals/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Consulting, Marketing and Education Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/marketing-and-education-consulting-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Copy Machines & Supplies",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/copy-machines-and-supplies/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Credit Card Programs",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/state-credit-card-programs/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Data Communication",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/data-communication/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Digital Quick Print",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/furniture-office24/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Direct Client Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/direct-client-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Document Destruction",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/document-destruction/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Drones and Robotics",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/drones-and-robotics/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Electrical Lighting",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/electrical-lighting/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Employee Drug and Alcohol Testing",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/employee-drug-alcohol-testing/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Equipment Rental",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/equipment-rental/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Facilities Management Products Solutions",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/facilities-management-products-solutions/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Fire Fuels Reduction",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/wildfire-risk-reduction/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Fire Response Vehicles and Equipment",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/fire-response-vehicles-and-equipment/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Food Program",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/food-program/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Fuel Management System",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/fuel-management-system/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Furniture",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/furniture/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Grant Research and Consulting",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/grant-research-and-consulting/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Grounds Maintenance Equipment",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/grounds-maintenance-equipment/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "G2B/Punchout",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/g2b-punchout/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Hazardous Waste Removal and Disposal",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/hazardous-waste-removal-and-disposal/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Heavy Construction Equipment and Related Items",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/heavy-construction-equipment-and-related-items/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Information Technology Products and Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/information-technology-products-and-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Inmate Communications",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/inmate-communications/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Inmate Detention Supplies",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/inmate-detention-supplies/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Inmate Extradition Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/furniture-office22/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "IT Research and Advisory Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/it-research-and-advisory-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Laboratory Equipment and Supplies",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/laboratory-equipment-and-supplies/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Laboratory Services Clinical",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/laboratory-services-clinical/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Less-Lethal Electronic Weapons",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/less-lethal-electronic-weapons/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Mail Handling Equipment",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/mail-handling-equipment/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Medical Surgical Supplies",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/medical-surgical-supplies/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Moving Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/moving-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Non-Commercial Sustaining Announcements",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/non-commercial-sponsor-acknowledgements/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Occupational Health Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/workplace-health-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Office Supplies",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/office-supplies/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Online Legal Research",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/online-legal-research/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Package Shipping and Delivery Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/package-shipping-delivery-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Parks and Recreation Equipment",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/parks-and-recreation-equipment/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Police Radar / Lidar Parts Equipment",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/police-radar--lidar-parts-equipment/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Prefabricated Concrete Buildings",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/prefabricated-concrete-buildings/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Preferred Purchase Program",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/preferred-purchase-program/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Procurement Services and Consultants",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/procurement-services-and-consultants/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Public Safety Communications",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/public-safety-communications/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Public Safety Connectivity and Technology",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/public-safety-connectivity-and-technology/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Public Safety Training and Simulation Equipment and Training",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/public-safety-training-and-simulation-equipment-and-training/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Public Safety Vehicle Lights, Siren and Accessories",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/public-safety-vehicle-lights-siren-and-accessories/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Public Safety Video Systems",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/public-safety-video-systems/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Pure Live Seed (PLS) Program",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/pure-live-seed-pls-program/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Recruiting, Branding and Marketing Strategies",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/recruiting-branding-and-marketing-strategies/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Rescue and Public Protection Equipment",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/rescue-and-public-protection-equipment/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Restroom and Shower Facility Solutions",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/restroom-and-shower-facility-solutions/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Public Safety Communications Products, Services, and Solutions",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/safety-military-equipment/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Security and Fire Protection Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/security-and-fire-protection-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Security and Patrol Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/security-patrol-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Silver State Industries",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/silver-state-industries/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Smart Infastructure Solutions, Outdoor Sensors and Related Products and Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/smart-infastructure-solutions-outdoor-sensors-and-related-products-and-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Snowplow and Edge Systems",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/snowplow-edge-systems/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Software Products and Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/software-products-and-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Software Value Added Reseller (SVAR)",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/software-value-added-resources/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Temporary Employment Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/temporary-employment-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Temporary Medical or Healthcare Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/temporary-medical-healthcare-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Tools and Diagnostic Equipment",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/tools-and-diagnostic-equipment/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Traffic Control Products And Related Products And Solutions",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/traffic-control-products-and-related-products-and-solutions/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Transcription Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/transcription-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Translation Interpretation",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/translation-interpretation/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Vehicle Lifts",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/vehicle-lifts/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Vehicle Parts",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/vehicle-parts/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Vehicle Purchases",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/vehicle-purchases/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Vehicle Rental",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/vehicle-rental/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Vehicle Tires Tubes and Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/vehicle-tires-tubes-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Voice and Data Communication",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/voice-data-communication/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Voice and Data Network Transport Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/voice-data-network-transport-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Voice and Data Telecom-Long Distance",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/voice-data-telecommunication-long-distance/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Wireless Device Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/wireless-device-services/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Wiring Cabling Fiber Communications Infrastructure",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/wiring-cabling-fiber-communications-infrastructure/",
+    "record_kind": "contract_category"
+  },
+  {
+    "solicitation_number": null,
+    "title": "Workplace Investigation Services",
+    "closing_date": null,
+    "primary_agency": "State of Nevada Purchasing Division",
+    "opportunity_url": "https://www.purchasing.nv.gov/statewide-contracts/workplace-investigation-services/",
+    "record_kind": "contract_category"
+  }
+]

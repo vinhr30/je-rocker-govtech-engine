@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "solicitation_id": "BPM007765",
+    "title": "ADOT Central Campus Project (Landscape Water Conservation)",
+    "agency": "Department of Transportation",
+    "posted_date": "2026-09-22",
+    "due_date": "2026-10-23",
+    "description": "ADOT Central Campus Project (Landscape Water Conservation)",
+    "category": "Irrigation system construction service",
+    "url": "https://app.az.gov/page.aspx/en/bpm/process_manage_extranet/14023",
+    "attachments": "[]",
+    "contact_name": "",
+    "contact_email": "",
+    "contact_phone": "",
+    "commodity_codes": "[]",
+    "addenda": "[]",
+    "metadata_json": "{\"additional_dates\": [], \"posted_date\": null, \"due_date\": null, \"status\": \"Open for Bidding\", \"source_status\": \"Open for Bidding\", \"posted_date_raw\": \"9/22/2026 12:00:00 AM\", \"due_date_raw\": \"10/23/2026 3:00:00 PM\", \"raw_title\": \"ADOT Central Campus Project (Landscape Water Conservation)\", \"raw_agency\": \"Department of Transportation\", \"raw_category\": \"Irrigation system construction service\", \"detail_url\": \"https://app.az.gov/page.aspx/en/bpm/process_manage_extranet/14023\"}",
+    "state": "Arizona",
+    "normalized_at": "2026-10-17T22:13:30.768562"
+  }
+]

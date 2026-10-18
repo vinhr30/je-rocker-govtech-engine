@@ -1,0 +1,591 @@
+{
+  "id": "five-page-vlm-benchmark",
+  "page": 3,
+  "total_pages": 446,
+  "url": "https://sam.gov/search/?index=opp",
+  "snapshot_sha256": "1c655d4065f093ed8650a925cf68136524f2266cd9f193b364dd328e631cfe89",
+  "processed_by": "Mac-Mal.local",
+  "model": "Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf",
+  "execution_time": 234.378,
+  "structured_data": [
+    {
+      "solicitation_number": "R402--Real Estate Acquisition Support Services (FY21 New Broker IDIQ) -- TIERED EVALUATIONS",
+      "title": "Real Estate Acquisition Support Services (FY21 New Broker IDIQ) -- TIERED EVALUATIONS",
+      "closing_date": "November 16, 2026 at 10:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "FA945326RX012",
+      "title": "Space Environment Technologies and Science (SETS) Broad Agency Announcement (BAA) Call 004",
+      "closing_date": "November 05, 2025 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "FD20302401595",
+      "title": "Remanufacture F108-201 MAIN FUEL PUMP",
+      "closing_date": "November 16, 2026 at 03:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C10D26Q0171",
+      "title": "Notice ID: 36C10D26Q0171",
+      "closing_date": "October 23, 2026 at 11:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "12-3JJ14-27-B-0002",
+      "title": "Frozen Vegetable Products: Carrots, Broccoli, Black Bean Burger Patties for Domestic Food Assistance",
+      "closing_date": "October 30, 2026 at 11:00 AM MST",
+      "primary_agency": "AGRICULTURE, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "FA7014-27-R-SACAS",
+      "title": "SAF/SA Campaign Analysis Support",
+      "closing_date": "November 16, 2026 at 10:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C78627B0002",
+      "title": "Y1PZ--CND-846-FSHNC-HEADSTONE SETTING-Fort Sam Houston National Cemetery requires a Headstone setting contract to perform \u00e2\u20ac\u0153 1. Initial and Replacement Upright Headstone and Flat Marker Setting",
+      "closing_date": "October 30, 2026 at 11:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C24427B0002",
+      "title": "Z1DA--NRM| 460-26-007 Electrical Distribution Inspection Repairs | NCO 4 Construction East (VA-26-00057558)",
+      "closing_date": "October 30, 2026 at 01:00 PM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "W912P827SS0001",
+      "title": "Sources Sought for Calcaiseu River Saltwater Barrier FRP Tainter Gate",
+      "closing_date": "November 04, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W912P827SS0001",
+      "title": "Notice ID: W912P827SS0001",
+      "closing_date": "November 04, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "70RFP427FRE500001",
+      "title": "Video Surveillance System Replacement requirement at the Roman Hruska U.S. Courthouse in Omaha, Nebraska",
+      "closing_date": "October 22, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A727Q0100",
+      "title": "61--REGULATOR,VOLTAGE AND",
+      "closing_date": "October 28, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M127Q0074",
+      "title": "43--SEPARATOR,WATER,LIQUID",
+      "closing_date": "October 31, 2026 at 09:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "IHS-WAG-27-1532105",
+      "title": "Sources Sought Notice for Pest Control Service for Wagner IHS Healthcare Center",
+      "closing_date": "October 31, 2026 at 09:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "68HERF27R0005",
+      "title": "Request for Information (RFI) Regarding the Next Generation of EPA's Superfund Remediation Acquisition Framework",
+      "closing_date": "November 02, 2026 at 08:00 AM MST",
+      "primary_agency": "U.S. ENVIRONMENTAL PROTECTION AGENCY"
+    },
+    {
+      "solicitation_number": "W9124D27RA006",
+      "title": "The requirement is to provide administrative support services required by Army Continuing Education Division (ACED) in the O ice of the Adjutant General",
+      "closing_date": "November 20, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPRTA1-27-R-0080",
+      "title": "PUMP, RECIPROCATING, NSN# 4320012622626FW, PN# UA538823-4",
+      "closing_date": "November 03, 2026 at 10:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "2099AC26N10000",
+      "title": "INTENT TO SOLE SOURCE - FLASHPOINT INTELLIGENCE CAPABILITIES AND SERVICES",
+      "closing_date": "October 23, 2026 at 09:00 AM MST",
+      "primary_agency": "U.S. Department of the Treasury"
+    },
+    {
+      "solicitation_number": "FA813727R0001",
+      "title": "This posting is for Tinker AFB - MAC BOA Holders ONLY.",
+      "closing_date": "November 16, 2026 at 10:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "140G0226Q0047",
+      "title": "AMPLICON SEQUENCING SERVICES",
+      "closing_date": "October 23, 2026 at 11:30 AM MST",
+      "primary_agency": "INTERIOR, DEPARTMENT OF THE"
+    },
+    {
+      "solicitation_number": "75ACF121F80033",
+      "title": "Repatriation Evaluation Support Services - Bridge Support Services",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "INTERIOR, DEPARTMENT OF THE"
+    },
+    {
+      "solicitation_number": "IHS-WAG-27-1532090",
+      "title": "Sources Sought for On-Site Elevator Maintenance Service for Wagner IHS Healthcare Center",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "HEALTH AND HUMAN SERVICES, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "N3220527R6009",
+      "title": "60-Day U.S. Jones Act Tanker Time Charter",
+      "closing_date": "October 20, 2026 at 08:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "47Q5MD20R0001",
+      "title": "Multiple Award Schedule",
+      "closing_date": "October 16, 2026 at 09:12 AM MST",
+      "primary_agency": "GENERAL SERVICES ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "FA466126R0008",
+      "title": "Airfield Blast Shield",
+      "closing_date": "October 27, 2026 at 08:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W912PM27BA003",
+      "title": "Jacksonville Harbor Maintenance Dredging",
+      "closing_date": "December 31, 2026 at 01:00 PM MST",
+      "primary_agency": "U.S. ARMY CORPS OF ENGINEERS, ENTERPRISE DREDGE DELIVERY CENTER (EDDC)"
+    },
+    {
+      "solicitation_number": "W912PM27BA003",
+      "title": "Jacksonville Harbor Maintenance Dredging",
+      "closing_date": "December 31, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W912BU26RA032",
+      "title": "Power Construction and Services II (PCS II) MATOC",
+      "closing_date": "November 03, 2026 at 01:30 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8E526Q0454",
+      "title": "56--CORE MATERIAL,CELLULAR,STRUCTURAL",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8E726T3810",
+      "title": "62--SEARCHLIGHT",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C25927Q0008",
+      "title": "J041--Trane BAS HVAC Control System Inspection, Maintenance, Upgrades, and Repair",
+      "closing_date": "October 28, 2026 at 09:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C25027Q0047",
+      "title": "F108--Radioactive Waste Removal and Disposal Services",
+      "closing_date": "October 27, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A727R0062-Sources_Sought",
+      "title": "Sources Sought for NSN 1670-01-586-4047",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A727R0062",
+      "title": "Defense Logistics Agency (DLA) Weapons Support",
+      "closing_date": "October 21, 2026 at 11:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "NASA-SVC-PAE-OCI",
+      "title": "System Vicarious Calibration (SVC) of the NASA Plankton, Aerosol, Cloud, ocean Ecosystem (PACE) Ocean Color Instrument (OCI) Using HyperNAV",
+      "closing_date": "November 02, 2026 at 09:59 PM MST",
+      "primary_agency": "NASA HEADQUARTERS"
+    },
+    {
+      "solicitation_number": "140D0426R0114",
+      "title": "USWFS EU T3 Helo Fire - Fort Wainwright, AK",
+      "closing_date": "November 17, 2026 at 01:00 PM MST",
+      "primary_agency": "INTERIOR, DEPARTMENT OF THE"
+    },
+    {
+      "solicitation_number": "36C10F26R0045",
+      "title": "R402--Real Estate Acquisition Support Services (REASS) Recompete",
+      "closing_date": "November 16, 2026 at 10:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "0012468284",
+      "title": "Human Cadaver - Based Medical Training and Program Support Services for the 44th Medical Brigade stationed at Fort Bragg Army Base, North Carolina.",
+      "closing_date": "October 30, 2026 at 02:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A627Q0118",
+      "title": "53--PIN,STRAIGHT,HEADED",
+      "closing_date": "October 30, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A627Q0118",
+      "title": "Proposed procurement for NSN 5315010969169 PIN,STRAIGHT,HEADED: Line 0001",
+      "closing_date": "October 30, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A727Q0099",
+      "title": "Proposed procurement for NSN 1650006044752 SELECTOR SET,HYDRAU: Line 0001",
+      "closing_date": "October 26, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C25227Q0059",
+      "title": "Replace Compressors on McQuay Chiller at the Edward Hines Jr. VA Hospital (Hines) Building 228",
+      "closing_date": "October 20, 2026 at 08:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "1240LT27Q0008",
+      "title": "Champion Creek Pit Rock Crushing",
+      "closing_date": "November 05, 2026 at 05:00 PM MST",
+      "primary_agency": "AGRICULTURE, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "MMAPR520726000151",
+      "title": "USMMA - Scoreboard Replacement RFI",
+      "closing_date": "October 23, 2026 at 07:00 AM MST",
+      "primary_agency": "TRANSPORTATION, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "HHM402-27-X-AUDIT",
+      "title": "Request for Information (RFI) - Audit Remediation Services",
+      "closing_date": "October 23, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W911QY-26-R-NUTRIENT-ANALYSIS",
+      "title": "Chemical Nutrient Analysis Service for Combat Feeding Division (CFD)",
+      "closing_date": "October 29, 2026 at 09:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "47QTCB22R0001",
+      "title": "Polaris GWAC Small Business Pool",
+      "closing_date": "October 07, 2022 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C10X26Q0091",
+      "title": "CRRC Facility Maintenance Services",
+      "closing_date": "October 23, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "CBP-INVNT-PAV-RFI",
+      "title": "CBP INVNT Personal Aerial Vehicle (PAV) Request for Information (RFI)",
+      "closing_date": "October 30, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C24426R0012",
+      "title": "Ponce Vet Center - Relocation",
+      "closing_date": "November 15, 2026 at 04:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE30027D4113",
+      "title": "Western Africa J&A",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE30027D4113",
+      "title": "Notice ID: SPE30027D4113",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "FA239626RB008",
+      "title": "111th HPW Mission Support Services MAC IDIQ",
+      "closing_date": "Oct 30, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "26-0027",
+      "title": "Class Justification and Approval - Brand Name - Cisco products for the Walla Walla District",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C24727Q0036_0001",
+      "title": "J065--RFQ - INSTALL LEAD BASED LINERS - 544 Columbia SC, 29209",
+      "closing_date": "Oct 23, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "HMM402-27-X-FRAS",
+      "title": "Request for Information (RFI) - Financial Reporting & Accounting",
+      "closing_date": "Oct 23, 2026 at 01:00 PM MST",
+      "primary_agency": "DEFENSE INTELLIGENCE AGENCY (DIA)"
+    },
+    {
+      "solicitation_number": "W15QKN26RA097",
+      "title": "Hexagon Coordinate Measurement Machines (CMM) Preventative Hardware, Software Maintenance and Repair Services to the DEVCOM-AC Quality Engineering & Systems Assurance (QE&SA) laboratory",
+      "closing_date": "Oct 23, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "W15QKN26RA097",
+      "title": "The U.S. Army Contracting Command \u2013 Rock Island is issuing this combined synopsis/solicitation W15QKN26RA097 as a Request for Qu",
+      "closing_date": "12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C10F26R0045",
+      "title": "R402--Real Estate Acquisition Support Services (FY21 New Broker IDIQ) -- TIERED EVALUATIONS",
+      "closing_date": "10:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "FA945326RX012",
+      "title": "Space Environment Technologies and Science (SETS) Broad Agency Announcement (BAA) Call 04",
+      "closing_date": "10:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C10D26Q0171",
+      "title": "Tools for Veteran",
+      "closing_date": "October 23, 2026 at 11:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "12-3J14-27-B-0002",
+      "title": "Frozen Vegetable Products: Carrots, Broccoli, Black Bean Burger Patties for Domestic Food Assistance",
+      "closing_date": "October 30, 2026 at 11:00 AM MST",
+      "primary_agency": "AGRICULTURE, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "36C78627B0002",
+      "title": "Y1PZ--CND-846-FSHNC-HEADSTONE SETTING-Fort Sam Houston National Cemetery requires a Headstone setting contract to perform \u00e2\u20ac\u0153 1. Initial and Replacement Upright Headstone and Flat Marker Setting",
+      "closing_date": "October 30, 2026 at 11:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "36C24427B0002",
+      "title": "Z1DA--NRM| 460-26-007 Electrical Distribution Inspection Repairs | NCO 4 Construction East (VA-26-00057558)",
+      "closing_date": "October 30, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "Z1DA--NRM| 460-26-007 Electrical Distribution Inspection Repairs | NCO 4 Construction East (VA-26-00057558)",
+      "title": "This is a REQUEST FOR INFORMATION (RFI) NOTICE FOR CONSTRUCTION FOR PLANNING PURPOSES ONLY. Project Title: Electrical Distribution Inspection Repairs",
+      "closing_date": "October 30, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPARTMENT OF VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "W912P827SS0001",
+      "title": "The US Army Corps of Engineers, New Orleans District, Contracting Division is issuing this sources sought synopsis as a means of conducting market res...",
+      "closing_date": "November 04, 2026 at 12:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "70RFP427FRE600001",
+      "title": "The U.S. Department of Homeland Security (DHS), Office of Procurement Operations (OPO), Federal Protective Service (FPS) has awarded a task order f...",
+      "closing_date": "October 22, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A727Q0100",
+      "title": "Proposed procurement for NSN 61100040056216 REGULATOR, VOLTAGE AND: Line 0001 Qty 18 UI EA Deliver To: DLA DISTRIBUTION DEPOT HILL By: 0089 DAYS AD...",
+      "closing_date": "October 28, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M127Q0074",
+      "title": "Proposed procurement for NSN 4330012212222 SEPARATOR, WATER, LIQUID: Line 0001 Qty 2 UI EA Deliver To: W1A DLA DIST SAN JOAQUIN By: 0030 DAYS ADO...",
+      "closing_date": "October 28, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "IHS-WAG-27-1532105",
+      "title": "Sources Sought Notice for Pest Control Service for Wagner IHS Healthcare Center",
+      "closing_date": "October 31, 2026 at 09:00 AM MST",
+      "primary_agency": "HEALTH AND HUMAN SERVICES, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "68HERF27R0005",
+      "title": "Request for Information (RFI)",
+      "closing_date": "November 02, 2026 at 08:00 AM MST",
+      "primary_agency": "U.S. ENVIRONMENTAL PROTECTION AGENCY"
+    },
+    {
+      "solicitation_number": "W9124D27RA006",
+      "title": "EDUCATION SERVICE SUPPORT CONTRACT (ESSC)",
+      "closing_date": "November 20, 2026 at 07:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "2099AC26N10000",
+      "title": "INTENT TO SOLE SOURCE - FLASHPOINT INTELLIGENCE CAPABILITIES AND SERVICES",
+      "closing_date": "October 23, 2026 at 09:00 AM MST",
+      "primary_agency": "U.S. Department of the Treasury Departmental Offices & Enterprise P"
+    },
+    {
+      "solicitation_number": "FA813727R0001",
+      "title": "WWYK260004 - REPAIR STRUCTURAL INTEGRITY, B1134, POST 34 & NORTH WALL",
+      "closing_date": "October 23, 2026 at 09:00 AM MST",
+      "primary_agency": "DEPARTMENT OF THE TREASURY, DEPARTMENT OF THE"
+    },
+    {
+      "solicitation_number": "FA813727R0001",
+      "title": "REPAIR STRUCTURAL INTEGRITY, B1134, POST 34 & NORTH WALL",
+      "closing_date": "10:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "140G0226Q0047",
+      "title": "AMPLICON SEQUENCING SERVICES",
+      "closing_date": "11:30 AM MST",
+      "primary_agency": "INTERIOR, DEPARTMENT OF THE"
+    },
+    {
+      "solicitation_number": "75ACF121F80033",
+      "title": "Repatriation Evaluation Support Services - Bridge Support Services",
+      "closing_date": "09:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "IHS-WAG-27-1532090",
+      "title": "Sources Sought Notice for On-Site Elevator Maintenance Service for Wagner IHS Healthcare Center",
+      "closing_date": "09:00 AM MST",
+      "primary_agency": "HEALTH AND HUMAN SERVICES, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "N3220527R6009",
+      "title": "60-Day U.S. Jones Act Tanker Time Charter",
+      "closing_date": "08:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "47Q5MD20R0001",
+      "title": "Multiple Award Schedule",
+      "closing_date": "09:12 AM MST",
+      "primary_agency": "GENERAL SERVICES ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "FA466126R0008",
+      "title": "Amendment 0002",
+      "closing_date": "October 27, 2026 at 08:00 AM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8E526Q0454",
+      "title": "56--CORE MATERIAL, CELLULAR, STRUCTURAL",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8E76T3810",
+      "title": "62--SEARCHLIGHT",
+      "closing_date": "October 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C25927Q0008",
+      "title": "J041--Trane BAS HVAC Control System Inspection, Maintenance, Upgrades, and Repair",
+      "closing_date": "October 28, 2026 at 09:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "108--Radioactive Waste Removal and Disposal Services",
+      "title": "This is a Sources Sought Notice for Radioactive Waste Removal and Disposal Services as identified in the Statement of Work (SOW) for the Ann Arbor VA Medical Center",
+      "closing_date": "October 27, 2026 at 07:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "NASA-SVC-PAE-OCI",
+      "title": "NASA HQ has a requirement for the sustained operation and maintenance of eight (8) HyperNav hyperspectral radiometric systems to support System Vicarious Calibration (SVC) of the NASA Plankton, Aerosol, Cloud, ocean Ecosystem (PACE) Ocean Color Instrument (OCI) Using HyperNAV",
+      "closing_date": "November 02, 2026 at 09:59 PM MST",
+      "primary_agency": "NATIONAL AERONAUTICS AND SPACE ADMINISTRATION"
+    },
+    {
+      "solicitation_number": "USWFS EU T3 Helo Fire - Fort Wainwright, AK",
+      "title": "USWFS EU T3 Helo Fire - Fort Wainwright, AK...",
+      "closing_date": "November 17, 2026 at 01:00 PM MST",
+      "primary_agency": "NATIONAL INTERIOR, DEPARTMENT OF THE"
+    },
+    {
+      "solicitation_number": "R402--Real Estate Acquisition Support Services (REASS) Recomplete",
+      "title": "Notice of VISN-Based Solicitation Structure Since release of the prior draft solicitation, the Department of Veterans Affairs (VA) has refined the acquisition of real estate acquisition support services",
+      "closing_date": "November 16, 2026 at 10:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "Human Cadaver - Based Medical Training and Program Support Services for the 44th Medical Brigade stationed at Fort Bragg Army Base, North Carolina.",
+      "title": "This is a Sources Sought Notice for Radioactive Waste Removal and Disposal Services as identified in the Statement of Work (SOW) for the Ann Arbor VA Medical Center",
+      "closing_date": "October 30, 2026 at 07:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "SPE4A727Q0099",
+      "title": "16--SELECTOR SET,HYDRAU",
+      "closing_date": "October 26, 2026 at 05:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "36C25227Q0059",
+      "title": "4130--Chiller Compressor Replacement at the Edward Hines Jr. VA Hospital (Hines) Building 228",
+      "closing_date": "October 20, 2026 at 08:00 AM MST",
+      "primary_agency": "VETERANS AFFAIRS, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "1240LT27Q0008",
+      "title": "Champion Creek Pit Rock Crushing Supply",
+      "closing_date": "November 05, 2026 at 05:00 PM MST",
+      "primary_agency": "AGRICULTURE, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "MMAPR520726000151",
+      "title": "USMMA - Scoreboard Replacement RFI",
+      "closing_date": "October 23, 2026 at 07:00 AM MST",
+      "primary_agency": "TRANSPORTATION, MARITIME"
+    },
+    {
+      "solicitation_number": "MMAPR520726000151",
+      "title": "USMA - Scoreboard Replacement RFI",
+      "closing_date": "October 23, 2026 at 07:00 AM MST",
+      "primary_agency": "TRANSPORTATION, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "HHM402-27-X-AUDIT",
+      "title": "Request for Information (RFI) \u2013 Audit Remediation Services",
+      "closing_date": "October 23, 2026 at 01:00 PM MST",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "47QTCB22R0001",
+      "title": "Polaris GWAC Small Business Pool",
+      "closing_date": "October 29, 2026 at 01:00 PM MST",
+      "primary_agency": "GENERAL SERVICES, ADMINISTRATION"
+    }
+  ],
+  "image_sections": 19,
+  "review_required": true,
+  "timestamp": 1792263948.6947432
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "solicitation_number": "Created Date",
+    "title": "Name",
+    "primary_agency": null,
+    "closing_date": null,
+    "opportunity_url": null,
+    "portal_status": null,
+    "raw_fields": [
+      "Name",
+      "Agency",
+      "Overview",
+      "Created Date",
+      "Start Date",
+      "Due Date",
+      "Updated Date",
+      "Completed Date",
+      "Status"
+    ],
+    "record_kind": "procurement_listing"
+  }
+]

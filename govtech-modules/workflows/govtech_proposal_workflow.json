@@ -1,0 +1,43 @@
+{
+  "namespace": "govtech",
+  "workflow_id": "govtech_proposal_v1",
+  "name": "GovTech Proposal Development & Compliance Workflow",
+  "stages": [
+    {
+      "stage_id": "stage_1_solicitation_parsing",
+      "name": "Solicitation & RFP Requirements Ingestion",
+      "description": "Parse Statement of Work (SOW), Section L (Instructions), and Section M (Evaluation Criteria).",
+      "deliverable": "Requirements Checklist"
+    },
+    {
+      "stage_id": "stage_2_compliance_matrix",
+      "name": "Compliance & Mandatory Qualifications Matrix",
+      "description": "Validate contractor capabilities, NAICS certifications, and security clearance requirements.",
+      "deliverable": "Compliance Cross-Reference Matrix"
+    },
+    {
+      "stage_id": "stage_3_technical_drafting",
+      "name": "Technical & Past Performance Drafting",
+      "description": "Structure technical volumes, staffing plans, and past performance project citations.",
+      "deliverable": "Draft Proposal Volume I & II"
+    },
+    {
+      "stage_id": "stage_4_pricing_cost_volume",
+      "name": "Cost Volume & Rate Card Reconciliation",
+      "description": "Align labor category hourly billing rates, subcontractor margins, and travel allowances.",
+      "deliverable": "Completed Cost & Pricing Volume"
+    },
+    {
+      "stage_id": "stage_5_red_team_review",
+      "name": "Red Team & Final Compliance Audit",
+      "description": "Independent executive peer review verifying all mandatory RFP stipulations are satisfied.",
+      "deliverable": "Final Submission-Ready Package"
+    },
+    {
+      "stage_id": "stage_6_submission_debrief",
+      "name": "Portal Submission & Debrief Archiving",
+      "description": "Upload to designated procurement portal (PIEE, SAM, or State e-Procurement) with receipt log.",
+      "deliverable": "Official Submission Confirmation"
+    }
+  ]
+}

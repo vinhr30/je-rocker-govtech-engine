@@ -1,0 +1,47 @@
+{
+  "state": "AZ",
+  "extraction_method": "state_workflow",
+  "transport": "persistent_chrome_dom_snapshot",
+  "structured_data": [
+    {
+      "solicitation_id": "BPM007765",
+      "title": "ADOT Central Campus Project (Landscape Water Conservation)",
+      "agency": "Department of Transportation",
+      "category": "Irrigation system construction service",
+      "status": "Open for Bidding",
+      "posted_date_raw": "9/22/2026 12:00:00 AM",
+      "due_date_raw": "10/23/2026 3:00:00 PM",
+      "detail_url": "https://app.az.gov/page.aspx/en/bpm/process_manage_extranet/14023",
+      "page_number": 1,
+      "raw_html": "<tr data-id=\"14023\" data-object-type=\"rfp\" id=\"body_x_grid_grd_tr_14023\"><td class=\"icon center aligned\" data-iv-role=\"cell\"><a aria-describedby=\"fixedtipdiv\" aria-disabled=\"false\" class=\"ui button iv-button icon borderless\" data-delay=\"True\" data-hoverable=\"true\" data-html=\"&lt;p&gt;Edit ADOT Central Campus Project (Landscape Water Conservation)&lt;/p&gt;\" data-iv-control=\"body_x_grid_grd_tr_14023_img___colManagegrid\" data-iv-control-type-name=\"buttonControl\" data-iv-role=\"field control\" data-iv-updatepanelcontrol-postback=\"true\" href=\"/page.aspx/en/bpm/process_manage_extranet/14023\" id=\"body_x_grid_grd_tr_14023_img___colManagegrid\" iv-action=\"manage\" tabindex=\"0\"><i aria-hidden=\"true\" class=\"iv-grid-fa-icon fa-pencil-alt icon\" data-iv-role=\"icon\"></i><span class=\"sr-only\">Edit ADOT Central Campus Project (Landscape Water Conservation)</span></a></td><td data-iv-role=\"cell\">BPM007765</td><td data-iv-role=\"cell\">ADOT Central Campus Project (Landscape Water Conservation)</td><td class=\"right aligned hidden\" data-iv-role=\"cell\" style=\"display:none;\">9/22/2026 12:00:00 AM</td><td data-iv-role=\"cell\">Irrigation system construction service</td><td data-iv-role=\"cell\">Department of Transportation</td><td class=\"right aligned hidden\" data-iv-role=\"cell\" style=\"display:none;\"></td><td data-iv-role=\"cell\">Open for Bidding</td><td class=\"checkbox center aligned\" data-iv-role=\"cell\"><div class=\"field readonly no-label iv-no-label iv-empty-type iv-checkbox iv-checkbox-column\" data-iv-control=\"body_x_grid_grd_tr_14023_ctrl_txtRfpAwarded\" data-iv-control-type-name=\"checkBoxControl\" data-iv-role=\"field\" data-iv-updatepanelcontrol-postback=\"true\"><div class=\"control-wrapper checkbox-control ui checkbox readonly\" data-iv-role=\"controlWrapper\"><input aria-label=\"RFx Awarded\" class=\"hidden-checkbox aria-field\" data-lostongridevent=\"true\" id=\"body_x_grid_grd_tr_14023_ctrl_txtRfpAwarded_checkbox\" tabindex=\"-1\" type=\"checkbox\"/><label for=\"body_x_grid_grd_tr_14023_ctrl_txtRfpAwarded_checkbox\"><span class=\"label-field sr-only\" data-iv-role=\"label\">RFx Awarded</span></label><input aria-label=\"RFx Awarded\" data-iv-role=\"control\" data-validation=\"body_x_grid_grd_tr_14023_ctrl_txtRfpAwarded\" id=\"body_x_grid_grd_tr_14023_ctrl_txtRfpAwarded\" name=\"body:x:grid:grd:tr_14023:ctrl_txtRfpAwarded\" type=\"hidden\" value=\"False\"/></div></div></td><td class=\"hidden\" data-iv-role=\"cell\" style=\"display:none;\"><div class=\"rfp-countdown\" rfp-end-date=\"1792792800099\"><div class=\"countDown\" style=\"float:left; padding-left:2px;\"> <div class=\"countDown\"> 06</div>d\u00a0 </div>\n<div class=\"countDown\" style=\"float:left; padding-left:2px;\"> <div class=\"countDown\"> 00</div>h\u00a0 </div>\n<div class=\"countDown\" style=\"float:left; padding-left:2px;\"> <div class=\"countDown\"> 13</div>min\u00a0 </div>\n<div class=\"countDown\" style=\"float:left; padding-left:2px;\"> <div class=\"countDown\"> 35</div>s\u00a0 </div>\n</div></td><td class=\"right aligned\" data-iv-role=\"cell\">9/22/2026 12:00:00 AM</td><td class=\"right aligned\" data-iv-role=\"cell\">10/23/2026 3:00:00 PM</td></tr>",
+      "scraped_at": "2026-10-17T21:46:24.559949+00:00"
+    }
+  ],
+  "discovered_records": 15,
+  "selected_records": 1,
+  "hydrated_records": 0,
+  "evidence": [
+    {
+      "snapshot_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-browser-tests/3e33f64b-ad77-4614-8846-d82995217846/listing_1.png",
+      "dom_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-browser-tests/3e33f64b-ad77-4614-8846-d82995217846/listing_1.json",
+      "snapshot_sha256": "18034db82a072934801ae47b4d5ea41b6121dac736914a941293590392079f6c",
+      "dom_sha256": "e4fb16da39ca2e94f0ee9d9ebe3c637f8355abc9403a45998a92a0645c65be1f",
+      "url": "https://app.az.gov/page.aspx/en/rfp/request_browse_public"
+    },
+    {
+      "snapshot_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-browser-tests/3e33f64b-ad77-4614-8846-d82995217846/detail_1.png",
+      "dom_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-browser-tests/3e33f64b-ad77-4614-8846-d82995217846/detail_1.json",
+      "snapshot_sha256": "bf1042710f20a210e65bd6a2e090ad38b5f4e724154a8a3e3e8596fe93f56da6",
+      "dom_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "url": "https://app.az.gov/page.aspx/en/bas/browser_check"
+    }
+  ],
+  "quality_issues": [
+    "manual_detail_verification_required"
+  ],
+  "review_required": true,
+  "status": "requires_manual_review",
+  "requested_max_pages": 1,
+  "max_details": 1,
+  "browser_tab_left_open": true
+}

@@ -1,0 +1,5 @@
+{
+  "enabled": true,
+  "interval_minutes": 1440,
+  "run_on_startup": false
+}

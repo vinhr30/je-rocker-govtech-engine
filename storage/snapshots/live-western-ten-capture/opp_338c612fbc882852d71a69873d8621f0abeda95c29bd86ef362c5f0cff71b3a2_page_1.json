@@ -1,0 +1,22 @@
+[
+  {
+    "solicitation_number": "Published Date",
+    "title": "check",
+    "primary_agency": null,
+    "closing_date": null,
+    "opportunity_url": null,
+    "portal_status": null,
+    "raw_fields": [
+      "check",
+      "Solicitation #",
+      "Title",
+      "Category",
+      "Jurisdiction",
+      "Department",
+      "Island",
+      "Published Date",
+      "Offer Due Date & Time (HST)"
+    ],
+    "record_kind": "procurement_listing"
+  }
+]

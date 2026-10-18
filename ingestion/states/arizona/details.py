@@ -166,7 +166,13 @@ def extract_addenda_entries(soup: BeautifulSoup) -> list[dict]:
 def is_browser_check_page(html: str | None) -> bool:
     if not html:
         return False
-    text = clean_text(html).lower()
+    if BeautifulSoup is not None:
+        soup = BeautifulSoup(html, "html.parser")
+        for node in soup.select("script, style, noscript, template, [hidden], [aria-hidden='true'], input[type='hidden']"):
+            node.decompose()
+        text = clean_text(soup.get_text(" ", strip=True)).lower()
+    else:
+        text = clean_text(html).lower()
     challenge_markers = (
         "browser check",
         "verify you are human",
@@ -175,7 +181,7 @@ def is_browser_check_page(html: str | None) -> bool:
         "continue to buyer arizona",
         "security check",
         "captcha",
-        "challenge",
+        "complete the challenge",
     )
     return any(marker in text for marker in challenge_markers)
 

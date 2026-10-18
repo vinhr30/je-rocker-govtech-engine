@@ -1,0 +1,46 @@
+{
+  "state": "VA",
+  "extraction_method": "state_workflow",
+  "workflow": "original_state_pipeline_with_targeted_browser_fallback",
+  "browser_evidence": [
+    {
+      "url": "https://mvendor.cgieva.com/Vendor/public/IVDetailsV2.jsp?rfp_id_lot=129312&rfp_id_round=1",
+      "snapshot_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-runs/live-browser-process-va-5fa60510-bfc3-4402-85e5-b9893de973bc/b2dcdfd6f9719512c51400a28b20b36da49ad57d94b3e9a9c409cd9d94b11913.png",
+      "snapshot_sha256": "8f324ef57a3cd9a09875674c03c4ef170a2c9a1010c64e2eb5b68437a52e4e68",
+      "purpose": "supplementary_browser_evidence",
+      "browser_tab_left_open": true
+    }
+  ],
+  "quality_issues": [
+    "manual_browser_verification_required: https://mvendor.cgieva.com/Vendor/public/IVDetailsV2.jsp?rfp_id_lot=129312&rfp_id_round=1",
+    "supplementary_evidence: manual_browser_verification_required: https://mvendor.cgieva.com/Vendor/public/IVDetailsV2.jsp?rfp_id_lot=129312&rfp_id_round=1"
+  ],
+  "database_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-runs/live-browser-process-va-5fa60510-bfc3-4402-85e5-b9893de973bc/opportunities_VA.db",
+  "discovered_records": 15,
+  "selected_records": 1,
+  "hydrated_records": 1,
+  "structured_data": [
+    {
+      "id": 1,
+      "solicitation_number": "RFP 129312-1",
+      "title": "Bond Counsel",
+      "agency": "Virginia Resources Authority -Virginia",
+      "opening_date": null,
+      "closing_date": "10/30/26 3:00 PM Time Left: 12 days, 19 hours Bond Counsel RFP RFP Prof Serv Closing On: 10/30/26 3:00 PM Time Left: 12 days, 19 hours View Opportunity Add to Favorites View Opportunity Add to Favorites",
+      "description": "",
+      "contact_name": null,
+      "contact_email": null,
+      "contact_phone": null,
+      "commodity_codes": "[]",
+      "attachments": "[]",
+      "url": "https://mvendor.cgieva.com/Vendor/public/IVDetailsV2.jsp?rfp_id_lot=129312&rfp_id_round=1",
+      "state": "VA",
+      "normalized_at": "2026-10-17T23:03:23.787952+00:00"
+    }
+  ],
+  "review_required": true,
+  "requested_max_pages": 1,
+  "max_details": 1,
+  "discovery_page_limit_supported": true,
+  "status": "evidence_requires_review"
+}

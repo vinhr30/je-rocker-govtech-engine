@@ -1,0 +1,687 @@
+{
+  "id": "paired-review-20261017-123020",
+  "page": 2,
+  "total_pages": 446,
+  "url": "https://sam.gov/search/?index=opp&page=2&pageSize=100&sort=-modifiedDate&sfm%5BsimpleSearch%5D%5BkeywordRadio%5D=ALL&sfm%5BsimpleSearch%5D%5BkeywordTags%5D%5B0%5D%5Bkey%5D=*&sfm%5BsimpleSearch%5D%5BkeywordTags%5D%5B0%5D%5Bvalue%5D=*&sfm%5BsimpleSearch%5D%5BkeywordEditorTextarea%5D=&sfm%5Bstatus%5D%5Bis_active%5D=true",
+  "snapshot_sha256": "04e2c1f63310baee855fc7f0e56f02942ec4420e0059cb4484697cf33ff57b6e",
+  "processed_by": "Mac-Mal.local",
+  "model": "Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf",
+  "execution_time": 238.074,
+  "structured_data": [
+    {
+      "solicitation_number": "SPF7M126U6178",
+      "title": "59--TRANSFORMER,CURRENT",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPF8ED27T0040",
+      "title": "81--SUPPORT,SHIPPING AND STORAGE CONTAIN",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPF7M126U6146",
+      "title": "59--CLAMP,CABLE,ELECTRICAL CONNECTOR",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPF7L326T280Q",
+      "title": "53--PARTS KIT,SEAL REPLACEMENT,MACHIN",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPF7M127U0007",
+      "title": "59--DISCHARGER,ELECTROSTATIC",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPF7M126U6059",
+      "title": "59--RETAINER,ELECTRICAL CONNECTOR",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6059",
+      "title": "59--RETAINER,ELECTRICAL CONNECTOR",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L426U1306",
+      "title": "29--MUFFLER,EXHAUST",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L327T0134",
+      "title": "53--GASKET",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6073",
+      "title": "53--SEAL",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A626U4037",
+      "title": "53--BOLT,MACHINE",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6397",
+      "title": "43--FILTER,FLUID",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A627U0004",
+      "title": "53--RECEPTACLE,TURNLOCK FASTENER",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A627U0004",
+      "title": "53--RECEPTACLE,TURNLOCK FASTENER",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U006V",
+      "title": "25--SPINDLE,WHEEL,DRIVING-NONDRIVING",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L127T0280",
+      "title": "53--PACKING ASSEMBLY",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U5576",
+      "title": "47--HOSE ASSEMBLY,NONMETALLIC",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U007D",
+      "title": "53--GASKET",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8E927T0125",
+      "title": "41--COOLING COIL,AIR,DUCT TYPE",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6415",
+      "title": "43--PARTS KIT,RECIPICATING PUMP",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6415",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6420",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U005S",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U009A",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6211",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8E527T0117",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L126U0643",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "53--SEAL,PLAIN",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "61--CABLE ASSEMBLY,POWER,ELECTRICAL,BRAN",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "59--RELAY,ELECTROMAGNETIC",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "47--COUPLING ASSEMBLY,QUICK DISCONNECT",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "47--STRAINER ELEMENT,SEDIMENT",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "53--PLUG,VENT",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "30--CONNECTING LINK,RIG",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L126T670R",
+      "title": "Notice ID: SPE7L126T670R",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6125",
+      "title": "59--ANTENNA",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE300-27-D-4111",
+      "title": "Europe Zone 4 Afloat J&A",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U008D",
+      "title": "53--CATCH,FLUSH",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A726T212X",
+      "title": "58--PANEL,CONTROL,ELECT",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L426U1297",
+      "title": "25--PARTS KIT,AIR,HYDRAULIC BRAKE SLAVE",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L127U0003",
+      "title": "53--SEAL,NONMETALLIC SPECIAL SHAPED SECT",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M127T0091",
+      "title": "43--RING,WEARING",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M127T0091",
+      "title": "43--RING,WEARING",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M27T0118",
+      "title": "48--VALVE ASSEMBLY,MANIFOLD",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M426U0426",
+      "title": "59--CONNECTOR,PLUG,ELECTRICAL",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L326T218D",
+      "title": "30--COUPLING,SHAFT,FLEX",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M426T368B",
+      "title": "47--HOSE ASSEMBLY,NONME",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L426U1305",
+      "title": "53--SEAL,HATCH RIM",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M426T166G",
+      "title": "47--TUBE,METALLIC",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "47QRRAA18D00BQ75D30126F21594",
+      "title": "Medicaid Data Analysis for Bacterial Respiratory Pathogens and Information Systems",
+      "closing_date": "October 31, 2026 at 08:00 AM MST",
+      "primary_agency": "HEALTH AND HUMAN SERVICES, DEPARTMENT OF"
+    },
+    {
+      "solicitation_number": "SPE4A727T0447",
+      "title": "16--GRIP ASSEMBLY, CONTROLLER, AIRCRAFT",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U007Z",
+      "title": "53--RETAINER, PACKING",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8E627T0066",
+      "title": "42--PARTS KIT, OXYGEN MASK",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U5906",
+      "title": "59--RELAY, ELECTROMAGNETIC",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A727T0388",
+      "title": "53--MOUNT, RESILIENT, WEAPON SYSTEM",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L126U0783",
+      "title": "53--PACKING ASSEMBLY",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6393",
+      "title": "61--DISTRIBUTION BOX",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L427U0009",
+      "title": "25--ROD, SPLASH GUARD",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L426U1304",
+      "title": "61--CONDITIONER, CHARGER, BATTERY",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A627T1279",
+      "title": "53--WASHER, PRELOADING",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L426U1289",
+      "title": "29--PARTS KIT, ELECTRICAL ENGINE STARTER",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7MC26T176D",
+      "title": "48--VALVE, BALL",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L426U1289",
+      "title": "59--CAPACITOR, FIXED, PAPER DIELECTRIC",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M26176D",
+      "title": "Notice ID: SPE7M26176D",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6052",
+      "title": "59--CAPACITOR,FIXED,PAPER DIELECTRIC",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8E927T0065",
+      "title": "42--FACEPIECE,BREATHING EQUIPMENT",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L126U0758",
+      "title": "47--HOSE ASSEMBLY,NONMETALLIC",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U4321",
+      "title": "66--METER,ARBITRARY SCALE",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U006R",
+      "title": "25--CONTROL,DIRECTIONAL SIGNAL ARM",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6853",
+      "title": "43--AIR CLEANER,INTAKE",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U007X",
+      "title": "25--PANEL,BODY,VEHICULAR",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6178",
+      "title": "59--TRANSFORMER,CURRENT",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8ED27T0040",
+      "title": "51--SUPPORT,SHIPPING AND STORAGE CONTENT",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6146",
+      "title": "59--CLAMP,CABLE,ELECTRICAL CONNECTOR",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L326T280Q",
+      "title": "53--PARTS KIT,SEAL REPLACEMENT,MECHANICA",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L326T280Q",
+      "title": "53--PARTS KIT, SEAL REPLACEMENT, MECHANICAL",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M127U0007",
+      "title": "59--DISCHARGER, ELECTROSTATIC",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6059",
+      "title": "59--RETAINER, ELECTRICAL CONNECTOR",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L426U1306",
+      "title": "29--MUFFLER, EXHAUST",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A626U4037",
+      "title": "53--BOLT, MACHINE",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A626U4037",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "350,000.00...",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6397",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "28000.00...",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A677U0004",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "44170.00...",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U006V",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "32000.00...",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L127U576",
+      "title": "HOSE ASSEMBLY,NONMETALLIC",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U007D",
+      "title": "GASKET",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE5E927T0125",
+      "title": "COOLING COIL,AIR,DUCT TYPE",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8E927T0125",
+      "title": "41--COOLING COIL,AIR,DUCT TYPE",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6415",
+      "title": "43--PARTS KIT,RECIPIRATING PUMP",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6420",
+      "title": "59--CIRCUIT CARD ASSEMBLY",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U005S",
+      "title": "30--INSERT,FLEXIBLE COUPLING",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L426T7069",
+      "title": "59--ELECTRONIC COMPONENTS ASSEMBLY",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U009A",
+      "title": "25--DOOR,VEHICULAR",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6211",
+      "title": "59--AMPLIFIER,AUDIO FREQUENCY",
+      "closing_date": null,
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE8E527T0117",
+      "title": "Welding Powder, Metallic Overlay",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L126U0643",
+      "title": "Seal, Plain",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A626T36BQ",
+      "title": "Cable Assembly, Power, Electrical, Bran",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6011",
+      "title": "Relay, Electromagnetic",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M327T0070",
+      "title": "Coupling Assembly, Quick Disconnect",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M327T0081",
+      "title": "Strainer Element, Sediment",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U008U",
+      "title": "Plug, Vent",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U008U",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L126T670R",
+      "title": "Not specified",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7M126U6125",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE300-27-D-4111",
+      "title": "Bridge Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7LX26U008D",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE4A726T212X",
+      "title": "Not specified",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "SPE7L426U1297",
+      "title": "Indefinite Delivery Contract",
+      "closing_date": "Not specified",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "53--SEAL,NONMETALLIC SPECIAL SHAPED SECT",
+      "title": "53--SEAL,NONMETALLIC SPECIAL SHAPED SECT",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "43--RING,WEARING",
+      "title": "43--RING,WEARING",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "48--VALVE ASSEMBLY,MANIFOLD",
+      "title": "48--VALVE ASSEMBLY,MANIFOLD",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    },
+    {
+      "solicitation_number": "59--CONNECTOR,PLUG, ELECTRICAL",
+      "title": "59--CONNECTOR,PLUG, ELECTRICAL",
+      "closing_date": "Oct 16, 2026",
+      "primary_agency": "DEPT OF DEFENSE"
+    }
+  ],
+  "image_sections": 17,
+  "review_required": true,
+  "timestamp": 1792265990.4085839
+}

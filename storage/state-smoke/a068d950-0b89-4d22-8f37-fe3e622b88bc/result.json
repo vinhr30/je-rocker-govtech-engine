@@ -1,0 +1,14 @@
+{
+  "state": "CA",
+  "extraction_method": "state_workflow",
+  "database_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-smoke/a068d950-0b89-4d22-8f37-fe3e622b88bc/opportunities_CA.db",
+  "discovered_records": 0,
+  "selected_records": 0,
+  "hydrated_records": 0,
+  "structured_data": [],
+  "review_required": true,
+  "requested_max_pages": 1,
+  "max_details": 1,
+  "discovery_page_limit_supported": false,
+  "status": "no_records_requires_review"
+}

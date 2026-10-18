@@ -1,0 +1,43 @@
+{
+  "state": "VA",
+  "extraction_method": "state_workflow",
+  "transport": "persistent_chrome_dom_snapshot",
+  "structured_data": [
+    {
+      "solicitation_number": "RFP 129312-1",
+      "title": "Bond Counsel",
+      "agency": "Virginia Resources Authority -Virginia",
+      "closing_date_raw": "10/30/26 3:00 PM Time Left: 12 days, 21 hours Bond Counsel RFP RFP Prof Serv Closing On: 10/30/26 3:00 PM Time Left: 12 days, 21 hours View Opportunity Add to Favorites View Opportunity Add to Favorites",
+      "status": "Open",
+      "detail_url": "https://mvendor.cgieva.com/Vendor/public/IVDetailsV2.jsp?rfp_id_lot=129312&rfp_id_round=1",
+      "raw_text": "Bond Counsel Status: Open RFP 129312-1 Virginia Resources Authority -Virginia Closing On: 10/30/26 3:00 PM Time Left: 12 days, 21 hours Bond Counsel RFP RFP Prof Serv Closing On: 10/30/26 3:00 PM Time Left: 12 days, 21 hours View Opportunity Add to Favorites View Opportunity Add to Favorites"
+    }
+  ],
+  "discovered_records": 15,
+  "selected_records": 1,
+  "hydrated_records": 0,
+  "evidence": [
+    {
+      "snapshot_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-browser-tests/ffb2f482-eadf-43ea-941a-df00979dc2a3/listing_1.png",
+      "dom_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-browser-tests/ffb2f482-eadf-43ea-941a-df00979dc2a3/listing_1.json",
+      "snapshot_sha256": "8d9ca8cf56a705e1fe7767dcefb899d5ac3b1d90fc2f019b725aafde34d82df3",
+      "dom_sha256": "b8053117fe0f80494c77b8606d377d237c2f223b8bcaaba9e353c545a37ca7f9",
+      "url": "https://mvendor.cgieva.com/Vendor/public/AllOpportunities.jsp"
+    },
+    {
+      "snapshot_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-browser-tests/ffb2f482-eadf-43ea-941a-df00979dc2a3/detail_1.png",
+      "dom_path": "/Users/vinhrocker/Desktop/Dashboard/storage/state-browser-tests/ffb2f482-eadf-43ea-941a-df00979dc2a3/detail_1.json",
+      "snapshot_sha256": "8f324ef57a3cd9a09875674c03c4ef170a2c9a1010c64e2eb5b68437a52e4e68",
+      "dom_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "url": "https://mvendor.cgieva.com/Vendor/public/IVDetailsV2.jsp?rfp_id_lot=129312&rfp_id_round=1"
+    }
+  ],
+  "quality_issues": [
+    "manual_detail_verification_required"
+  ],
+  "review_required": true,
+  "status": "requires_manual_review",
+  "requested_max_pages": 1,
+  "max_details": 1,
+  "browser_tab_left_open": true
+}
